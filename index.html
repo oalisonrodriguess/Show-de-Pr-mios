@@ -217,9 +217,9 @@
                 <div id="main-title" contenteditable="true" class="text-2xl sm:text-3xl font-black text-sky-400 leading-tight focus:outline-none focus:ring-2 ring-sky-500 rounded-lg px-2">
                     <!-- Será preenchido pelo JS -->
                 </div>
-                 <div id="connection-indicator" class="flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-white text-xs font-bold transition-all duration-500 bg-red-500 mt-2 mx-auto">
-                    <div class="w-2 h-2 rounded-full bg-white"></div>
-                    <span id="connection-status-text" data-label-key="connectionIndicatorDisconnected">Desconectado</span>
+                 <div id="connection-indicator" title="Tentando conectar ao servidor..." class="flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-white text-xs font-bold transition-all duration-500 bg-blue-500 mt-2 mx-auto">
+                    <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                    <span id="connection-status-text">Conectando...</span>
                 </div>
             </div>
         </header>
@@ -574,8 +574,6 @@
         // Objeto para todos os textos customizáveis (i18n)
         let appLabels = {
             mainTitle: "Show de Prêmios",
-            connectionIndicatorConnected: "Conectado",
-            connectionIndicatorDisconnected: "Desconectado",
             howToUseTitle: "🎬 Como Usar?",
             howToUseButton: "Em Breve!",
             versionHistoryButton: "Histórico de Versões",
@@ -2662,25 +2660,43 @@
         }
 
         async function startApp() {
+            const indicator = DOMElements.connectionIndicator;
+            const indicatorText = DOMElements.connectionStatusText;
+            const dot = indicator.querySelector('div');
+
             try {
-                 const firebaseConfig = { apiKey: "AIzaSyDULAgBMD6g__7TuLgNIrjsEyC9es_gEZg", authDomain: "show-de-premios-65d20.firebaseapp.com", projectId: "show-de-premios-65d20", storageBucket: "show-de-prêmios-65d20.appspot.com", messagingSenderId: "454374708177", appId: "1:454374708177:web:7372a5fe967277973006f0", measurementId: "G-43DSKKVD0P" };
+                const firebaseConfig = { apiKey: "AIzaSyDULAgBMD6g__7TuLgNIrjsEyC9es_gEZg", authDomain: "show-de-premios-65d20.firebaseapp.com", projectId: "show-de-premios-65d20", storageBucket: "show-de-prêmios-65d20.appspot.com", messagingSenderId: "454374708177", appId: "1:454374708177:web:7372a5fe967277973006f0", measurementId: "G-43DSKKVD0P" };
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
+
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
                         dbRef = doc(db, 'artifacts', 'show-de-prêmios-netlify', 'users', userId);
                         firebaseReady = true;
-                        DOMElements.connectionIndicator.classList.replace('bg-red-500', 'bg-green-500');
-                        DOMElements.connectionStatusText.textContent = appLabels.connectionIndicatorConnected;
+
+                        // Estado: Online (Nuvem)
+                        indicator.className = 'flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-white text-xs font-bold transition-all duration-500 bg-green-500 mt-2 mx-auto';
+                        dot.className = 'w-2 h-2 rounded-full bg-white';
+                        indicatorText.textContent = 'Online (Nuvem)';
+                        indicator.title = 'Conectado! Seu progresso está sendo salvo na nuvem.';
+                        
                         await loadStateFromFirestore(); 
                     }
                 });
                 await signInAnonymously(auth);
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                showAlert("Falha ao conectar com o banco de dados. O progresso não será salvo.");
+                
+                // Estado: Modo Offline (Local)
+                indicator.className = 'flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-white text-xs font-bold transition-all duration-500 bg-yellow-500 mt-2 mx-auto';
+                dot.className = 'w-2 h-2 rounded-full bg-white';
+                indicatorText.textContent = 'Modo Offline (Local)';
+                indicator.title = 'Não foi possível conectar. O progresso NÃO será salvo.';
+                showAlert("Falha na conexão. O aplicativo está em modo offline e seu progresso não será salvo.");
+                
+                // Continua a execução do app em modo offline
                 applyLabels();
                 renderUIFromState();
             }
