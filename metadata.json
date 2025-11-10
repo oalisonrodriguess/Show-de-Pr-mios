@@ -1,0 +1,5 @@
+{
+  "name": "Show de Prêmios",
+  "description": "An interactive prize show and bingo application with features for managing rounds, drawing numbers, tracking winners, and customizing the game experience.",
+  "requestFramePermissions": []
+}
