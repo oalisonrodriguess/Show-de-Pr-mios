@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Show de Prêmios</title>
+    <title>Bingo Cloud (Show de Prêmios)</title>
     <!-- Carrega o Tailwind CSS para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Carrega a fonte Inter do Google Fonts -->
@@ -69,10 +69,17 @@
             50% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
         }
         .active-round-highlight {
-            animation: none; /* Remove a animação de pulso */
+            animation: pulse-border 2s infinite; /* Animação de pulso */
             border: 2px solid #10b981;
             transform: scale(1.02); /* Leve destaque visual */
             opacity: 1 !important; /* Garante que fique totalmente visível */
+        }
+
+        .playing-btn {
+            background-color: #16a34a !important; /* green-600 */
+        }
+        .playing-btn:hover {
+            background-color: #15803d !important; /* green-700 */
         }
 
         @keyframes fall-in-ball {
@@ -181,6 +188,21 @@
         [contenteditable="true"]:empty:before { content: attr(placeholder); color: #6b7280; pointer-events: none; display: block; }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
         .bingo-cell, .winner-card { cursor: pointer; }
+        .bingo-cell { position: relative; } /* Necessário para posicionar o indicador de patrocinador */
+
+        /* Indicador de Patrocinador no Painel de Números */
+        .bingo-cell.has-sponsor::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 10px;
+            height: 10px;
+            background-color: #f59e0b; /* amber-500 */
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.7);
+        }
 
         /* Esconde o seletor de cor padrão */
         input[type="color"] { -webkit-appearance: none; appearance: none; border: none; width: 24px; height: 24px; cursor: pointer; background-color: transparent; padding: 0; }
@@ -188,21 +210,36 @@
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 2px solid #9ca3af; border-radius: 50%; }
 
+        /* Animação de Texto Rolante */
+        @keyframes scroll-text {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-scroll-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .animate-scroll-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-text 10s linear infinite;
+        }
+
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-
+    <meta name="description" content="An interactive prize show and bingo application.">
     <canvas id="confetti-canvas"></canvas>
     
     <div class="flex flex-col min-h-screen">
         <header class="text-center py-4 flex-shrink-0 relative mt-6">
             <div class="flex flex-col items-center justify-center">
                 <!-- App Logo (será preenchido dinamicamente) -->
-                <div id="app-logo" class="w-16 h-16 sm:w-20 sm:h-20 mb-2">
+                <div id="app-logo" class="w-32 h-32 sm:w-48 sm:h-48 mb-2">
                     <!-- O logo customizado será inserido aqui, ou o SVG padrão será mostrado -->
                 </div>
                 
-                <div id="main-title" contenteditable="true" class="text-2xl sm:text-3xl font-black text-sky-400 leading-tight focus:outline-none focus:ring-2 ring-sky-500 rounded-lg px-2">
+                <div id="main-title" class="text-2xl sm:text-3xl font-black text-sky-400 leading-tight focus:outline-none focus:ring-2 ring-sky-500 rounded-lg px-2">
                     <!-- Será preenchido pelo JS -->
                 </div>
                  <div id="connection-indicator" title="Tentando conectar ao servidor..." class="flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-white text-xs font-bold transition-all duration-500 bg-blue-500 mt-2 mx-auto">
@@ -256,7 +293,7 @@
 
             </aside>
 
-            <!-- COLUNA CENTRAL: PAINEL, NÚMERO ANUNCIADO E BRINDES -->
+            <!-- COLUNA CENTRAL: PAINEL, NÚMERO ANUNCIado E BRINDES -->
             <div class="lg:col-span-3 flex flex-col gap-6">
                 <!-- PAINEL DE NÚMEROS -->
                 <section class="p-4 bg-gray-800 rounded-2xl shadow-xl">
@@ -358,7 +395,7 @@
                         <div class="relative">
                             <input type="number" id="auction-item-current-bid" placeholder="Lance Inicial (R$)" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
                             <div id="gavel-icon" class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hidden">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gavel" viewBox="0 0 16 16"><path d="M8.625 0a.627.627 0 0 0-.442.183L6.938 1.432c-.084.084-.15.18-.202.283-.146.285-.233.61-.233.957v.013a.626.626 0 0 0 .131.393l.394.437-3.931 3.932a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L8.53 4.101l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202l1.249-1.25a.627.627 0 0 0 .183-.442V1.25a.625.625 0 0 0-.625-.625h-2.5zm-2.43 3.362L4.35 1.517a.125.125 0 0 1 .088-.212h2.5a.125.125 0 0 1 .125.125v2.5a.125.125 0 0 1-.212.088L7.02 2.194l-2.828 2.828L5.38 3.834a.627.627 0 0 0-1.187-.22zM12.293.453l2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672.087-.957.233-.103-.052-.199-.118-.283-.202L11 2.828l2.02-2.02a.125.125 0 0 1 .177 0l-.884.884-3.931-3.931a.625.625 0 0 0 0-.884l-.043-.043a.625.625 0 0 0-.884 0L1.313 7.02l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.25-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013a1.625 1.625 0 0 0-.957.233c-.103.052-.199.118-.283.202L4.01 13.98l-2.122 2.12a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L4.938 15l1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118.283-.202L9.194 12l-2.828-2.828 1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118.283-.202l1.249-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672.087-.957.233-.103-.052-.199-.118-.283-.202L9.844 9l2.828-2.828L15.5 8.999a.625.625 0 0 0 .884 0l.043-.043a.625.625 0 0 0 0-.884L13.599 5.24l.414-.393a.625.625 0 0 0 .131-.393v-.013a1.625 1.625 0 0 0-.233-.957c-.052-.103-.118-.199-.202-.283L12.48.983a.627.627 0 0 0-.187-.217z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gavel" viewBox="0 0 16 16"><path d="M8.625 0a.627.627 0 0 0-.442.183L6.938 1.432c-.084.084-.15.18-.202.283-.146.285-.233.61-.233.957v.013a.626.626 0 0 0 .131.393l.394.437-3.931 3.932a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L8.53 4.101l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202l1.249-1.25a.627.627 0 0 0 .183-.442V1.25a.625.625 0 0 0-.625-.625h-2.5zm-2.43 3.362L4.35 1.517a.125.125 0 0 1 .088-.212h2.5a.125.125 0 0 1 .125.125v2.5a.125.125 0 0 1-.212.088L7.02 2.194l-2.828 2.828L5.38 3.834a.627.627 0 0 0-1.187-.22zM12.293.453l2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672-.087-.957.233-.103-.052-.199-.118-.283-.202L11 2.828l2.02-2.02a.125.125 0 0 1 .177 0l-.884.884-3.931-3.931a.625.625 0 0 0 0-.884l-.043-.043a.625.625 0 0 0-.884 0L1.313 7.02l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.25-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013a1.625 1.625 0 0 0-.957.233c-.103.052-.199.118-.283.202L4.01 13.98l-2.122 2.12a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L4.938 15l1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202L9.194 12l-2.828-2.828 1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.249-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672-.087-.957.233-.103-.052-.199-.118-.283-.202L9.844 9l2.828-2.828L15.5 8.999a.625.625 0 0 0 .884 0l.043-.043a.625.625 0 0 0 0-.884L13.599 5.24l.414-.393a.625.625 0 0 0 .131-.393v-.013a1.625 1.625 0 0 0-.233-.957c-.052-.103-.118-.199-.202-.283L12.48.983a.627.627 0 0 0-.187-.217z"/></svg>
                             </div>
                         </div>
                         <div class="flex items-center justify-center gap-2 pt-2">
@@ -414,7 +451,7 @@
         </main>
         <footer class="text-center py-4 px-4 text-xs text-gray-400 dark:text-gray-500">
             <p class="font-bold">Este programa é o resultado do Trabalho de Conclusão de Curso de <a href="https://www.instagram.com/oalison.rodrigues" target="_blank" class="text-sky-500 dark:text-sky-400 hover:underline">Alison Fernando Rodrigues dos Santos</a>, sob orientação do <a href="https://www.instagram.com/danilonobresant/" target="_blank" class="text-sky-500 dark:text-sky-400 hover:underline">Prof. Pe. Dr. Danilo Nobre</a>.</p>
-            <p class="mt-2">Título: "<a href="https://drive.google.com/file/d/1ePRuNoD-4jQZLrgFIanilhur3mB4-S19/view?usp=sharing" target="_blank" class="text-sky-500 dark:text-sky-400 hover:underline">E O VERBO SE FEZ I.A.?</a> DA REFLEXÃO TEOLÓGICA E COMUNICATIVA AO DESENVOLVIMENTO DE SOLUÇÕES PASTORAIS COM INTELIGÊNCIA ARTIFICIAL".</p>
+            <p class="mt-2">Título: "<a href="https://drive.google.com/file/d/1ePRuNoD-4jQZLrgFIanilhur3mB4-S19/view?usp?sharing" target="_blank" class="text-sky-500 dark:text-sky-400 hover:underline">E O VERBO SE FEZ I.A.?</a> DA REFLEXÃO TEOLÓGICA E COMUNICATIVA AO DESENVOLVIMENTO DE SOLUÇÕES PASTORAIS COM INTELIGÊNCIA ARTIFICIAL".</p>
             <p class="mt-2">Desenvolvido inteiramente com a Inteligência Artificial Gemini 2.5 PRO da Google, este projeto demonstra como é possível criar soluções pastorais inovadoras com criatividade e ferramentas de baixo custo ou gratuitas, mesmo sem conhecimentos prévios em programação.</p>
             <p class="mt-4">
                 Versão <span id="version" contenteditable="true" class="focus:outline-none focus:ring-2 ring-gray-600 rounded-lg px-2 inline-block"></span>
@@ -443,7 +480,9 @@
     <div id="donation-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div> 
     <div id="changelog-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
     <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
+    <div id="round-edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script type="module" src="index.tsx"></script>
 </body>
 </html>
