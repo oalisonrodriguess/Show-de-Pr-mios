@@ -138,6 +138,58 @@
             animation: gavel-strike-impact 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
             transform-origin: bottom right; /* Ponto de rotação aprimorado */
         }
+        
+        /* ANIMAÇÃO DE LANCE DO LEILÃO */
+        @keyframes bid-feedback {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-60px) scale(0.7); opacity: 0; }
+        }
+        .bid-feedback-animation {
+            position: absolute;
+            top: -30px; /* Posição inicial acima do campo de lance */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            font-weight: 900;
+            pointer-events: none;
+            animation: bid-feedback 1s ease-out forwards;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        /* Animação para Atualização do Lance do Leilão */
+        @keyframes bid-update {
+            0% { transform: scale(1); color: #fbbf24; /* amber-400 */ }
+            50% { transform: scale(1.15); color: #fde047; /* yellow-300 */ text-shadow: 0 0 15px #fde047;}
+            100% { transform: scale(1); color: #fbbf24; /* amber-400 */ }
+        }
+        .animate-bid-update {
+            animation: bid-update 0.4s ease-in-out;
+        }
+
+        /* Animação de Letreiro para Descrição da Rodada */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+        .marquee-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        /* Animação de Brilho para Prêmios */
+        @keyframes prize-glow {
+            0%, 100% { text-shadow: 0 0 5px rgba(251, 191, 36, 0.7); }
+            50% { text-shadow: 0 0 15px rgba(253, 224, 71, 1); }
+        }
+        .prize-highlight {
+            animation: prize-glow 3s ease-in-out infinite;
+        }
 
         /* Estilos específicos para ordenar as rodadas: Ativa no topo, Completa no final */
         #games-list {
@@ -210,21 +262,6 @@
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 2px solid #9ca3af; border-radius: 50%; }
 
-        /* Animação de Texto Rolante */
-        @keyframes scroll-text {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        .animate-scroll-container {
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .animate-scroll-text {
-            display: inline-block;
-            padding-left: 100%;
-            animation: scroll-text 10s linear infinite;
-        }
-
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -272,6 +309,9 @@
 
                 <!-- 2. BOTÕES DE CONTROLE GERAIS -->
                 <div class="flex flex-col gap-2 mb-4 flex-shrink-0">
+                    <button id="save-local-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="saveToFileButton">Salvar no Computador</button>
+                    <label for="load-local-input" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all text-center cursor-pointer" data-label-key="loadFromFileButton">Carregar do Computador</label>
+                    <input type="file" id="load-local-input" class="hidden" accept=".json,application/json">
                     <button id="interval-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="intervalButton">Intervalo</button>
                     <button id="share-btn" class="hidden w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-base shadow-lg transition-all" data-label-key="generateProofButton">Gerar Prova</button>
                     <button id="end-event-btn" class="hidden w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="endEventButton">Encerrar Evento</button>
@@ -299,9 +339,27 @@
                 <section class="p-4 bg-gray-800 rounded-2xl shadow-xl">
                     <h2 class="text-xl font-bold mb-4 text-center text-slate-300" data-label-key="bingoBoardTitle">Painel de Números</h2>
                     
-                    <!-- INDICADOR DE RODADA ATIVA -->
-                    <div id="current-round-display" class="text-lg font-bold text-center text-sky-400 bg-gray-700 py-2 rounded-lg mb-4 transition-all shadow-inner">
-                        <!-- Conteúdo dinâmico via JS -->
+                    <!-- NOVO PAINEL DE RODADA ATIVA -->
+                    <div id="active-round-panel" class="bg-gray-700 rounded-lg mb-4 p-6 text-center transition-all shadow-inner hidden cursor-pointer hover:bg-gray-600" title="Clique para editar prêmios e descrição">
+                        <div class="grid grid-cols-3 items-center gap-x-4">
+                            <div id="active-round-info" class="text-left">
+                                <p id="active-round-name" class="text-3xl font-bold text-sky-400"></p>
+                                <p class="text-sm text-slate-400 mt-1"><span id="active-round-date"></span> - <span id="active-round-time"></span></p>
+                            </div>
+                            <div id="active-round-prizes" class="text-center border-x border-gray-600 px-4 text-lg prize-highlight">
+                                <!-- Prêmios serão inseridos aqui -->
+                            </div>
+                            <div id="active-round-stats" class="text-right">
+                                <p class="text-sm text-slate-400">Números Sorteados</p>
+                                <p id="active-round-called-count" class="text-3xl font-bold text-white"></p>
+                            </div>
+                        </div>
+                        <div id="active-round-description-display" class="marquee-container text-slate-300 text-base mt-3 pt-3 border-t border-gray-600 hidden text-left italic">
+                            <span class="marquee-text"></span>
+                        </div>
+                    </div>
+                    <div id="no-active-round-panel" class="text-lg font-bold text-center text-slate-400 bg-gray-700 py-4 rounded-lg mb-4 transition-all shadow-inner">
+                        Selecione uma Rodada
                     </div>
                     
                     <!-- NOVO: Wrapper para aplicar o zoom (com overflow-x-auto para evitar sobreposição) -->
@@ -325,13 +383,13 @@
                         
                         <!-- Slider de Zoom PAINEL DE NÚMEROS -->
                         <div class="mb-3">
-                            <label for="board-zoom-slider" class="block text-xs font-bold text-slate-400 mb-1" data-label-key="boardScaleLabel">Escala Painel Números</label>
+                            <label for="board-zoom-slider" class="block text-xs font-bold text-slate-400 mb-1" data-label-key="boardScaleLabel">Escala Painel Números (<span id="board-zoom-value">100</span>%)</label>
                             <input type="range" id="board-zoom-slider" min="50" max="150" value="100" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg">
                         </div>
 
                         <!-- Slider de Zoom NÚMERO ANUNCIADO -->
                         <div class="mb-3">
-                            <label for="display-zoom-slider" class="block text-xs font-bold text-slate-400 mb-1" data-label-key="displayScaleLabel">Escala Número Anunciado</label>
+                            <label for="display-zoom-slider" class="block text-xs font-bold text-slate-400 mb-1" data-label-key="displayScaleLabel">Escala Número Anunciado (<span id="display-zoom-value">100</span>%)</label>
                             <input type="range" id="display-zoom-slider" min="50" max="150" value="100" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg">
                         </div>
 
@@ -352,11 +410,11 @@
                     </div>
                     
                     <!-- NÚMERO ANUNCIADO -->
-                    <div class="lg:col-span-3 bg-gray-800 rounded-2xl shadow-2xl p-6 flex flex-col justify-center items-center">
+                    <div class="lg:col-span-3 bg-gray-800 rounded-2xl shadow-2xl p-6 flex flex-col justify-center items-center h-full">
                         <p id="main-display-label" class="text-xl sm:text-2xl font-bold text-slate-400 tracking-wider uppercase" data-label-key="announcedNumberLabel">Número Anunciado</p>
                         <!-- Wrapper do Zoom para o Número Anunciado -->
                         <div id="current-number-wrapper" class="my-4 flex justify-center items-center w-full">
-                            <div id="current-number" class="font-black text-gray-800 flex justify-center items-center gap-x-2 sm:gap-x-4 w-64 h-64 sm:w-[420px] sm:h-[420px] rounded-full bg-slate-50 shadow-inner" style="font-size: clamp(6rem, 25vw, 15rem); line-height: 1; visibility: hidden;"></div>
+                            <div id="current-number" class="font-black flex justify-center items-center gap-x-2 sm:gap-x-4 rounded-full w-64 h-64 sm:w-80 sm:h-80" style="font-size: clamp(6rem, 25vw, 15rem); line-height: 1; visibility: hidden;"></div>
                         </div>
                         <div class="mt-4 text-center">
                             <h3 class="text-xl font-bold text-slate-300 mb-3" data-label-key="lastNumbersLabel">Últimos 5 Números</h3>
@@ -393,6 +451,7 @@
                     <form id="auction-form" class="space-y-3 max-w-lg mx-auto">
                         <input type="text" id="auction-item-name" placeholder="Nome do Item" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
                         <div class="relative">
+                            <div id="bid-feedback-container" class="absolute inset-0 flex justify-center items-center"></div>
                             <input type="number" id="auction-item-current-bid" placeholder="Lance Inicial (R$)" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
                             <div id="gavel-icon" class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hidden">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gavel" viewBox="0 0 16 16"><path d="M8.625 0a.627.627 0 0 0-.442.183L6.938 1.432c-.084.084-.15.18-.202.283-.146.285-.233.61-.233.957v.013a.626.626 0 0 0 .131.393l.394.437-3.931 3.932a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L8.53 4.101l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202l1.249-1.25a.627.627 0 0 0 .183-.442V1.25a.625.625 0 0 0-.625-.625h-2.5zm-2.43 3.362L4.35 1.517a.125.125 0 0 1 .088-.212h2.5a.125.125 0 0 1 .125.125v2.5a.125.125 0 0 1-.212.088L7.02 2.194l-2.828 2.828L5.38 3.834a.627.627 0 0 0-1.187-.22zM12.293.453l2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672-.087-.957.233-.103-.052-.199-.118-.283-.202L11 2.828l2.02-2.02a.125.125 0 0 1 .177 0l-.884.884-3.931-3.931a.625.625 0 0 0 0-.884l-.043-.043a.625.625 0 0 0-.884 0L1.313 7.02l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.25-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013a1.625 1.625 0 0 0-.957.233c-.103.052-.199.118-.283.202L4.01 13.98l-2.122 2.12a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L4.938 15l1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202L9.194 12l-2.828-2.828 1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.249-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672-.087-.957.233-.103-.052-.199-.118-.283-.202L9.844 9l2.828-2.828L15.5 8.999a.625.625 0 0 0 .884 0l.043-.043a.625.625 0 0 0 0-.884L13.599 5.24l.414-.393a.625.625 0 0 0 .131-.393v-.013a1.625 1.625 0 0 0-.233-.957c-.052-.103-.118-.199-.202-.283L12.48.983a.627.627 0 0 0-.187-.217z"/></svg>
@@ -409,10 +468,13 @@
                         <!-- LANCE ATUAL EM DESTAQUE -->
                         <div class="text-center mt-4">
                             <p class="text-slate-400 text-lg uppercase tracking-wider">Lance Atual</p>
-                            <p id="auction-current-bid-display" class="font-black text-amber-400 text-7xl sm:text-8xl transition-transform duration-200 ease-in-out" style="text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);">R$ 0</p>
+                            <p id="auction-current-bid-display" class="font-black text-amber-400 text-7xl sm:text-8xl transition-all duration-200" style="text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);">R$ 0</p>
                         </div>
                         <input type="text" id="auction-winner-name" placeholder="Nome do Arrematador" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
-                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg mt-1" data-label-key="sellItemButton">Vender Item</button>
+                        <div class="flex gap-2">
+                            <button type="button" id="reset-auction-btn" class="w-1/3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg">Limpar</button>
+                            <button type="submit" class="w-2/3 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg" data-label-key="sellItemButton">Vender Item</button>
+                        </div>
                     </form>
                 </section>
             </div>
@@ -429,10 +491,10 @@
                 <!-- 3. RODADAS E PRÊMIOS (CONTEÚDO FLEXÍVEL) -->
                 <div class="bg-gray-800 rounded-2xl shadow-xl p-6 flex-grow flex flex-col">
                         <h2 class="text-2xl font-bold text-slate-300 mb-4 flex-shrink-0" data-label-key="roundsAndPrizesTitle">Rodadas e Prêmios</h2>
+                        <!-- BOTÃO ADICIONAR RODADA EXTRA -->
+                        <button id="add-extra-game-btn" class="w-full bg-sky-700 hover:bg-sky-800 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all mb-4 flex-shrink-0" data-label-key="addExtraRoundButton">Adicionar Rodada Extra</button>
                         <!-- A lista de jogos continua rolável, mas agora ocupa a altura do pai que está esticado -->
                         <div id="games-list" class="space-y-3 pr-2 flex-grow overflow-y-auto"></div>
-                        <!-- BOTÃO ADICIONAR RODADA EXTRA -->
-                        <button id="add-extra-game-btn" class="w-full bg-sky-700 hover:bg-sky-800 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all mt-4 flex-shrink-0" data-label-key="addExtraRoundButton">Adicionar Rodada Extra</button>
                 </div>
 
                 <!-- 4. INSCREVA-SE NO CANAL (FIXO NO FINAL) -->
@@ -478,6 +540,7 @@
     <div id="reset-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
     <div id="drawn-prizes-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
     <div id="donation-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div> 
+    <div id="final-winners-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
     <div id="changelog-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
     <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
     <div id="round-edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
