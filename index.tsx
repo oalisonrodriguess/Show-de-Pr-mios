@@ -122,7 +122,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             drawnTextStrokeColor: '#000000',
             drawnTextStrokeWidth: 2,
             isEventClosed: false,
-            customLogoBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYCAYAAAC+ORIOAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAACAAElEQVRYw+ydnXMVRbbAn3v3vfO+fG7eG8i3SFAIj8CEQCAEAgEIdYgEFAiBwCAE9l7YiQECAnsvGNi7D8iAgQECgoRukvfnuu6p6a6unqlndqZnZ+b+aD2d6VnVE6e+Vb169eoNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzäs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4Y-Y-aho ha+1S3sAAAAASUVORK5CYII=',
+            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0zODIgMjE5QzM4MiAyMTEuODIgMzgyIDE5Ny42NCAzNzUuNDUgMTg4LjU2MkMzNjguOSAxNzkuNDg0IDM1Ny42MiAxNzYgMzM1IDE3NkgxNzdDMTU0LjM4IDE3NiAxNDMuMSAxNzkuNDg0IDEzNi41NSAxODguNTYyQzEzMCAxOTcuNjQgMTMwIDIxMS44MiAxMzAgMjE5VjI5M0MxMzAgMzAwLjE4IDEzMCAzMTQuMzYgMTM2LjU1IMzIzLjQzOEMxNDMuMSAzMzIuNTM2IDE1NC4zOCAzMzYgMTc3IDMzNkgzMzVDMzU3LjYyIDMzNiAzNjguOSAzMzIuNTM2IDM3NS40NSAzMjMuNDM4QzM4MiAzMTQuMzYgMzgyIDMwMC4xOCAzODIgMjkzVjIxOVoiIGZpbGw9IiMwMzg3RjAiLz4KPHBhdGggZD0iTTI1NiAzODJDMzI4Ljc1NSAzODIgMzg2IDMyNC43NTUgMzg2IDI1MkMzODYgMTc5LjI0NSAzMjguNzU1IDEyMiAyNTYgMTIyQzE4My4yNDUgMTIyIDEyNiAxNzkuMjQ1IDEyNiAyNTJDMTI2IDMyNC4zNTUgMTgzLjI0NSAzODIgMjU2IDM4MloiIGZpbGw9IiNGRkRFMDAiIHN0cm9rZT0iIzAyODdGNiIgc3Ryb2tlLXdpZHRoPSIxMiIvPgo8cGF0aCBkPSJNMjU2IDIwNy43MDhMMjc0LjYyNCAyNDUuNDU2TDMxNi4zNDEgMjUxLjY5N0wyODYuOTgzIDI4MC4zMDhMMjk1LjI1IDMyMS44NDJMMjU2IDI4Mi45NTRMMjE2Ljc1IDMyMS44NDJMMjI1LjAxNyAyODAuMzA4TDE5NS42NTkgMjUxLjY5N0wyMzcuMzc2IDI0NS40NTZMMjU2IDIwNy43MDhaIiBmaWxsPSIjRkZBRDAwIi8+Cjwvc3ZnPgo=',
             enableSponsorsByNumber: false,
             enableModalAutoclose: true,
             modalAutocloseSeconds: 2,
@@ -1100,6 +1100,10 @@ function applyDisplayZoom(scale: number) {
             try {
                 const appState = getAppState();
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appState));
+                 if (isLocalMode) {
+                    const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    DOMElements.connectionStatusText.textContent = `Modo Local (Salvo às ${time})`;
+                }
             } catch (error) {
                 console.error("Falha ao salvar estado no localStorage:", error);
             }
@@ -1130,6 +1134,8 @@ function applyDisplayZoom(scale: number) {
             const appState = getAppState();
             try {
                 await setDoc(dbRef, appState);
+                const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                DOMElements.connectionStatusText.textContent = `Conectado (Salvo às ${time})`;
                 renderUpdateInfo(); 
 
                 if (areAllGamesComplete() && !appConfig.isEventClosed) { 
@@ -1209,27 +1215,46 @@ function applyDisplayZoom(scale: number) {
 
         function renderUIFromState() {
             renderCustomLogo();
-            renderMasterBoard(); 
+            // 1. Primeiro, renderiza o painel em seu estado padrão. Isso cria os elementos.
+            renderMasterBoard();
             DOMElements.gamesListEl.innerHTML = '';
-            
+        
+            // 2. Renderiza a lista de rodadas.
             if (Object.keys(gamesData).length > 0) {
                 const sortedGameNumbers = Object.keys(gamesData).filter(key => !isNaN(parseInt(key))).sort((a, b) => parseInt(a) - parseInt(b));
                 for (const gameNum of sortedGameNumbers) {
                     if (gamesData[gameNum] && typeof gamesData[gameNum] === 'object') {
                         const gameEl = createGameElement(parseInt(gameNum), gamesData[gameNum].prizes);
                         DOMElements.gamesListEl.appendChild(gameEl);
-                        // FIX: Added missing function call to 'updateGameItemUI' to resolve "Cannot find name" error.
-                        if (gamesData[gameNum].isComplete) updateGameItemUI(gameEl, true);
-                        // FIX: Added missing function call to 'updateGameItemUI' to resolve "Cannot find name" error.
-                        else updateGameItemUI(gameEl, false);
+                        updateGameItemUI(gameEl, gamesData[gameNum].isComplete);
                     }
                 }
             }
-            
+        
+            // 3. Renderiza a lista de vencedores.
+            renderAllWinners();
+            renderShortcutsLegend();
+        
+            // 4. Configura os controles da UI (sliders, etc.).
+            if (Object.values(gamesData).some(game => (game as any).winners && (game as any).winners.length > 0)) {
+                DOMElements.shareBtn.classList.remove('hidden');
+                DOMElements.endEventBtn.classList.remove('hidden');
+            }
+        
+            const boardZoomSlider = document.getElementById('board-zoom-slider') as HTMLInputElement;
+            const displayZoomSlider = document.getElementById('display-zoom-slider') as HTMLInputElement;
+            if (boardZoomSlider) boardZoomSlider.value = appConfig.boardScale.toString();
+            if (displayZoomSlider) displayZoomSlider.value = appConfig.displayScale.toString();
+            applyBoardZoom(appConfig.boardScale);
+            applyDisplayZoom(appConfig.displayScale);
+        
+            DOMElements.noRepeatPrizeDrawCheckbox.checked = true;
+        
+            // 5. AGORA, após toda a estrutura da UI ser construída, aplica o estado da rodada ativa.
+            // Isso garante que todos os elementos estejam no DOM antes de tentarmos modificá-los.
             document.querySelectorAll('.game-item').forEach(el => el.classList.remove('active-round-highlight'));
-            
             if (activeGameNumber && gamesData[activeGameNumber]) {
-                loadRoundState(activeGameNumber);
+                // Estiliza o botão da rodada ativa primeiro
                 const activeGameItem = DOMElements.gamesListEl.querySelector(`.game-item[data-game-number="${activeGameNumber}"]`);
                 if (activeGameItem) {
                     activeGameItem.classList.add('active-round-highlight');
@@ -1238,29 +1263,13 @@ function applyDisplayZoom(scale: number) {
                         playBtn.textContent = 'Jogando...';
                         playBtn.classList.add('playing-btn');
                     }
-                    activeGameItem.classList.remove('game-completed-style');
                 }
+                // Em seguida, carrega o estado para essa rodada, que atualizará o painel e outras exibições.
+                loadRoundState(activeGameNumber);
             } else {
-                 DOMElements.activeRoundPanel.classList.add('hidden');
-                 DOMElements.noActiveRoundPanel.classList.remove('hidden');
+                // Se nenhuma rodada estiver ativa, garante que o painel e o board estejam no estado "sem rodada".
+                loadRoundState(null);
             }
-            
-            renderAllWinners();
-            renderShortcutsLegend();
-            
-            if (Object.values(gamesData).some(game => (game as any).winners && (game as any).winners.length > 0)) {
-                DOMElements.shareBtn.classList.remove('hidden');
-                DOMElements.endEventBtn.classList.remove('hidden');
-            }
-            
-            const boardZoomSlider = document.getElementById('board-zoom-slider') as HTMLInputElement;
-            const displayZoomSlider = document.getElementById('display-zoom-slider') as HTMLInputElement;
-            if (boardZoomSlider) boardZoomSlider.value = appConfig.boardScale.toString();
-            if (displayZoomSlider) displayZoomSlider.value = appConfig.displayScale.toString();
-            applyBoardZoom(appConfig.boardScale);
-            applyDisplayZoom(appConfig.displayScale); 
-            
-            DOMElements.noRepeatPrizeDrawCheckbox.checked = true;
         }
 
         // --- Funções do Jogo ---
@@ -2674,7 +2683,7 @@ function showSettingsModal() {
         }
     });
     document.getElementById('remove-custom-logo-btn').addEventListener('click', () => {
-        appConfig.customLogoBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYCAYAAAC+ORIOAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAACAAElEQVRYw+ydnXMVRbbAn3v3vfO+fG7eG8i3SFAIj8CEQCAEAgEIdYgEFAiBwCAE9l7YiQECAnsvGNi7D8iAgQECgoRukvfnuu6p6a6unqlndqZnZ+b+aD2d6VnVE6e+Vb169eoNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzäs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4Y-Y-aho ha+1S3sAAAAASUVORK5CYII='; // Default logo
+        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0zODIgMjE5QzM4MiAyMTEuODIgMzgyIDE5Ny42NCAzNzUuNDUgMTg4LjU2MkMzNjguOSAxNzkuNDg0IDM1Ny42MiAxNzYgMzM1IDE3NkgxNzdDMTU0LjM4IDE3NiAxNDMuMSAxNzkuNDg0IDEzNi41NSAxODguNTYyQzEzMCAxOTcuNjQgMTMwIDIxMS44MiAxMzAgMjE5VjI5M0MxMzAgMzAwLjE4IDEzMCAzMTQuMzYgMTM2LjU1IMzIzLjQzOEMxNDMuMSAzMzIuNTM2IDE1NC4zOCAzMzYgMTc3IDMzNkgzMzVDMzU3LjYyIDMzNiAzNjguOSAzMzIuNTM2IDM3NS40NSAzMjMuNDM4QzM4MiAzMTQuMzYgMzgyIDMwMC4xOCAzODIgMjkzVjIxOVoiIGZpbGw9IiMwMzg3RjAiLz4KPHBhdGggZD0iTTI1NiAzODJDMzI4Ljc1NSAzODIgMzg2IDMyNC43NTUgMzg2IDI1MkMzODYgMTc5LjI0NSAzMjguNzU1IDEyMiAyNTYgMTIyQzE4My4yNDUgMTIyIDEyNiAxNzkuMjQ1IDEyNiAyNTJDMTI2IDMyNC4zNTUgMTgzLjI0NSAzODIgMjU2IDM4MloiIGZpbGw9IiNGRkRFMDAiIHN0cm9rZT0iIzAyODdGNiIgc3Ryb2tlLXdpZHRoPSIxMiIvPgo8cGF0aCBkPSJNMjU2IDIwNy43MDhMMjc0LjYyNCAyNDUuNDU2TDMxNi4zNDEgMjUxLjY5N0wyODYuOTgzIDI4MC4zMDhMMjk1LjI1IDMyMS44NDJMMjU2IDI4Mi45NTRMMjE2Ljc1IDMyMS44NDJMMjI1LjAxNyAyODAuMzA4TDE5NS42NTkgMjUxLjY5N0wyMzcuMzc2IDI0NS40NTZMMjU2IDIwNy43MDhaIiBmaWxsPSIjRkZBRDAwIi8+Cjwvc3ZnPgo='; // Default logo
         customLogoPreview.src = appConfig.customLogoBase64;
         renderCustomLogo();
         debouncedSave();
@@ -3350,7 +3359,7 @@ function showRoundEditModal(gameNumber: string) {
                 isLocalMode = true;
                 DOMElements.connectionIndicator.classList.remove('bg-blue-500', 'bg-green-600');
                 DOMElements.connectionIndicator.classList.add('bg-yellow-500');
-                DOMElements.connectionStatusText.textContent = 'Modo Local (Salvo)';
+                DOMElements.connectionStatusText.textContent = 'Modo Local';
                 await loadInitialState();
             }
         }
