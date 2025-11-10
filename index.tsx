@@ -1,5 +1,6 @@
 
 
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -91,7 +92,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 - **NÚMEROS MAIORES E MAIS LARGOS:** O design dos números no modal de verificação foi aprimorado. Eles agora são maiores e mais largos, com uma fonte mais forte, melhorando drasticamente a legibilidade.
 - **LAYOUT OTIMIZADO:** O modal de verificação foi reestruturado para garantir que a rolagem da lista de números funcione perfeitamente, mesmo com o zoom aplicado.`;
 
-        // --- Configurações Globais da Aplicação (Persistidas no Firebase) ---
+        // --- Configurações Globais da Aplicação (Persistidas no Firebase ou LocalStorage) ---
         let appConfig = {
             // FIXOS
             pixKey: '1e8e4af0-4d23-440c-9f3d-b4e527f65911',
@@ -109,7 +110,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             drawnTextStrokeColor: '#000000',
             drawnTextStrokeWidth: 2,
             isEventClosed: false,
-            customLogoBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYCAYAAAC+ORIOAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAACAAElEQVRYw+ydnXMVRbbAn3v3vfO+fG7eG8i3SFAIj8CEQCAEAgEIdYgEFAiBwCAE9l7YiQECAnsvGNi7D8iAgQECgoRukvfnuu6p6a6unqlndqZnZ+b+aD2d6VnVE6e+Vb169eoNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4Y-Y-aho ha+1S3sAAAAASUVORK5CYII=',
+            customLogoBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYCAYAAAC+ORIOAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAACAAElEQVRYw+ydnXMVRbbAn3v3vfO+fG7eG8i3SFAIj8CEQCAEAgEIdYgEFAiBwCAE9l7YiQECAnsvGNi7D8iAgQECgoRukvfnuu6p6a6unqlndqZnZ+b+aD2d6VnVE6e+Vb169eoNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4YNGzZs2LBhw4Y-Y-aho ha+1S3sAAAAASUVORK5CYII=',
             enableSponsorsByNumber: false,
             enableModalAutoclose: true,
             modalAutocloseSeconds: 5,
@@ -260,6 +261,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let db, auth, userId, dbRef;
         let firebaseReady = false;
         let isLocalMode = false;
+        const LOCAL_STORAGE_KEY = 'bingoCloudState';
 
         // --- Seletores de Elementos ---
         const DOMElements = {
@@ -706,11 +708,43 @@ function populateSettingsShortcutsTab() {
                 </div>`
             };
         }
+        
+        function getAppState() {
+            return {
+                gamesData,
+                gameCount,
+                activeGameNumber,
+                menuItems,
+                drawnPrizeNumbers,
+                versionText: currentVersion,
+                versionHistory,
+                appConfig,
+                appLabels,
+            };
+        }
 
+        function loadAppState(state: any) {
+            gamesData = state.gamesData || {};
+            gameCount = state.gameCount || 6;
+            activeGameNumber = state.activeGameNumber || null;
+            menuItems = state.menuItems || [ "Refrigerante - R$ 5,00", "Cerveja - R$ 7,00", "Água - R$ 3,00", "Espetinho - R$ 8,00", "Pastel - R$ 6,00", "Porção de Fritas - R$ 15,00" ];
+            drawnPrizeNumbers = state.drawnPrizeNumbers || [];
+            versionHistory = state.versionHistory || versionHistory;
+            const loadedConfig = state.appConfig || {};
+            appConfig = { ...appConfig, ...loadedConfig };
+            const loadedLabels = state.appLabels || {};
+            appLabels = { ...appLabels, ...loadedLabels };
+        }
+        
         const debouncedSave = () => {
-            if (isLocalMode) return;
             clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(saveStateToFirestore, 1500); 
+            saveTimeout = setTimeout(() => {
+                if (isLocalMode) {
+                    saveStateToLocalStorage();
+                } else {
+                    saveStateToFirestore();
+                }
+            }, 1000); 
         };
         
         function generateTestData() {
@@ -754,7 +788,9 @@ function populateSettingsShortcutsTab() {
             activeGameNumber = '3';
             gamesData[3].calledNumbers = gamesData[3].calledNumbers.slice(0, 10);
 
-            saveStateToFirestore().then(() => {
+            // Save and reload
+            const savePromise = isLocalMode ? Promise.resolve(saveStateToLocalStorage()) : saveStateToFirestore();
+            savePromise.then(() => {
                 showAlert("Dados de teste gerados com sucesso! O aplicativo será recarregado com o novo histórico.");
                 DOMElements.settingsModal.classList.add('hidden');
                 setTimeout(() => window.location.reload(), 1500);
@@ -847,25 +883,38 @@ function populateSettingsShortcutsTab() {
             if (DOMElements.lastUpdated) DOMElements.lastUpdated.innerText = `Última atualização: ${fixedDate}`;
         }
         
+        function saveStateToLocalStorage() {
+            try {
+                const appState = getAppState();
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appState));
+            } catch (error) {
+                console.error("Falha ao salvar estado no localStorage:", error);
+            }
+        }
+
+        function loadStateFromLocalStorage(): boolean {
+            try {
+                const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (savedState) {
+                    const appState = JSON.parse(savedState);
+                    loadAppState(appState);
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error("Falha ao carregar estado do localStorage:", error);
+                return false;
+            }
+        }
+
         async function saveStateToFirestore() {
             if (!firebaseReady || !dbRef || isLocalMode) return;
-            const versionToSave = currentVersion;
-
+            
             appConfig.tutorialVideoLink = 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ'; 
             appConfig.paypalLink = 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW';
             appConfig.pixKey = '1e8e4af0-4d23-440c-9f3d-b4e527f65911';
             
-            const appState = {
-                gamesData: gamesData,
-                gameCount: gameCount,
-                activeGameNumber: activeGameNumber,
-                menuItems: menuItems,
-                drawnPrizeNumbers: drawnPrizeNumbers,
-                versionText: versionToSave,
-                versionHistory: versionHistory,
-                appConfig: appConfig,
-                appLabels: appLabels, // Salva os textos customizados
-            };
+            const appState = getAppState();
             try {
                 await setDoc(dbRef, appState);
                 renderUpdateInfo(); 
@@ -884,74 +933,62 @@ function populateSettingsShortcutsTab() {
             }
         }
 
-        async function loadStateFromFirestore() {
-            if (!dbRef && !isLocalMode) return;
+        async function loadInitialState() {
+            let stateLoaded = false;
             let forceSave = false;
-            try {
-                 if (isLocalMode) { // Carrega estado inicial para modo local
-                    console.log("Rodando em modo local. O progresso não será salvo.");
-                    forceSave = false; // Não tenta salvar no modo local
-                } else {
+        
+            if (isLocalMode) {
+                stateLoaded = loadStateFromLocalStorage();
+            } else {
+                try {
                     const docSnap = await getDoc(dbRef);
                     if (docSnap.exists()) {
                         const appState = docSnap.data();
-                        
-                        gamesData = appState.gamesData || {};
-                        gameCount = appState.gameCount || 6;
-                        activeGameNumber = appState.activeGameNumber || null;
-                        menuItems = appState.menuItems || [ "Refrigerante - R$ 5,00", "Cerveja - R$ 7,00", "Água - R$ 3,00", "Espetinho - R$ 8,00", "Pastel - R$ 6,00", "Porção de Fritas - R$ 15,00" ];
-                        drawnPrizeNumbers = appState.drawnPrizeNumbers || [];
-                        versionHistory = appState.versionHistory || versionHistory;
-                        
+                        loadAppState(appState);
                         if (appState.versionText && appState.versionText !== currentVersion) {
                             console.log(`[UPGRADE] Versão local (${currentVersion}) forçada sobre a versão salva (${appState.versionText}).`);
                             forceSave = true;
                         }
-                                                
-                        // Carrega configurações e labels
-                        const loadedConfig = appState.appConfig || {};
-                        appConfig = { ...appConfig, ...loadedConfig };
-                        const loadedLabels = appState.appLabels || {};
-                        appLabels = { ...appLabels, ...loadedLabels };
-
-                        appConfig.tutorialVideoLink = 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ';
-                        appConfig.paypalLink = 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW';
-                        appConfig.pixKey = '1e8e4af0-4d23-440c-9f3d-b4e527f65911';
-
-                    } else {
-                        forceSave = true;
+                        stateLoaded = true;
                     }
+                } catch (error) {
+                    console.error("Erro ao carregar dados do Firestore: ", error);
+                    showAlert("Não foi possível carregar os dados salvos. Verificando dados locais.");
+                    stateLoaded = loadStateFromLocalStorage();
                 }
-
-                 if (Object.keys(gamesData).length === 0) { // Se não houver dados, cria o estado inicial
-                    gameCount = 6;
-                    gamesData = {};
-                    for (let i = 1; i <= gameCount; i++) {
-                        gamesData[i] = {
-                            prizes: {
-                                prize1: predefinedPrizes[i - 1]?.prize1 || '',
-                                prize2: predefinedPrizes[i - 1]?.prize2 || '',
-                                prize3: predefinedPrizes[i - 1]?.prize3 || ''
-                            },
-                            calledNumbers: [],
-                            winners: [],
-                            isComplete: false,
-                            color: roundColors[(i-1) % roundColors.length],
-                        };
-                    }
-                }
-
-            } catch (error) {
-                console.error("Erro ao carregar dados do Firestore: ", error);
-                showAlert("Não foi possível carregar os dados salvos.");
             }
-            
-            applyLabels(); // Aplica os textos customizados
+        
+            if (!stateLoaded || Object.keys(gamesData).length === 0) {
+                console.log("Nenhum estado salvo encontrado. Inicializando com dados padrão.");
+                gameCount = 6;
+                gamesData = {};
+                for (let i = 1; i <= gameCount; i++) {
+                    gamesData[i] = {
+                        prizes: {
+                            prize1: predefinedPrizes[i - 1]?.prize1 || '',
+                            prize2: predefinedPrizes[i - 1]?.prize2 || '',
+                            prize3: predefinedPrizes[i - 1]?.prize3 || ''
+                        },
+                        calledNumbers: [],
+                        winners: [],
+                        isComplete: false,
+                        color: roundColors[(i-1) % roundColors.length],
+                    };
+                }
+                forceSave = true; // Força salvar o estado inicial
+            }
+        
+            // Garante que links e chaves fixas não sejam sobrescritos por dados antigos
+            appConfig.tutorialVideoLink = 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ';
+            appConfig.paypalLink = 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW';
+            appConfig.pixKey = '1e8e4af0-4d23-440c-9f3d-b4e527f65911';
+        
+            applyLabels();
             updateProgramTitle();
             renderUIFromState();
             
-            if (forceSave && !isLocalMode) {
-                 await saveStateToFirestore();
+            if (forceSave) {
+                debouncedSave();
             }
         }
 
@@ -1809,6 +1846,8 @@ function populateSettingsShortcutsTab() {
             const game = gamesData[activeGameNumber];
             if (!game) return;
             
+            triggerBingoWinConfetti();
+
             DOMElements.winnerModal.innerHTML = getModalTemplates().winner;
             (document.getElementById('winner-title-display') as HTMLElement).textContent = (appConfig.bingoTitle || 'BINGO') + '!';
             (document.getElementById('game-text-winner') as HTMLElement).textContent = `Rodada ${activeGameNumber}`;
@@ -1866,7 +1905,7 @@ function populateSettingsShortcutsTab() {
                  } else {
                      if (areAllGamesComplete() && !appConfig.isEventClosed) {
                          appConfig.isEventClosed = true;
-                         saveStateToFirestore(); 
+                         debouncedSave(); 
                          const allWinners = Object.values(gamesData).flatMap(g => (g as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
                          if (allWinners.length > 0) startFinalWinnerSlide(allWinners);
                      }
@@ -1951,9 +1990,152 @@ function populateSettingsShortcutsTab() {
                 prizeValueEl.setAttribute('contenteditable', 'false');
             });
         }
+        
+        function adjustSlider(sliderId: string, adjustment: number) {
+            const slider = document.getElementById(sliderId) as HTMLInputElement;
+            if (!slider) return;
+            
+            const currentValue = parseInt(slider.value, 10);
+            const min = parseInt(slider.min, 10);
+            const max = parseInt(slider.max, 10);
+            
+            let newValue = currentValue + adjustment;
+            
+            // Garante que o valor permaneça dentro dos limites min/max
+            if (newValue < min) newValue = min;
+            if (newValue > max) newValue = max;
+            
+            slider.value = newValue.toString();
+            
+            // Dispara um evento 'input' para acionar as atualizações da UI
+            slider.dispatchEvent(new Event('input', { bubbles: true }));
+            debouncedSave(); // Salva a alteração
+        }
+
+        function handleKeydown(e: KeyboardEvent) {
+            // --- Atalhos Específicos de Modais ---
+        
+            // Atalhos do Modal de Verificação (1, 2, 3, Esc) e Zoom (+, -)
+            if (!DOMElements.verificationModal.classList.contains('hidden')) {
+                e.preventDefault();
+                switch (e.key) {
+                    case '1':
+                        (document.getElementById('confirm-prize1-btn') as HTMLButtonElement)?.click();
+                        break;
+                    case '2':
+                        (document.getElementById('confirm-prize2-btn') as HTMLButtonElement)?.click();
+                        break;
+                    case '3':
+                        (document.getElementById('confirm-prize3-btn') as HTMLButtonElement)?.click();
+                        break;
+                    case 'Escape':
+                        (document.getElementById('reject-bingo-btn') as HTMLButtonElement)?.click();
+                        break;
+                    case '+':
+                    case '=':
+                        adjustSlider('verification-zoom-slider', 5);
+                        break;
+                    case '-':
+                        adjustSlider('verification-zoom-slider', -5);
+                        break;
+                }
+                return; // Impede o processamento de outros atalhos
+            }
+        
+            // Zoom do Modal de Patrocinador (+, -)
+            if (!DOMElements.sponsorDisplayModal.classList.contains('hidden')) {
+                e.preventDefault();
+                switch (e.key) {
+                    case '+':
+                    case '=':
+                        adjustSlider('sponsor-display-zoom-slider', 5);
+                        break;
+                    case '-':
+                        adjustSlider('sponsor-display-zoom-slider', -5);
+                        break;
+                    case 'Escape':
+                         (document.getElementById('close-sponsor-display-btn') as HTMLButtonElement)?.click();
+                        break;
+                }
+                return; // Impede o processamento de outros atalhos
+            }
+        
+            // --- Atalhos Globais ---
+        
+            const activeInput = document.activeElement;
+            // Bloqueia atalhos globais se o usuário estiver digitando em um campo
+            // FIX: Cast `activeInput` to `HTMLElement` to access `isContentEditable`.
+            if (activeInput && (activeInput.tagName === 'INPUT' || activeInput.tagName === 'TEXTAREA' || (activeInput as HTMLElement).isContentEditable)) {
+                // Exceção para a tecla 'Enter' no campo de número manual
+                if (!(e.key === 'Enter' && activeInput.id === 'number-input')) {
+                    return;
+                }
+            }
+        
+            let shortcutString = '';
+            if (e.ctrlKey) shortcutString += 'Control+';
+            if (e.altKey) shortcutString += 'Alt+';
+            if (e.shiftKey) shortcutString += 'Shift+';
+        
+            let key = e.key;
+            if (key === ' ') {
+                key = 'Space';
+            } else if (key.length === 1 && !e.ctrlKey && !e.altKey) {
+                return;
+            } else if (key.length === 1) {
+                key = key.toUpperCase();
+            } else {
+                key = key.charAt(0).toUpperCase() + key.slice(1);
+            }
+        
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
+                return;
+            }
+            shortcutString += key;
+        
+            const shortcuts = appConfig.shortcuts;
+            let action: keyof typeof shortcuts | null = null;
+        
+            for (const key in shortcuts) {
+                if (shortcuts[key as keyof typeof shortcuts] === shortcutString) {
+                    action = key as keyof typeof shortcuts;
+                    break;
+                }
+            }
+        
+            if (action) {
+                e.preventDefault();
+                switch (action) {
+                    case 'autoDraw':
+                        handleAutoDraw();
+                        break;
+                    case 'verify':
+                        showVerificationPanel();
+                        break;
+                    case 'clearRound':
+                        DOMElements.clearRoundBtnTop.click();
+                        break;
+                    case 'drawPrize':
+                        (document.getElementById('prize-draw-random-btn') as HTMLButtonElement)?.click();
+                        break;
+                    case 'registerPrize':
+                        DOMElements.prizeDrawForm.requestSubmit();
+                        break;
+                    case 'sellAuction':
+                         DOMElements.auctionForm.requestSubmit();
+                        break;
+                    case 'showInterval':
+                        DOMElements.intervalBtn.click();
+                        break;
+                }
+            }
+        }
 
         // --- Funções de Event Listeners ---
         function initializeEventListeners() {
+            // Atalhos Globais
+            window.addEventListener('keydown', handleKeydown);
+
             // Formulário de Anúncio Manual
             DOMElements.manualInputForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -1968,8 +2150,7 @@ function populateSettingsShortcutsTab() {
             // Botões de Controle do Painel
              ['auto-draw-btn-top', 'auto-draw-btn-bottom'].forEach(id => document.getElementById(id).addEventListener('click', handleAutoDraw));
              ['verify-btn-top', 'verify-btn-bottom'].forEach(id => document.getElementById(id).addEventListener('click', showVerificationPanel));
-             ['clear-round-btn-top', 'clear-round-btn-bottom'].forEach(id => {
-                const btn = document.getElementById(id);
+             [DOMElements.clearRoundBtnTop, DOMElements.clearRoundBtnBottom].forEach(btn => {
                 if (btn) btn.addEventListener('click', () => {
                      if (!activeGameNumber) {
                         showAlert("Selecione uma rodada para limpar.");
@@ -2226,24 +2407,24 @@ function populateSettingsShortcutsTab() {
                             DOMElements.connectionIndicator.classList.add('bg-green-500');
                         }
                         if(DOMElements.connectionStatusText) DOMElements.connectionStatusText.textContent = "Conectado";
-                        await loadStateFromFirestore();
+                        await loadInitialState();
                     } else {
                         console.error("Falha na autenticação anônima.");
                         throw new Error("Falha na autenticação.");
                     }
                 });
             } catch (error) {
-                console.warn("Erro na autenticação anônima:", error.message);
-                console.log("Iniciando em MODO LOCAL. As alterações não serão salvas na nuvem.");
+                console.warn("Firebase não conectado:", error.message);
+                console.log("Iniciando em MODO LOCAL. O progresso será salvo no navegador.");
                 isLocalMode = true;
                 firebaseReady = false;
                  if(DOMElements.connectionIndicator) {
                     DOMElements.connectionIndicator.classList.remove('bg-blue-500', 'bg-green-500');
                     DOMElements.connectionIndicator.classList.add('bg-yellow-500');
                 }
-                if(DOMElements.connectionStatusText) DOMElements.connectionStatusText.textContent = "Modo Local";
+                if(DOMElements.connectionStatusText) DOMElements.connectionStatusText.textContent = "Modo Local (Salvo)";
                 // Carrega um estado padrão para o modo local
-                await loadStateFromFirestore(); 
+                await loadInitialState(); 
             }
         }
         
@@ -2271,6 +2452,29 @@ function populateSettingsShortcutsTab() {
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
             }, 250);
+        }
+
+        function triggerBingoWinConfetti() {
+            if (typeof confetti !== 'function') return;
+            const count = 200;
+            const defaults = {
+                origin: { y: 0.7 },
+                zIndex: 1000
+            };
+    
+            function fire(particleRatio: number, opts: any) {
+                confetti({
+                    ...defaults,
+                    ...opts,
+                    particleCount: Math.floor(count * particleRatio)
+                });
+            }
+    
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
         }
 
         declare var confetti: any;
@@ -2452,8 +2656,8 @@ function populateSettingsShortcutsTab() {
                         showAlert("Não foi possível reiniciar o evento. Tente novamente.");
                     }
                 } else {
-                    // Lógica para modo local (simplesmente reseta o estado e recarrega)
-                    gamesData = {}; // Apaga os dados em memória
+                    // Lógica para modo local (limpa localStorage e recarrega)
+                    localStorage.removeItem(LOCAL_STORAGE_KEY);
                     showAlert("Evento reiniciado com sucesso (Modo Local). A página será recarregada.");
                     setTimeout(() => window.location.reload(), 2000);
                 }
@@ -2728,11 +2932,10 @@ function populateSettingsShortcutsTab() {
             document.getElementById('close-settings-btn').addEventListener('click', () => {
                 DOMElements.settingsModal.classList.add('hidden');
                  // Save on close as well
-                 saveStateToFirestore().then(() => {
-                    applyLabels();
-                    renderMasterBoard();
-                    if(activeGameNumber) loadRoundState(activeGameNumber);
-                 });
+                 debouncedSave();
+                 applyLabels();
+                 renderMasterBoard();
+                 if(activeGameNumber) loadRoundState(activeGameNumber);
             });
         }
         
@@ -2919,4 +3122,3 @@ function populateSettingsShortcutsTab() {
                 container.appendChild(row);
             }
         }
-        
