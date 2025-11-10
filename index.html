@@ -33,7 +33,7 @@
         .animate-bounce-in { animation: bounce-in 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
 
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pop-up { 0% { opacity: 0; transform: scale(0.8); } 100% { transform: scale(1); } }
+        @keyframes pop-up { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
         .modal-content { animation: pop-up 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
         
         @keyframes shake-error {
@@ -249,12 +249,20 @@
                 <div class="flex flex-col gap-2 mb-4 flex-shrink-0">
                     <button id="interval-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="intervalButton">Intervalo</button>
                     <button id="share-btn" class="hidden w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-base shadow-lg transition-all" data-label-key="generateProofButton">Gerar Prova</button>
-                    <button id="end-event-btn" class="hidden w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="endEventButton">Encerrar Evento</button>
+                    <button id="end-event-btn" class="hidden w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="endEventButton">Encerrar Evento</button>
                     <button id="reset-event-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="resetEventButton">Reiniciar Evento</button>
                 </div>
 
+                <!-- LEGENDA DE ATALHOS -->
+                <div id="shortcuts-legend" class="mt-4 flex-shrink-0">
+                    <h3 class="text-base font-bold text-sky-400 mb-3 text-center" data-label-key="quickShortcutsTitle">Atalhos Rápidos</h3>
+                    <ul id="shortcuts-legend-list" class="space-y-2 text-xs text-slate-400 pl-4">
+                        <!-- Conteúdo dinâmico via JS -->
+                    </ul>
+                </div>
+
                 <!-- 3. VENCEDORES (LISTA FLEXÍVEL E SCROLLÁVEL) -->
-                <h2 class="text-2xl font-bold text-slate-300 mb-2 flex-shrink-0" data-label-key="winnersTitle">Vencedores</h2>
+                <h2 class="text-2xl font-bold text-slate-300 mb-2 flex-shrink-0 mt-4" data-label-key="winnersTitle">Vencedores</h2>
                 <!-- Removendo max-h: [85vh] -->
                 <div id="winners-container" class="space-y-4 flex-grow overflow-y-auto pr-2"></div>
 
@@ -362,7 +370,7 @@
                         <div class="relative">
                             <input type="number" id="auction-item-current-bid" placeholder="Lance Inicial (R$)" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
                             <div id="gavel-icon" class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hidden">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gavel" viewBox="0 0 16 16"><path d="M8.625 0a.627.627 0 0 0-.442.183L6.938 1.432c-.084.084-.15.18-.202.283-.146.285-.233.61-.233.957v.013a.626.626 0 0 0 .131.393l.394.437-3.931 3.932a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L8.53 4.101l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202l1.249-1.25a.627.627 0 0 0 .183-.442V1.25a.625.625 0 0 0-.625-.625h-2.5zm-2.43 3.362L4.35 1.517a.125.125 0 0 1 .088-.212h2.5a.125.125 0 0 1 .125.125v2.5a.125.125 0 0 1-.212.088L7.02 2.194l-2.828 2.828L5.38 3.834a.627.627 0 0 0-1.187-.22zM12.293.453l2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672.087-.957.233-.103-.052-.199-.118-.283-.202L11 2.828l2.02-2.02a.125.125 0 0 1 .177 0l-.884.884-3.931-3.931a.625.625 0 0 0 0-.884l-.043-.043a.625.625 0 0 0-.884 0L1.313 7.02l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118.283-.202l1.25-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013a1.625 1.625 0 0 0-.957.233c-.103.052-.199.118-.283.202L4.01 13.98l-2.122 2.12a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L4.938 15l1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202L9.194 12l-2.828-2.828 1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202l1.249-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672.087-.957.233-.103-.052-.199-.118-.283-.202L9.844 9l2.828-2.828L15.5 8.999a.625.625 0 0 0 .884 0l.043-.043a.625.625 0 0 0 0-.884L13.599 5.24l.414-.393a.625.625 0 0 0 .131-.393v-.013a1.625 1.625 0 0 0-.233-.957c-.052-.103-.118-.199-.202-.283L12.48.983a.627.627 0 0 0-.187-.217z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gavel" viewBox="0 0 16 16"><path d="M8.625 0a.627.627 0 0 0-.442.183L6.938 1.432c-.084.084-.15.18-.202.283-.146.285-.233.61-.233.957v.013a.626.626 0 0 0 .131.393l.394.437-3.931 3.932a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L8.53 4.101l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202l1.249-1.25a.627.627 0 0 0 .183-.442V1.25a.625.625 0 0 0-.625-.625h-2.5zm-2.43 3.362L4.35 1.517a.125.125 0 0 1 .088-.212h2.5a.125.125 0 0 1 .125.125v2.5a.125.125 0 0 1-.212.088L7.02 2.194l-2.828 2.828L5.38 3.834a.627.627 0 0 0-1.187-.22zM12.293.453l2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672.087-.957.233-.103-.052-.199-.118-.283-.202L11 2.828l2.02-2.02a.125.125 0 0 1 .177 0l-.884.884-3.931-3.931a.625.625 0 0 0 0-.884l-.043-.043a.625.625 0 0 0-.884 0L1.313 7.02l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.25-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013a1.625 1.625 0 0 0-.957.233c-.103.052-.199.118-.283.202L4.01 13.98l-2.122 2.12a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L4.938 15l1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118.283-.202L9.194 12l-2.828-2.828 1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118.283-.202l1.249-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672.087-.957.233-.103-.052-.199-.118-.283-.202L9.844 9l2.828-2.828L15.5 8.999a.625.625 0 0 0 .884 0l.043-.043a.625.625 0 0 0 0-.884L13.599 5.24l.414-.393a.625.625 0 0 0 .131-.393v-.013a1.625 1.625 0 0 0-.233-.957c-.052-.103-.118-.199-.202-.283L12.48.983a.627.627 0 0 0-.187-.217z"/></svg>
                             </div>
                         </div>
                         <div class="flex items-center justify-center gap-2 pt-2">
@@ -454,7 +462,7 @@
 
         // --- Variáveis de Estado ---
         let floatingNumberTimeout = null;
-        let currentVersion = "5.8.0"; // Persistência de Zoom, Atalhos e Melhorias Visuais
+        let currentVersion = "5.9.1"; // Cor do botão Encerrar Evento
 
         function getFormattedDateTime() {
             const now = new Date();
@@ -490,7 +498,14 @@
         let drawnPrizeNumbers = [];
         let winnerDisplayTimeout; 
         const winnerDisplayDuration = 5000;
-        let versionHistory = `**v5.8.0 (Atual)**
+        let versionHistory = `**v5.9.1 (Atual)**
+- **DIFERENCIAÇÃO VISUAL:** O botão "Encerrar Evento" foi alterado para a cor roxa, distinguindo-o claramente do botão vermelho "Reiniciar Evento" para evitar cliques acidentais.
+
+**v5.9.0**
+- **ATALHOS PERSONALIZÁVEIS:** A aba "Atalhos" nas configurações foi remodelada para permitir que o usuário defina suas próprias combinações de teclas para as ações principais (Sorteio, Verificar, Limpar).
+- **LEGENDA DE ATALHOS NA TELA:** Adicionada uma legenda de "Atalhos Rápidos" na barra lateral esquerda. Ela é atualizada dinamicamente para refletir os atalhos personalizados pelo usuário.
+
+**v5.8.0**
 - **PERSISTÊNCIA DE ZOOM:** O nível de zoom aplicado no painel de "Verificando Números" agora é salvo. Ao reabrir o painel, ele manterá o último tamanho configurado.
 - **HISTÓRICO DE VERSÕES APRIMORADO:** O histórico de versões agora exibe apenas as 10 últimas atualizações e não é mais editável, garantindo a integridade das informações.
 - **LISTA DE ATALHOS:** Adicionada uma nova aba de "Atalhos" no menu "Personalizar", listando os comandos de teclado disponíveis para agilizar o uso.
@@ -529,20 +544,7 @@
 **v5.1.0**
 - **NÚMEROS GIGANTES (PAINEL E VERIFICAÇÃO):** O tamanho dos números no painel principal e no modal de verificação foi drasticamente aumentado para garantir máxima visibilidade em projetores e telas grandes.
 - **DISPLAY DE LANCE DO LEILÃO:** Adicionado um novo display de "Lance Atual" com números enormes na seção de leilão, facilitando o acompanhamento dos valores pela plateia em tempo real.
-- **ANIMAÇÃO DE LEILÃO APRIMORADA:** A animação do martelo do leilão foi melhorada para ser mais impactante e satisfatória, com um efeito de "batida" mais forte.
-
-**v5.0.0**
-- **REMODELAÇÃO DO PAINEL DE NÚMEROS:** O painel foi redesenhado para usar duas colunas por letra (B-I-N-G-O), resultando em um visual mais amplo, com números maiores e mais legíveis, que se ajusta melhor à tela.
-- **CORES DA RODADA NO PAINEL:** A cor personalizada de cada rodada agora é aplicada aos números sorteados no painel principal, criando uma identidade visual clara e imediata para a rodada ativa.
-- **LEILÃO INTERATIVO E CENTRALIZADO:** A seção de Leilão foi movida para o painel central, abaixo do número anunciado. Foram adicionados botões de lance rápido (+50, +100, custom) e uma animação 3D de martelo que é acionada a cada lance, tornando o processo mais dinâmico.
-- **SORTEIO AUTOMÁTICO MAIS IMPACTANTE:** O tamanho do número revelado no modal de sorteio automático foi significativamente aumentado para maior impacto visual.
-
-**v4.0.0**
-- **MEGA-ATUALIZAÇÃO: Módulo de Leilão:** Adicionada uma seção completa de "Leilão" na barra lateral. Permite registrar o item, lances e o arrematador, que é automaticamente adicionado à lista de vencedores e à prova final.
-- **MEGA-ATUALIZAÇÃO: Animação de Sorteio 3D:** A animação de sorteio automático foi substituída por um globo de bingo 3D giratório e dinâmico, com um "ciclone" de números para criar mais suspense e impacto visual.
-- **APRIMORAMENTO: Logo Personalizável:** Adicionada a opção de carregar um logo personalizado (via Base64) no menu "Personalizar", que substitui o logo padrão do aplicativo.
-- **APRIMORAMENTO: Slideshow de Patrocinadores:** O modal de "Intervalo" agora pode exibir imagens de patrocinadores (via Base64) em um slideshow, alternando com os itens do cardápio.
-- **APRIMORAMENTO: Cores de Rodada Automáticas e Editáveis:** Cada nova rodada agora recebe uma cor de destaque diferente automaticamente. Além disso, um seletor de cor foi adicionado a cada rodada, permitindo total personalização visual.`;
+- **ANIMAÇÃO DE LEILÃO APRIMORADA:** A animação do martelo do leilão foi melhorada para ser mais impactante e satisfatória, com um efeito de "batida" mais forte.`;
 
         // --- Configurações Globais da Aplicação (Persistidas no Firebase) ---
         let appConfig = {
@@ -562,6 +564,11 @@
             isEventClosed: false,
             customLogoBase64: '',
             sponsorImagesBase64: [],
+            shortcuts: {
+                autoDraw: 'Control+Enter',
+                verify: 'Control+Space',
+                clearRound: 'Control+Delete'
+            }
         };
 
         // Objeto para todos os textos customizáveis (i18n)
@@ -661,11 +668,12 @@
             settingsTabAppearance: "Aparência",
             settingsTabLabels: "Textos e Rótulos",
             settingsTabShortcuts: "Atalhos",
-            shortcutsTitle: "Atalhos de Teclado",
-            shortcutsDescription: "Use estes atalhos para agilizar as operações durante o evento:",
-            shortcutAutoDraw: "Inicia um Sorteio Automático.",
-            shortcutVerify: "Abre o painel para Verificar Números.",
-            shortcutClearRound: "Abre a confirmação para Limpar a Rodada Atual.",
+            quickShortcutsTitle: "Atalhos Rápidos",
+            shortcutsEditTitle: "Personalizar Atalhos",
+            shortcutsEditDescription: "Clique em um campo e pressione a nova combinação de teclas. As alterações são salvas automaticamente.",
+            shortcutLabelAutoDraw: "Sorteio Automático",
+            shortcutLabelVerify: "Verificar Números",
+            shortcutLabelClearRound: "Limpar Rodada Atual",
             settingsLogoTitle: "Logo do Evento",
             settingsLogoDescription: "Cole o código Base64 da sua imagem. A imagem será redimensionada para caber no espaço.",
             settingsLogoRemoveButton: "Remover Logo",
@@ -854,14 +862,12 @@
                              </div>
                         </div>
 
-                        <div id="tab-content-shortcuts" class="hidden space-y-4 text-left">
-                            <h3 class="text-xl font-bold text-slate-300">${appLabels.shortcutsTitle}</h3>
-                            <p class="text-sm text-slate-400">${appLabels.shortcutsDescription}</p>
-                            <ul class="list-disc list-inside space-y-2 bg-gray-700 p-4 rounded-lg">
-                                <li><span class="font-mono bg-gray-900 px-2 py-1 rounded text-amber-400">CTRL + ENTER</span>: <span data-label-key="shortcutAutoDraw">${appLabels.shortcutAutoDraw}</span></li>
-                                <li><span class="font-mono bg-gray-900 px-2 py-1 rounded text-amber-400">CTRL + ESPAÇO</span>: <span data-label-key="shortcutVerify">${appLabels.shortcutVerify}</span></li>
-                                <li><span class="font-mono bg-gray-900 px-2 py-1 rounded text-amber-400">CTRL + DELETE</span>: <span data-label-key="shortcutClearRound">${appLabels.shortcutClearRound}</span></li>
-                            </ul>
+                        <div id="tab-content-shortcuts" class="hidden space-y-6 text-left">
+                            <h3 class="text-xl font-bold text-slate-300">${appLabels.shortcutsEditTitle}</h3>
+                            <p class="text-sm text-slate-400">${appLabels.shortcutsEditDescription}</p>
+                            <div id="shortcuts-form-container" class="space-y-4">
+                                <!-- Os campos de atalho serão inseridos aqui pelo JS -->
+                            </div>
                         </div>
                     </div>
                     
@@ -1129,6 +1135,7 @@
             }
             
             renderAllWinners();
+            renderShortcutsLegend();
             
             if (Object.values(gamesData).some(game => game.winners && game.winners.length > 0)) {
                 DOMElements.shareBtn.classList.remove('hidden');
@@ -2166,6 +2173,41 @@
             DOMElements.changelogModal.classList.remove('hidden');
         }
 
+        function renderShortcutsLegend() {
+            const legendList = document.getElementById('shortcuts-legend-list');
+            if (!legendList) return;
+            
+            const shortcuts = appConfig.shortcuts;
+            const labels = {
+                autoDraw: appLabels.shortcutLabelAutoDraw,
+                verify: appLabels.shortcutLabelVerify,
+                clearRound: appLabels.shortcutLabelClearRound
+            };
+
+            legendList.innerHTML = '';
+            for (const key in shortcuts) {
+                const li = document.createElement('li');
+                const keysHtml = shortcuts[key].split('+').map(k => `<kbd class="font-mono bg-gray-900 px-2 py-1 rounded text-amber-400">${k}</kbd>`).join(' + ');
+                li.innerHTML = `${labels[key]}: ${keysHtml}`;
+                legendList.appendChild(li);
+            }
+        }
+        
+        function eventToShortcutString(event) {
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(event.key)) return null;
+
+            let keyString = "";
+            if (event.ctrlKey) keyString += "Control+";
+            if (event.altKey) keyString += "Alt+";
+            if (event.shiftKey) keyString += "Shift+";
+
+            if (event.code === 'Space') {
+                keyString += 'Space';
+            } else {
+                keyString += event.key.length === 1 ? event.key.toUpperCase() : event.key;
+            }
+            return keyString;
+        }
 
         function showSettingsModal() {
             DOMElements.settingsModal.innerHTML = getModalTemplates().settings;
@@ -2190,9 +2232,9 @@
             
             const labelsFormContainer = document.getElementById('labels-form-container');
             labelsFormContainer.innerHTML = '';
-            const labelOrder = ["mainTitle", "roundsAndPrizesTitle", "winnersTitle", "bingoBoardTitle", "prizeDrawTitle", "auctionTitle", "prize1Label", "prize2Label", "prize3Label", "intervalModalTitle", "intervalModalSubtitle", "announcedNumberLabel", "lastNumbersLabel", "controlsPanelTitle", "boardScaleLabel", "displayScaleLabel", "manualAnnounceButton", "autoDrawButton", "verifyButton", "clearRoundButton", "clearRoundConfirmTitle", "clearRoundConfirmMessage", "clearRoundConfirmButton", "clearRoundCancelButton", "checkDrawnPrizesButton", "prizeDrawRandomButton", "registerPrizeButton", "sellItemButton", "addExtraRoundButton", "supportTitle", "supportButton", "howToUseTitle", "versionHistoryButton", "customizeButton", "intervalButton", "generateProofButton", "endEventButton", "resetEventButton", "subscribeTitle", "subscribeButton", "verificationModalTitle", "verificationModalBackButton", "modalBackButton", "winnerModalNamePlaceholder", "winnerModalRegisterButton", "alertModalTitle", "alertModalOkButton", "congratsModalTitle", "congratsModalPrizeLabel", "congratsModalMessage", "congratsModalCloseButton", "menuEditModalTitle", "menuEditModalDescription", "modalCancelButton", "modalSaveButton", "winnerEditModalTitle", "winnerEditModalNamePlaceholder", "winnerEditModalPrizePlaceholder", "winnerEditModalRemoveButton", "deleteConfirmModalTitle", "deleteConfirmModalDeleteButton", "proofOptionsModalTitle", "proofOptionsModalDescription", "proofOptionsModalGenerateButton", "spinningWheelSkipButton", "resetConfirmModalTitle", "resetConfirmModalMessage", "resetConfirmModalConfirmButton", "drawnPrizesModalTitle", "modalCloseButton", "donationModalTitle", "donationModalDescription", "donationModalPaypalLabel", "donationModalPixLabel", "donationModalCopyButton", "finalWinnersModalTitle", "finalWinnersModalProofButton", "finalWinnersModalSupportButton", "changelogModalTitle", "changelogModalCurrentVersionLabel", "settingsModalTitle", "settingsTabAppearance", "settingsTabLabels", "settingsTabShortcuts", "shortcutsTitle", "shortcutsDescription", "shortcutAutoDraw", "shortcutVerify", "shortcutClearRound", "settingsLogoTitle", "settingsLogoDescription", "settingsLogoRemoveButton", "settingsSponsorsTitle", "settingsSponsorsDescription", "settingsBingoTitleLabel", "settingsBingoTitleDescription", "settingsBoardColorLabel", "settingsBoardColorDescription", "settingsBoardColorResetButton", "settingsDrawnNumberTitle", "settingsDrawnTextColorLabel", "settingsDrawnStrokeColorLabel", "settingsDrawnStrokeWidthLabel", "settingsTestDataButton", "settingsCloseSaveButton"];
+            const labelOrder = ["mainTitle", "roundsAndPrizesTitle", "winnersTitle", "bingoBoardTitle", "prizeDrawTitle", "auctionTitle", "prize1Label", "prize2Label", "prize3Label", "intervalModalTitle", "intervalModalSubtitle", "announcedNumberLabel", "lastNumbersLabel", "controlsPanelTitle", "boardScaleLabel", "displayScaleLabel", "manualAnnounceButton", "autoDrawButton", "verifyButton", "clearRoundButton", "clearRoundConfirmTitle", "clearRoundConfirmMessage", "clearRoundConfirmButton", "clearRoundCancelButton", "checkDrawnPrizesButton", "prizeDrawRandomButton", "registerPrizeButton", "sellItemButton", "addExtraRoundButton", "supportTitle", "supportButton", "howToUseTitle", "versionHistoryButton", "customizeButton", "intervalButton", "generateProofButton", "endEventButton", "resetEventButton", "subscribeTitle", "subscribeButton", "verificationModalTitle", "verificationModalBackButton", "modalBackButton", "winnerModalNamePlaceholder", "winnerModalRegisterButton", "alertModalTitle", "alertModalOkButton", "congratsModalTitle", "congratsModalPrizeLabel", "congratsModalMessage", "congratsModalCloseButton", "menuEditModalTitle", "menuEditModalDescription", "modalCancelButton", "modalSaveButton", "winnerEditModalTitle", "winnerEditModalNamePlaceholder", "winnerEditModalPrizePlaceholder", "winnerEditModalRemoveButton", "deleteConfirmModalTitle", "deleteConfirmModalDeleteButton", "proofOptionsModalTitle", "proofOptionsModalDescription", "proofOptionsModalGenerateButton", "spinningWheelSkipButton", "resetConfirmModalTitle", "resetConfirmModalMessage", "resetConfirmModalConfirmButton", "drawnPrizesModalTitle", "modalCloseButton", "donationModalTitle", "donationModalDescription", "donationModalPaypalLabel", "donationModalPixLabel", "donationModalCopyButton", "finalWinnersModalTitle", "finalWinnersModalProofButton", "finalWinnersModalSupportButton", "changelogModalTitle", "changelogModalCurrentVersionLabel", "settingsModalTitle", "settingsTabAppearance", "settingsTabLabels", "settingsTabShortcuts", "quickShortcutsTitle", "shortcutsEditTitle", "shortcutsEditDescription", "shortcutLabelAutoDraw", "shortcutLabelVerify", "shortcutLabelClearRound", "settingsLogoTitle", "settingsLogoDescription", "settingsLogoRemoveButton", "settingsSponsorsTitle", "settingsSponsorsDescription", "settingsBingoTitleLabel", "settingsBingoTitleDescription", "settingsBoardColorLabel", "settingsBoardColorDescription", "settingsBoardColorResetButton", "settingsDrawnNumberTitle", "settingsDrawnTextColorLabel", "settingsDrawnStrokeColorLabel", "settingsDrawnStrokeWidthLabel", "settingsTestDataButton", "settingsCloseSaveButton"];
 
-            const labelDescriptions = { mainTitle: "Título Principal do Evento", roundsAndPrizesTitle: "Título: Rodadas e Prêmios", winnersTitle: "Título: Vencedores", bingoBoardTitle: "Título: Painel de Números", prizeDrawTitle: "Título: Sorteio de Brindes", auctionTitle: "Título: Leilão", prize1Label: "Nome do Prêmio 1 (Ex: Quina)", prize2Label: "Nome do Prêmio 2 (Ex: Cartela Cheia)", prize3Label: "Nome do Prêmio 3 (Ex: Azarão)", intervalModalTitle: "Modal Intervalo: Título", intervalModalSubtitle: "Modal Intervalo: Subtítulo", announcedNumberLabel: "Rótulo: Número Anunciado", lastNumbersLabel: "Rótulo: Últimos 5 Números", controlsPanelTitle: "Título: Controles", boardScaleLabel: "Rótulo: Escala Painel", displayScaleLabel: "Rótulo: Escala Número Anunciado", manualAnnounceButton: "Botão: Anunciar Manual", autoDrawButton: "Botão: Sorteio Automático", verifyButton: "Botão: Verificar", clearRoundButton: "Botão: Limpar Rodada", clearRoundConfirmTitle: "Modal Limpar: Título", clearRoundConfirmMessage: "Modal Limpar: Mensagem", clearRoundConfirmButton: "Modal Limpar: Botão Confirmar", clearRoundCancelButton: "Modal Limpar: Botão Cancelar", checkDrawnPrizesButton: "Botão: Conferir Sorteados", prizeDrawRandomButton: "Botão: Sortear Brinde", registerPrizeButton: "Botão: Registrar Brinde", sellItemButton: "Botão: Vender Item", addExtraRoundButton: "Botão: Adicionar Rodada", supportTitle: "Título: Apoio", supportButton: "Botão: Apoiar/Doar", howToUseTitle: "Título: Como Usar", versionHistoryButton: "Botão: Histórico de Versões", customizeButton: "Botão: Personalizar", intervalButton: "Botão: Intervalo", generateProofButton: "Botão: Gerar Prova", endEventButton: "Botão: Encerrar Evento", resetEventButton: "Botão: Reiniciar Evento", subscribeTitle: "Título: Inscrever-se", subscribeButton: "Botão: Inscrever-se", verificationModalTitle: "Modal Verificar: Título", verificationModalBackButton: "Modal Verificar: Botão Voltar", modalBackButton: "Botão Genérico: Voltar ao App", winnerModalNamePlaceholder: "Modal Vencedor: Placeholder Nome", winnerModalRegisterButton: "Modal Vencedor: Botão Registrar", alertModalTitle: "Modal Alerta: Título", alertModalOkButton: "Modal Alerta: Botão OK", congratsModalTitle: "Modal Parabéns: Título", congratsModalPrizeLabel: "Modal Parabéns: Rótulo Prêmio", congratsModalMessage: "Modal Parabéns: Mensagem", congratsModalCloseButton: "Modal Parabéns: Botão Fechar", menuEditModalTitle: "Modal Editar Menu: Título", menuEditModalDescription: "Modal Editar Menu: Descrição", modalCancelButton: "Botão Genérico: Cancelar", modalSaveButton: "Botão Genérico: Salvar", winnerEditModalTitle: "Modal Editar Ganhador: Título", winnerEditModalNamePlaceholder: "Modal Editar Ganhador: Placeholder Nome", winnerEditModalPrizePlaceholder: "Modal Editar Ganhador: Placeholder Prêmio", winnerEditModalRemoveButton: "Modal Editar Ganhador: Botão Remover", deleteConfirmModalTitle: "Modal Deletar: Título", deleteConfirmModalDeleteButton: "Modal Deletar: Botão Excluir", proofOptionsModalTitle: "Modal Prova: Título", proofOptionsModalDescription: "Modal Prova: Descrição", proofOptionsModalGenerateButton: "Modal Prova: Botão Gerar", spinningWheelSkipButton: "Animação: Botão Pular", resetConfirmModalTitle: "Modal Resetar: Título", resetConfirmModalMessage: "Modal Resetar: Mensagem", resetConfirmModalConfirmButton: "Modal Resetar: Botão Confirmar", drawnPrizesModalTitle: "Modal Brindes Sorteados: Título", modalCloseButton: "Botão Genérico: Fechar", donationModalTitle: "Modal Doação: Título", donationModalDescription: "Modal Doação: Descrição", donationModalPaypalLabel: "Modal Doação: Rótulo PayPal", donationModalPixLabel: "Modal Doação: Rótulo PIX", donationModalCopyButton: "Modal Doação: Botão Copiar", finalWinnersModalTitle: "Modal Final: Título", finalWinnersModalProofButton: "Modal Final: Botão Prova", finalWinnersModalSupportButton: "Modal Final: Botão Apoiar", changelogModalTitle: "Modal Versões: Título", changelogModalCurrentVersionLabel: "Modal Versões: Rótulo Versão", settingsModalTitle: "Modal Config: Título", settingsTabAppearance: "Modal Config: Aba Aparência", settingsTabLabels: "Modal Config: Aba Textos", settingsTabShortcuts: "Modal Config: Aba Atalhos", shortcutsTitle: "Título da Aba Atalhos", shortcutsDescription: "Descrição da Aba Atalhos", shortcutAutoDraw: "Descrição atalho: Sorteio", shortcutVerify: "Descrição atalho: Verificar", shortcutClearRound: "Descrição atalho: Limpar", settingsLogoTitle: "Config Aba Aparência: Título Logo", settingsLogoDescription: "Config Aba Aparência: Descrição Logo", settingsLogoRemoveButton: "Config Aba Aparência: Botão Remover Logo", settingsSponsorsTitle: "Config Aba Aparência: Título Patrocinadores", settingsSponsorsDescription: "Config Aba Aparência: Descrição Patrocinadores", settingsBingoTitleLabel: "Config Aba Aparência: Título Grito", settingsBingoTitleDescription: "Config Aba Aparência: Descrição Grito", settingsBoardColorLabel: "Config Aba Aparência: Título Cor Cartela", settingsBoardColorDescription: "Config Aba Aparência: Descrição Cor Cartela", settingsBoardColorResetButton: "Config Aba Aparência: Botão Limpar Cor", settingsDrawnNumberTitle: "Config Aba Aparência: Título Num. Sorteado", settingsDrawnTextColorLabel: "Config Aba Aparência: Rótulo Cor Texto", settingsDrawnStrokeColorLabel: "Config Aba Aparência: Rótulo Cor Borda", settingsDrawnStrokeWidthLabel: "Config Aba Aparência: Rótulo Largura Borda", settingsTestDataButton: "Config Botão: Gerar Teste", settingsCloseSaveButton: "Config Botão: Fechar e Salvar"};
+            const labelDescriptions = { mainTitle: "Título Principal do Evento", roundsAndPrizesTitle: "Título: Rodadas e Prêmios", winnersTitle: "Título: Vencedores", bingoBoardTitle: "Título: Painel de Números", prizeDrawTitle: "Título: Sorteio de Brindes", auctionTitle: "Título: Leilão", prize1Label: "Nome do Prêmio 1 (Ex: Quina)", prize2Label: "Nome do Prêmio 2 (Ex: Cartela Cheia)", prize3Label: "Nome do Prêmio 3 (Ex: Azarão)", intervalModalTitle: "Modal Intervalo: Título", intervalModalSubtitle: "Modal Intervalo: Subtítulo", announcedNumberLabel: "Rótulo: Número Anunciado", lastNumbersLabel: "Rótulo: Últimos 5 Números", controlsPanelTitle: "Título: Controles", boardScaleLabel: "Rótulo: Escala Painel", displayScaleLabel: "Rótulo: Escala Número Anunciado", manualAnnounceButton: "Botão: Anunciar Manual", autoDrawButton: "Botão: Sorteio Automático", verifyButton: "Botão: Verificar", clearRoundButton: "Botão: Limpar Rodada", clearRoundConfirmTitle: "Modal Limpar: Título", clearRoundConfirmMessage: "Modal Limpar: Mensagem", clearRoundConfirmButton: "Modal Limpar: Botão Confirmar", clearRoundCancelButton: "Modal Limpar: Botão Cancelar", checkDrawnPrizesButton: "Botão: Conferir Sorteados", prizeDrawRandomButton: "Botão: Sortear Brinde", registerPrizeButton: "Botão: Registrar Brinde", sellItemButton: "Botão: Vender Item", addExtraRoundButton: "Botão: Adicionar Rodada", supportTitle: "Título: Apoio", supportButton: "Botão: Apoiar/Doar", howToUseTitle: "Título: Como Usar", versionHistoryButton: "Botão: Histórico de Versões", customizeButton: "Botão: Personalizar", intervalButton: "Botão: Intervalo", generateProofButton: "Botão: Gerar Prova", endEventButton: "Botão: Encerrar Evento", resetEventButton: "Botão: Reiniciar Evento", subscribeTitle: "Título: Inscrever-se", subscribeButton: "Botão: Inscrever-se", verificationModalTitle: "Modal Verificar: Título", verificationModalBackButton: "Modal Verificar: Botão Voltar", modalBackButton: "Botão Genérico: Voltar ao App", winnerModalNamePlaceholder: "Modal Vencedor: Placeholder Nome", winnerModalRegisterButton: "Modal Vencedor: Botão Registrar", alertModalTitle: "Modal Alerta: Título", alertModalOkButton: "Modal Alerta: Botão OK", congratsModalTitle: "Modal Parabéns: Título", congratsModalPrizeLabel: "Modal Parabéns: Rótulo Prêmio", congratsModalMessage: "Modal Parabéns: Mensagem", congratsModalCloseButton: "Modal Parabéns: Botão Fechar", menuEditModalTitle: "Modal Editar Menu: Título", menuEditModalDescription: "Modal Editar Menu: Descrição", modalCancelButton: "Botão Genérico: Cancelar", modalSaveButton: "Botão Genérico: Salvar", winnerEditModalTitle: "Modal Editar Ganhador: Título", winnerEditModalNamePlaceholder: "Modal Editar Ganhador: Placeholder Nome", winnerEditModalPrizePlaceholder: "Modal Editar Ganhador: Placeholder Prêmio", winnerEditModalRemoveButton: "Modal Editar Ganhador: Botão Remover", deleteConfirmModalTitle: "Modal Deletar: Título", deleteConfirmModalDeleteButton: "Modal Deletar: Botão Excluir", proofOptionsModalTitle: "Modal Prova: Título", proofOptionsModalDescription: "Modal Prova: Descrição", proofOptionsModalGenerateButton: "Modal Prova: Botão Gerar", spinningWheelSkipButton: "Animação: Botão Pular", resetConfirmModalTitle: "Modal Resetar: Título", resetConfirmModalMessage: "Modal Resetar: Mensagem", resetConfirmModalConfirmButton: "Modal Resetar: Botão Confirmar", drawnPrizesModalTitle: "Modal Brindes Sorteados: Título", modalCloseButton: "Botão Genérico: Fechar", donationModalTitle: "Modal Doação: Título", donationModalDescription: "Modal Doação: Descrição", donationModalPaypalLabel: "Modal Doação: Rótulo PayPal", donationModalPixLabel: "Modal Doação: Rótulo PIX", donationModalCopyButton: "Modal Doação: Botão Copiar", finalWinnersModalTitle: "Modal Final: Título", finalWinnersModalProofButton: "Modal Final: Botão Prova", finalWinnersModalSupportButton: "Modal Final: Botão Apoiar", changelogModalTitle: "Modal Versões: Título", changelogModalCurrentVersionLabel: "Modal Versões: Rótulo Versão", settingsModalTitle: "Modal Config: Título", settingsTabAppearance: "Modal Config: Aba Aparência", settingsTabLabels: "Modal Config: Aba Textos", settingsTabShortcuts: "Modal Config: Aba Atalhos", quickShortcutsTitle: "Legenda Atalhos: Título", shortcutsEditTitle: "Config Atalhos: Título", shortcutsEditDescription: "Config Atalhos: Descrição", shortcutLabelAutoDraw: "Config Atalhos: Rótulo Sorteio", shortcutLabelVerify: "Config Atalhos: Rótulo Verificar", shortcutLabelClearRound: "Config Atalhos: Rótulo Limpar", settingsLogoTitle: "Config Aba Aparência: Título Logo", settingsLogoDescription: "Config Aba Aparência: Descrição Logo", settingsLogoRemoveButton: "Config Aba Aparência: Botão Remover Logo", settingsSponsorsTitle: "Config Aba Aparência: Título Patrocinadores", settingsSponsorsDescription: "Config Aba Aparência: Descrição Patrocinadores", settingsBingoTitleLabel: "Config Aba Aparência: Título Grito", settingsBingoTitleDescription: "Config Aba Aparência: Descrição Grito", settingsBoardColorLabel: "Config Aba Aparência: Título Cor Cartela", settingsBoardColorDescription: "Config Aba Aparência: Descrição Cor Cartela", settingsBoardColorResetButton: "Config Aba Aparência: Botão Limpar Cor", settingsDrawnNumberTitle: "Config Aba Aparência: Título Num. Sorteado", settingsDrawnTextColorLabel: "Config Aba Aparência: Rótulo Cor Texto", settingsDrawnStrokeColorLabel: "Config Aba Aparência: Rótulo Cor Borda", settingsDrawnStrokeWidthLabel: "Config Aba Aparência: Rótulo Largura Borda", settingsTestDataButton: "Config Botão: Gerar Teste", settingsCloseSaveButton: "Config Botão: Fechar e Salvar"};
 
             labelOrder.forEach(key => {
                  if (appLabels[key] !== undefined) {
@@ -2203,6 +2245,44 @@
                     labelsFormContainer.appendChild(div);
                 }
             });
+
+            const shortcutsFormContainer = document.getElementById('shortcuts-form-container');
+            shortcutsFormContainer.innerHTML = '';
+            const shortcutLabels = {
+                autoDraw: appLabels.shortcutLabelAutoDraw,
+                verify: appLabels.shortcutLabelVerify,
+                clearRound: appLabels.shortcutLabelClearRound
+            };
+            for (const key in appConfig.shortcuts) {
+                const div = document.createElement('div');
+                div.className = 'grid grid-cols-3 items-center gap-4';
+                const label = document.createElement('label');
+                label.htmlFor = `shortcut-input-${key}`;
+                label.className = 'text-slate-300 col-span-1';
+                label.textContent = shortcutLabels[key];
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `shortcut-input-${key}`;
+                input.readOnly = true;
+                input.value = appConfig.shortcuts[key];
+                input.className = 'col-span-2 p-2 bg-gray-600 text-white rounded-lg font-mono text-center cursor-pointer focus:ring-sky-500 border border-gray-500';
+                
+                input.addEventListener('keydown', (e) => {
+                    e.preventDefault();
+                    const newShortcut = eventToShortcutString(e);
+                    if (newShortcut) {
+                        input.value = newShortcut;
+                        appConfig.shortcuts[key] = newShortcut;
+                        renderShortcutsLegend();
+                        debouncedSave();
+                    }
+                });
+
+                div.appendChild(label);
+                div.appendChild(input);
+                shortcutsFormContainer.appendChild(div);
+            }
 
             customLogoInput.value = appConfig.customLogoBase64;
             sponsorImagesInput.value = appConfig.sponsorImagesBase64.join('\n');
@@ -2558,25 +2638,25 @@
             
             // Atalhos de teclado
             window.addEventListener('keydown', (e) => {
-                if (e.target.isContentEditable || ['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+                const settingsModalVisible = !DOMElements.settingsModal.classList.contains('hidden');
+                const shortcutInputFocused = settingsModalVisible && document.activeElement && document.activeElement.id.startsWith('shortcut-input-');
+
+                if (e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || shortcutInputFocused) {
                     return;
                 }
-                
-                if (e.ctrlKey) {
-                    switch (e.code) {
-                        case 'Enter':
-                            e.preventDefault();
-                            document.querySelector('#auto-draw-btn:not(:disabled)')?.click();
-                            break;
-                        case 'Space':
-                            e.preventDefault();
-                            showVerificationModal();
-                            break;
-                        case 'Delete':
-                            e.preventDefault();
-                            showClearRoundConfirmModal();
-                            break;
-                    }
+
+                const keyString = eventToShortcutString(e);
+                if (!keyString) return;
+
+                if (keyString === appConfig.shortcuts.autoDraw) {
+                    e.preventDefault();
+                    document.querySelector('#auto-draw-btn:not(:disabled)')?.click();
+                } else if (keyString === appConfig.shortcuts.verify) {
+                    e.preventDefault();
+                    showVerificationModal();
+                } else if (keyString === appConfig.shortcuts.clearRound) {
+                    e.preventDefault();
+                    showClearRoundConfirmModal();
                 }
             });
         }
