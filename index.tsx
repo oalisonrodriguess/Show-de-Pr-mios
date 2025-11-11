@@ -3326,9 +3326,12 @@ function showRoundEditModal(gameNumber: string) {
             try {
                 // Configuração do Firebase
                 const firebaseConfig = {
-                    apiKey: process.env.FIREBASE_API_KEY,
-                    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-                    projectId: process.env.FIREBASE_PROJECT_ID,
+                  apiKey: "AIzaSyDULAgBMD6g__7TuLgNIrjsEyC9es_gEZg",
+                  authDomain: "show-de-premios-65d20.firebaseapp.com",
+                  projectId: "show-de-premios-65d20",
+                  storageBucket: "show-de-premios-65d20.firebasestorage.app",
+                  messagingSenderId: "454374708177",
+                  appId: "1:454374708177:web:7372a5fe967277973006f0"
                 };
 
                 if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {

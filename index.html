@@ -497,55 +497,52 @@
                         <div id="games-list" class="space-y-3 pr-2 flex-grow overflow-y-auto"></div>
                 </div>
 
-                <!-- 4. INSCREVA-SE NO CANAL (FIXO NO FINAL) -->
-                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl flex-shrink-0">
-                    <div class="text-center">
-                        <h3 class="text-base font-bold text-red-500 mb-3" data-label-key="subscribeTitle">Inscreva-se no Canal</h3>
-                        <!-- Ícone do YouTube usando SVG inline para garantir visibilidade -->
-                        <svg class="w-12 h-12 mx-auto mb-2 text-red-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M19.615 3.184c-3.613-.243-11.666-.243-15.278 0C1.196 3.427.818 3.82.637 4.298c-.18.479-.18 1.488-.18 3.513v7.382c0 2.024 0 3.033.18 3.513.181.478.559.871 1.094 1.114 3.613.243 11.666.243 15.278 0 .535-.243.913-.636 1.094-1.114.18-.48.18-1.489.18-3.513V7.811c0-2.025 0-3.033-.18-3.513-.181-.478-.559-.871-1.094-1.114zM9.545 15.545V8.455L15.61 12l-6.065 3.545z"/>
-                        </svg>
-                        <p class="text-xs text-slate-300 mb-3">Clique para se inscrever e acompanhar as novidades do projeto!</p>
-                        <a href="https://www.youtube.com/@iaecatolico" target="_blank" class="inline-block px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-sm transition-all shadow-lg" data-label-key="subscribeButton">Inscrever-se no Canal</a>
-                    </div>
+                <!-- 4. INSCREVA-SE NO CANAL (SEMPRE NO FINAL) -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl flex-shrink-0 mt-auto">
+                    <h3 class="text-base font-bold text-red-500 mb-2 text-center" data-label-key="subscribeTitle">Inscreva-se no Canal</h3>
+                    <a href="https://www.youtube.com/@showdepremiosbingo?sub_confirmation=1" target="_blank" id="subscribe-btn" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-lg" data-label-key="subscribeButton">
+                        Inscrever-se no Canal
+                    </a>
                 </div>
             </aside>
         </main>
-        <footer class="text-center py-4 px-4 text-xs text-gray-400 dark:text-gray-500">
-            <p class="font-bold">Este programa é o resultado do Trabalho de Conclusão de Curso de <a href="https://www.instagram.com/oalison.rodrigues" target="_blank" class="text-sky-500 dark:text-sky-400 hover:underline">Alison Fernando Rodrigues dos Santos</a>, sob orientação do <a href="https://www.instagram.com/danilonobresant/" target="_blank" class="text-sky-500 dark:text-sky-400 hover:underline">Prof. Pe. Dr. Danilo Nobre</a>.</p>
-            <p class="mt-2">Título: "<a href="https://drive.google.com/file/d/1ePRuNoD-4jQZLrgFIanilhur3mB4-S19/view?usp?sharing" target="_blank" class="text-sky-500 dark:text-sky-400 hover:underline">E O VERBO SE FEZ I.A.?</a> DA REFLEXÃO TEOLÓGICA E COMUNICATIVA AO DESENVOLVIMENTO DE SOLUÇÕES PASTORAIS COM INTELIGÊNCIA ARTIFICIAL".</p>
-            <p class="mt-2">Desenvolvido inteiramente com a Inteligência Artificial Gemini 2.5 PRO da Google, este projeto demonstra como é possível criar soluções pastorais inovadoras com criatividade e ferramentas de baixo custo ou gratuitas, mesmo sem conhecimentos prévios em programação.</p>
-            <p class="mt-4">
-                Versão <span id="version" contenteditable="true" class="focus:outline-none focus:ring-2 ring-gray-600 rounded-lg px-2 inline-block"></span>
-                - <span id="last-updated"></span>
+        
+        <footer class="text-center p-4 mt-auto text-xs text-slate-500 flex-shrink-0">
+            <p>
+                <span id="version-text">Bingo Cloud v<span id="version">6.6.0</span></span> | 
+                <span id="last-updated"></span> | 
+                <a href="https://github.com/flavio-m-macedo/bingo-cloud" target="_blank" class="hover:text-sky-400">GitHub</a> |
+                <a href="https://1drv.ms/b/s!AqxRfy_aD-0FgdJ2gH3tQk3Fq-7HDA?e=a3S65N" target="_blank" class="hover:text-sky-400">Trabalho de Conclusão de Curso</a>
             </p>
-            <p class="mt-2">Encontrou um erro? <a href="mailto:oalison.rodrigues@gmail.com" class="text-sky-500 dark:text-sky-400 hover:underline">Reporte aqui</a></p>
         </footer>
     </div>
 
-    <!-- Modals -->
-    <div id="verification-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4"></div>
-    <div id="floating-number-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4"></div>
-    <div id="sponsor-display-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4"></div>
-    <div id="winner-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4"></div>
-    <div id="custom-alert-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4"></div>
-    <div id="congrats-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4"></div>
-    <div id="event-break-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-40 p-4"></div>
-    <div id="menu-edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="winner-edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="delete-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="clear-round-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="proof-options-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="spinning-wheel-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50 p-4 perspective-[1000px]"></div>
-    <div id="reset-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="drawn-prizes-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="donation-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div> 
-    <div id="final-winners-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="changelog-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-    <div id="round-edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"></div>
-
+    <!-- Modals (Initially Hidden, but present in the DOM for JS to find) -->
+    <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="floating-number-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="sponsor-display-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="winner-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="custom-alert-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="congrats-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="event-break-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="menu-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="winner-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="clear-round-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="proof-options-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="spinning-wheel-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="reset-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="drawn-prizes-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="donation-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="final-winners-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="changelog-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    <div id="round-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
+    
+    <!-- Script principal da aplicação -->
+    <script type="module" src="./index.tsx"></script>
+    
+    <!-- Biblioteca de Confetti para animações de vitória -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-    <script type="module" src="index.tsx"></script>
 </body>
 </html>
