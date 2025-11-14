@@ -1,4 +1,5 @@
 
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -113,7 +114,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             drawnTextStrokeColor: '#000000',
             drawnTextStrokeWidth: 2,
             isEventClosed: false,
-            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I4MmY2Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDRkOWZmIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImJhbGwiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmYmYzMjQiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmNTk5MDQiLz48L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii0xMDAlIiB5PSItMTAwJSIgd2lkdGg9IjMwMCUiIGhlaWdodD0iMzAwJSI+PGZlR2F1c3NpYW5CbHVyIGluPSJTb3VyY2VBbHBoYSIgc3RkRGV2aWF0aW9uPSIxMiIgcmVzdWx0PSJibHVyIi8+PGZlRm9vZEZpbHRlcj0idXJsKCNiZykiIHJlc3VsdD0iYmx1ciIvPjxmZUNvbXBvc2l0ZSBpbj0iYmx1ciIgaW4yPSJibHVyIiBvcGVyYXRvcj0iaW4iIHJlc3VsdD0iZ2xvd0NvbG9yIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJnbG93Q29sb3IiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+PC9maWx0ZXI+PC9kZWZzPjxnIGZpbHRlcj0idXJsKCNnbG93KSI+PHBhdGggZmlsbD0idXJsKCNiZykiIGQ9Ik00MjEuMSAyMjEuN0MyNy4xLTMxLjUtNDUuMyA2OS43LTU3LjkgMTEyLjVDLTIyIDI0My4xIDExMi4zIDM0NCAyNDEuMiAzNDRoMTM2LjljNzUgMCAxMzUuOS02MC45IDEzNS45LTEzN0M1MTQuMSAyNzYgNDc0LjQgMjM0LjUgNDIxLjEgMjIxLjd6Ii8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxMjAiIGZpbGw9InVybCgjYmFsbCkiLz48dGV4dCB4PSIyNTYiIHk9IjMwNiIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgwIiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+QjwvdGV4dD48L2c+PC9zdmc+',
+            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY2xvdWRHcmFkaWVudCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzOGJkZjgiLz4gPCEtLSBza3ktNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3ZGQzZmMiLz4gPCEtLSBza3ktMzAwIC0tPgogICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJiYWxsR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+IDwhLS0gYW1iZXItNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYmJmMjQiLz4gPCEtLSBhbWJlci00MDAgLS0+CiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4KICAgICAgICA8ZmlsdGVyIGlkPSJnbG93IiB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMjAwJSIgaGVpZ2h0PSIyMDAlIj4KICAgICAgICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgPGZlTWVyZ2U+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49ImNvbG9yZWRCbHVyIi8+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4KICAgICAgICAgICAgPC9mZU1lcmdlPgogICAgICAgIDwvZmlsdGVyPgogICAgPC9kZWZzPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8cGF0aCBmaWxsPSJ1cmwoI2Nsb3VkR3JhZGllbnQpIiBkPSJNMzQwLjcgODUuM2MtMTYuNC0zMy44LTUwLjgtNTYuMi05MC43LTU2LjItNDYuMSAwLTg1LjMgMzEuOC05Ny4zIDc0LjUtNDcuNSA4LjctODIuNCA1Mi04Mi40IDEwMS45IDAgNTcuMyA0Ni40IDEwMy43IDEwMy43IDEwMy43aDE3NS4yYzQ5LjMgMCA4OS4xLTM5LjggODkuMS04OS4xIDAtNDYuMS0zNS4zLTg0LTgwLjktODguNnoiIG9wYWNpdHk9IjAuOCIvPgogICAgICAgIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI4MCIgcj0iMTIwIiBmaWxsPSJ1cmwoI2JhbGxHcmFkaWVudCkiLz4KICAgICAgICA8dGV4dCB4PSIyNTYiIHk9IjMzMCIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYwIiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjYTE1YzA3IiBzdHJva2Utd2lkdGg9IjUiPkI8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg==',
             enableSponsorsByNumber: false,
             enableModalAutoclose: true,
             modalAutocloseSeconds: 5,
@@ -874,7 +875,7 @@ function populateSettingsShortcutsTab() {
             activeGameNumber = '3';
             gamesData[3].calledNumbers = gamesData[3].calledNumbers.slice(0, 10);
 
-            const savePromise = isLocalMode ? Promise.resolve(saveStateToLocalStorage()) : saveStateToFirestore();
+            const savePromise = isLocalMode ? saveStateToLocalStorage() : saveStateToFirestore();
             savePromise.then(() => {
                 showAlert("Dados de teste gerados com sucesso! O aplicativo será recarregado com o novo histórico.");
                 DOMElements.settingsModal.classList.add('hidden');
@@ -1032,6 +1033,62 @@ function applyDisplayZoom(scale: number) {
         }
         
         // --- Funções de Salvamento ---
+        const DB_NAME = 'BingoCloudDB';
+        const STORE_NAME = 'sponsorImages';
+        let dbPromise: Promise<IDBDatabase>;
+
+        function openDb() {
+            if (!dbPromise) {
+                dbPromise = new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, 1);
+                    request.onerror = () => reject("Error opening IndexedDB.");
+                    request.onsuccess = () => resolve(request.result);
+                    request.onupgradeneeded = (event) => {
+                        const db = (event.target as IDBOpenDBRequest).result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        }
+                    };
+                });
+            }
+            return dbPromise;
+        }
+
+        async function saveSponsorImage(id: string, image: string) {
+            const db = await openDb();
+            return new Promise<void>((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put({ id, image });
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject("Failed to save image to IndexedDB.");
+            });
+        }
+
+        async function loadSponsorImages() {
+            try {
+                const db = await openDb();
+                return new Promise<void>((resolve, reject) => {
+                    const transaction = db.transaction(STORE_NAME, 'readonly');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.getAll();
+
+                    request.onsuccess = () => {
+                        const images = request.result;
+                        images.forEach(item => {
+                            if (appConfig.sponsorsByNumber[item.id]) {
+                                appConfig.sponsorsByNumber[item.id].image = item.image;
+                            }
+                        });
+                        resolve();
+                    };
+                    request.onerror = () => reject("Failed to load images from IndexedDB.");
+                });
+            } catch (error) {
+                console.error("Could not initialize IndexedDB for loading images:", error);
+            }
+        }
+
         function saveStateToFile() {
             try {
                 const appState = getAppState();
@@ -1098,11 +1155,26 @@ function applyDisplayZoom(scale: number) {
             reader.readAsText(file);
         }
 
-        function saveStateToLocalStorage() {
+        async function saveStateToLocalStorage() {
             try {
                 const appState = getAppState();
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appState));
-                 if (isLocalMode) {
+                const stateToStore = JSON.parse(JSON.stringify(appState));
+        
+                if (isLocalMode && stateToStore.appConfig && stateToStore.appConfig.sponsorsByNumber) {
+                    const imageSavePromises: Promise<void>[] = [];
+                    for (const num in stateToStore.appConfig.sponsorsByNumber) {
+                        const sponsor = stateToStore.appConfig.sponsorsByNumber[num];
+                        if (sponsor.image && sponsor.image.startsWith('data:image')) {
+                            imageSavePromises.push(saveSponsorImage(num, sponsor.image));
+                            delete sponsor.image;
+                        }
+                    }
+                    await Promise.all(imageSavePromises);
+                }
+        
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToStore));
+        
+                if (isLocalMode) {
                     const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     DOMElements.connectionStatusText.innerHTML = `<strong>Modo Local</strong> (Salvo às ${time})`;
                 }
@@ -1110,13 +1182,14 @@ function applyDisplayZoom(scale: number) {
                 console.error("Falha ao salvar estado no localStorage:", error);
             }
         }
-
-        function loadStateFromLocalStorage(): boolean {
+        
+        async function loadStateFromLocalStorage(): Promise<boolean> {
             try {
                 const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
                 if (savedState) {
                     const appState = JSON.parse(savedState);
                     loadAppState(appState);
+                    await loadSponsorImages();
                     return true;
                 }
                 return false;
@@ -1159,7 +1232,7 @@ function applyDisplayZoom(scale: number) {
             let forceSave = false;
         
             if (isLocalMode) {
-                stateLoaded = loadStateFromLocalStorage();
+                stateLoaded = await loadStateFromLocalStorage();
             } else {
                 try {
                     const docSnap = await getDoc(dbRef);
@@ -1175,7 +1248,7 @@ function applyDisplayZoom(scale: number) {
                 } catch (error) {
                     console.error("Erro ao carregar dados do Firestore: ", error);
                     showAlert("Não foi possível carregar os dados salvos. Verificando dados locais.");
-                    stateLoaded = loadStateFromLocalStorage();
+                    stateLoaded = await loadStateFromLocalStorage();
                 }
             }
         
@@ -2751,7 +2824,7 @@ function showSettingsModal() {
         }
     });
     document.getElementById('remove-custom-logo-btn')!.addEventListener('click', () => {
-        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I4MmY2Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDRkOWZmIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImJhbGwiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmYmYzMjQiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmNTk5MDQiLz48L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii0xMDAlIiB5PSItMTAwJSIgd2lkdGg9IjMwMCUiIGhlaWdodD0iMzAwJSI+PGZlR2F1c3NpYW5CbHVyIGluPSJTb3VyY2VBbHBoYSIgc3RkRGV2aWF0aW9uPSIxMiIgcmVzdWx0PSJibHVyIi8+PGZlRm9vZEZpbHRlcj0idXJsKCNiZykiIHJlc3VsdD0iYmx1ciIvPjxmZUNvbXBvc2l0ZSBpbj0iYmx1ciIgaW4yPSJibHVyIiBvcGVyYXRvcj0iaW4iIHJlc3VsdD0iZ2xvd0NvbG9yIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJnbG93Q29sb3IiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+PC9maWx0ZXI+PC9kZWZzPjxnIGZpbHRlcj0idXJsKCNnbG93KSI+PHBhdGggZmlsbD0idXJsKCNiZykiIGQ9Ik00MjEuMSAyMjEuN0MyNy4xLTMxLjUtNDUuMyA2OS43LTU3LjkgMTEyLjVDLTIyIDI0My4xIDExMi4zIDM0NCAyNDEuMiAzNDRoMTM2LjljNzUgMCAxMzUuOS02MC45IDEzNS45LTEzN0M1MTQuMSAyNzYgNDc0LjQgMjM0LjUgNDIxLjEgMjIxLjd6Ii8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxMjAiIGZpbGw9InVybCgjYmFsbCkiLz48dGV4dCB4PSIyNTYiIHk9IjMwNiIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgwIiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+QjwvdGV4dD48L2c+PC9zdmc+'; // Default logo
+        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY2xvdWRHcmFkaWVudCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzOGJkZjgiLz4gPCEtLSBza3ktNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3ZGQzZmMiLz4gPCEtLSBza3ktMzAwIC0tPgogICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJiYWxsR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+IDwhLS0gYW1iZXItNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYmJmMjQiLz4gPCEtLSBhbWJlci00MDAgLS0+CiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4KICAgICAgICA8ZmlsdGVyIGlkPSJnbG93IiB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMjAwJSIgaGVpZ2h0PSIyMDAlIj4KICAgICAgICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgPGZlTWVyZ2U+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49ImNvbG9yZWRCbHVyIi8+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4KICAgICAgICAgICAgPC9mZU1lcmdlPgogICAgICAgIDwvZmlsdGVyPgogICAgPC9kZWZzPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8cGF0aCBmaWxsPSJ1cmwoI2Nsb3VkR3JhZGllbnQpIiBkPSJNMzQwLjcgODUuM2MtMTYuNC0zMy44LTUwLjgtNTYuMi05MC43LTU2LjItNDYuMSAwLTg1LjMgMzEuOC05Ny4zIDc0LjUtNDcuNSA4LjctODIuNCA1Mi04Mi40IDEwMS45IDAgNTcuMyA0Ni40IDEwMy43IDEwMy43IDEwMy43aDE3NS4yYzQ5LjMgMCA4OS4xLTM5LjggODkuMS04OS4xIDAtNDYuMS0zNS4zLTg0LTgwLjktODguNnoiIG9wYWNpdHk9IjAuOCIvPgogICAgICAgIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI4MCIgcj0iMTIwIiBmaWxsPSJ1cmwoI2JhbGxHcmFkaWVudCkiLz4KICAgICAgICA8dGV4dCB4PSIyNTYiIHk9IjMzMCIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYwIiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjYTE1YzA3IiBzdHJva2Utd2lkdGg9IjUiPkI8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg=='; // Default logo
         customLogoPreview.src = appConfig.customLogoBase64;
         renderCustomLogo();
         debouncedSave();
@@ -2966,298 +3039,121 @@ function showSettingsModal() {
 
             const keyString = buildShortcutString(e);
             const activeEl = document.activeElement;
-            const isInputFocused = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || (activeEl as HTMLElement).isContentEditable);
-            
-            if (document.activeElement === DOMElements.numberInput && e.key === 'Enter') {
-                 e.preventDefault();
-                 handleManualSubmit();
-                 return;
-            }
-        
+            const isInputFocused = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.getAttribute('contenteditable') === 'true');
+
             if (isInputFocused) {
+                if (e.key === 'Escape') {
+                    (activeEl as HTMLElement).blur();
+                }
                 return;
             }
-            
-            const shortcutActions: { [key: string]: () => void } = {
-                [appConfig.shortcuts.autoDraw]: handleAutoDraw,
-                [appConfig.shortcuts.verify]: showVerificationPanel,
-                [appConfig.shortcuts.clearRound]: () => {
-                    if (activeGameNumber) {
-                        DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
-                        DOMElements.clearRoundConfirmModal.classList.remove('hidden');
-                        document.getElementById('confirm-clear-round-btn')!.addEventListener('click', () => {
-                            startNewRound();
-                            DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                        });
-                        document.getElementById('cancel-clear-round-btn')!.addEventListener('click', () => {
-                            DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                        });
-                    } else {
-                        showAlert("Nenhuma rodada ativa para limpar.");
-                    }
-                },
-                [appConfig.shortcuts.drawPrize]: () => {
+        
+            switch (keyString) {
+                case appConfig.shortcuts.autoDraw:
+                    e.preventDefault();
+                    handleAutoDraw();
+                    break;
+                case appConfig.shortcuts.verify:
+                    e.preventDefault();
+                    showVerificationPanel();
+                    break;
+                case appConfig.shortcuts.clearRound:
+                    e.preventDefault();
+                    (DOMElements.clearRoundBtnBottom as HTMLButtonElement).click();
+                    break;
+                case appConfig.shortcuts.drawPrize:
+                    e.preventDefault();
                     (document.getElementById('prize-draw-random-btn') as HTMLButtonElement)?.click();
-                },
-                [appConfig.shortcuts.registerPrize]: () => {
+                    break;
+                case appConfig.shortcuts.registerPrize:
+                    e.preventDefault();
                     DOMElements.prizeDrawForm.requestSubmit();
-                },
-                [appConfig.shortcuts.sellAuction]: () => {
+                    break;
+                case appConfig.shortcuts.sellAuction:
+                    e.preventDefault();
                     DOMElements.auctionForm.requestSubmit();
-                },
-                [appConfig.shortcuts.showInterval]: () => {
-                    DOMElements.intervalBtn?.click();
-                }
-            };
-            
-            if (shortcutActions[keyString]) {
-                e.preventDefault();
-                shortcutActions[keyString]();
+                    break;
+                case appConfig.shortcuts.showInterval:
+                    e.preventDefault();
+                    (DOMElements.intervalBtn as HTMLButtonElement).click();
+                    break;
             }
-        }
-
-        // --- Funções Adicionais e Faltantes para Event Handlers ---
-        
-        function drawPrizeNumber() {
-            const min = parseInt((document.getElementById('prize-draw-min') as HTMLInputElement).value, 10);
-            const max = parseInt((document.getElementById('prize-draw-max') as HTMLInputElement).value, 10);
-            const noRepeat = DOMElements.noRepeatPrizeDrawCheckbox.checked;
-
-            if (isNaN(min) || isNaN(max) || min > max) {
-                showAlert("Por favor, insira um intervalo válido para o sorteio.");
-                return;
-            }
-
-            const availableNumbers = Array.from({ length: max - min + 1 }, (_, i) => i + min)
-                .filter(num => !noRepeat || !drawnPrizeNumbers.includes(num));
-
-            if (availableNumbers.length === 0) {
-                showAlert("Todos os números neste intervalo já foram sorteados.");
-                return;
-            }
-
-            const randomIndex = Math.floor(Math.random() * availableNumbers.length);
-            const drawnNumber = availableNumbers[randomIndex];
-            
-            if(noRepeat) drawnPrizeNumbers.push(drawnNumber);
-
-            const numberInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
-            numberInput.value = drawnNumber.toString();
-
-            // Animação de Sorteio
-            const displayContainer = DOMElements.prizeDrawDisplayContainer;
-            const roundColor = activeGameNumber ? gamesData[activeGameNumber]?.color : '#8b5cf6'; // Roxo padrão
-            displayContainer.innerHTML = `<div id="prize-draw-display" class="font-black text-white flex justify-center items-center w-full h-full p-4 rounded-full" style="font-size: clamp(6rem, 25vw, 15rem); line-height: 1; background-color: ${roundColor};"></div>`;
-            displayContainer.classList.remove('hidden');
-            (DOMElements.currentNumberEl as HTMLElement).style.visibility = 'hidden';
-            DOMElements.mainDisplayLabel.textContent = 'Cartela Sorteada!';
-
-            const displayEl = document.getElementById('prize-draw-display')!;
-            let spinCount = 0;
-            const spinInterval = setInterval(() => {
-                const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-                displayEl.textContent = randomNum.toString();
-                displayEl.classList.add('animate-custom-flash');
-                setTimeout(() => displayEl.classList.remove('animate-custom-flash'), 300);
-                spinCount++;
-                if (spinCount > 15) {
-                    clearInterval(spinInterval);
-                    displayEl.textContent = drawnNumber.toString();
-                    displayEl.classList.add('pulse-glow-animation');
-                }
-            }, 100);
-            
-            debouncedSave();
         }
         
-        function registerPrize(e: Event) {
-            e.preventDefault();
-            const numberInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
-            const nameInput = document.getElementById('prize-draw-name') as HTMLInputElement;
-            const descriptionInput = document.getElementById('prize-draw-description') as HTMLInputElement;
-
-            const cartela = numberInput.value.trim();
-            if (!cartela) {
-                showAlert("Por favor, sorteie ou digite o número da cartela.");
-                return;
-            }
-
-            if (!gamesData['Brindes']) {
-                gamesData['Brindes'] = { winners: [] };
-            }
-            
-            const winnerData = {
-                id: Date.now(),
-                name: nameInput.value.trim() || `Ganhador #${cartela}`,
-                prize: descriptionInput.value.trim() || 'Brinde',
-                gameNumber: 'Brindes',
-                bingoType: 'Sorteio',
-                cartela: cartela
-            };
-
-            gamesData['Brindes'].winners.push(winnerData);
-            
-            if (DOMElements.noRepeatPrizeDrawCheckbox.checked && !drawnPrizeNumbers.includes(parseInt(cartela, 10))) {
-                drawnPrizeNumbers.push(parseInt(cartela, 10));
-            }
-            
-            renderAllWinners();
-            showCongratsModal(winnerData.name, winnerData.prize, true, winnerData.cartela);
-            
-            numberInput.value = '';
-            nameInput.value = '';
-            descriptionInput.value = '';
-            debouncedSave();
-        }
-
-        function sellAuctionItem(e: Event) {
-            e.preventDefault();
-            const itemNameInput = document.getElementById('auction-item-name') as HTMLInputElement;
-            const winnerNameInput = document.getElementById('auction-winner-name') as HTMLInputElement;
-            const bidInput = document.getElementById('auction-item-current-bid') as HTMLInputElement;
-
-            const itemName = itemNameInput.value.trim();
-            const winnerName = winnerNameInput.value.trim();
-            const bid = bidInput.value;
-
-            if (!itemName || !winnerName || parseInt(bid) <= 0) {
-                showAlert("Preencha o nome do item, o nome do arrematador e um valor de lance maior que zero.");
-                return;
-            }
-
-            const gavelIcon = document.getElementById('gavel-icon')!;
-            gavelIcon.classList.remove('hidden');
-            gavelIcon.classList.add('animate-gavel-strike');
-            setTimeout(() => gavelIcon.classList.add('hidden'), 600);
-            
-            if (!gamesData['Leilão']) {
-                gamesData['Leilão'] = { winners: [] };
-            }
-
-            const auctionData = {
-                id: Date.now(),
-                name: winnerName,
-                prize: `${itemName} (R$ ${bid})`,
-                gameNumber: 'Leilão',
-                bingoType: 'Leilão',
-                itemName: itemName,
-                bid: bid
-            };
-
-            gamesData['Leilão'].winners.push(auctionData);
-            renderAllWinners();
-            
-            // Limpa o formulário do leilão
-            itemNameInput.value = '';
-            winnerNameInput.value = '';
-            bidInput.value = '0';
-            updateAuctionBidDisplay(0);
-            (document.getElementById('custom-bid-input') as HTMLInputElement).value = '';
-            
-            debouncedSave();
-        }
-        
-        function showDrawnPrizesModal() {
-            DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
-            const listContainer = document.getElementById('drawn-prizes-list')!;
-            const subtitle = document.getElementById('drawn-prizes-subtitle')!;
-
-            subtitle.textContent = `Total de ${drawnPrizeNumbers.length} cartelas sorteadas`;
-            listContainer.innerHTML = '';
-
-            if (drawnPrizeNumbers.length === 0) {
-                listContainer.textContent = "Nenhuma cartela de brinde foi sorteada ainda.";
-            } else {
-                drawnPrizeNumbers.forEach((num, index) => {
-                    const numberEl = document.createElement('div');
-                    numberEl.className = 'bg-gray-700 text-white font-bold rounded-lg p-3 text-2xl flex items-center gap-2';
-                    if(index === drawnPrizeNumbers.length - 1) {
-                         numberEl.classList.add('bg-amber-500', 'text-black', 'scale-110');
-                    }
-                    
-                    numberEl.innerHTML = `<span>${num}</span><button data-num="${num}" class="delete-prize-btn text-xs bg-red-600 rounded-full w-5 h-5 flex items-center justify-center">X</button>`;
-                    listContainer.appendChild(numberEl);
-                });
-            }
-
-            listContainer.querySelectorAll('.delete-prize-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const numToRemove = parseInt((e.target as HTMLElement).dataset.num!, 10);
-                    drawnPrizeNumbers = drawnPrizeNumbers.filter(n => n !== numToRemove);
-                    debouncedSave();
-                    showDrawnPrizesModal(); // Re-render the modal
-                });
-            });
-
-            DOMElements.drawnPrizesModal.classList.remove('hidden');
-            document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
-                DOMElements.drawnPrizesModal.classList.add('hidden');
-            });
-        }
-        
-        function showIntervalScreen() {
+        function showEventBreakModal() {
             DOMElements.eventBreakModal.innerHTML = getModalTemplates().eventBreak;
             DOMElements.eventBreakModal.classList.remove('hidden');
-            
-            const leftContent = document.getElementById('break-left-content')!;
-            const rightContent = document.getElementById('break-right-content')!;
-            const rightTitle = document.getElementById('break-right-title')!;
+        
+            const leftContentEl = document.getElementById('break-left-content')!;
+            const rightContentEl = document.getElementById('break-right-content')!;
             const clockEl = document.getElementById('break-clock')!;
-            
-            let currentLeftIndex = 0;
-            let currentRightIndex = 0;
-
-            const allWinners = Object.values(gamesData).flatMap(game => (game as any).winners || []).reverse();
-            const allSponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.name || s.image);
-
-            const rightItems = allSponsors.length > 0 ? allSponsors : allWinners;
-            rightTitle.textContent = allSponsors.length > 0 ? "Patrocinadores" : "Últimos Ganhadores";
-
-            const updateContent = () => {
-                // Animação de saída
-                leftContent.classList.add('opacity-0');
-                rightContent.classList.add('opacity-0');
-
+            const leftTitleEl = document.getElementById('break-left-title')!;
+            const rightTitleEl = document.getElementById('break-right-title')!;
+        
+            const sponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.name);
+            const contentListRight = sponsors.length > 0 ? sponsors.map(s => s.name) : Object.values(gamesData).flatMap(g => (g as any).winners || []).filter(Boolean).map((w:any) => w.name);
+            const titleRight = sponsors.length > 0 ? "Patrocinadores" : "Vencedores";
+        
+            const contentListLeft = menuItems;
+            let currentIndexLeft = 0;
+            let currentIndexRight = 0;
+        
+            const updateContent = (el: HTMLElement, list: string[], index: number) => {
+                if (!list || list.length === 0) {
+                    el.textContent = '...';
+                    return;
+                }
+                el.classList.add('opacity-0');
                 setTimeout(() => {
-                    // Atualiza conteúdo Esquerdo (Cardápio)
-                    if (menuItems.length > 0) {
-                        leftContent.textContent = menuItems[currentLeftIndex];
-                        currentLeftIndex = (currentLeftIndex + 1) % menuItems.length;
-                    }
-
-                    // Atualiza conteúdo Direito (Patrocinadores/Vencedores)
-                    if (rightItems.length > 0) {
-                        const item = rightItems[currentRightIndex];
-                        if (allSponsors.length > 0) { // É patrocinador
-                             rightContent.innerHTML = `<div class="flex flex-col items-center gap-4"><img src="${item.image}" class="h-48 object-contain rounded-lg"><p>${item.name}</p></div>`;
-                        } else { // É vencedor
-                             rightContent.innerHTML = `<p>${item.name}</p><p class="text-5xl text-amber-400 mt-2">${item.prize}</p>`;
-                        }
-                        currentRightIndex = (currentRightIndex + 1) % rightItems.length;
-                    } else {
-                        rightContent.textContent = "Apoie nosso evento!";
-                    }
-
-                    // Animação de entrada
-                    leftContent.classList.remove('opacity-0');
-                    rightContent.classList.remove('opacity-0');
+                    el.textContent = list[index % list.length];
+                    el.classList.remove('opacity-0');
                 }, 500);
             };
-
-            intervalContentInterval = setInterval(updateContent, 5000);
-            updateContent();
-
-            intervalClockInterval = setInterval(() => {
-                clockEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            }, 1000);
+        
+            leftTitleEl.textContent = "Cardápio";
+            rightTitleEl.textContent = titleRight;
             
-            breakConfettiInterval = setInterval(() => {
-                if (typeof confetti === 'function') {
-                    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-                    confetti({ particleCount: 5, startVelocity: 15, spread: 360, origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }, zIndex: 0 });
+            updateContent(leftContentEl, contentListLeft, currentIndexLeft);
+            updateContent(rightContentEl, contentListRight, currentIndexRight);
+        
+            intervalContentInterval = setInterval(() => {
+                currentIndexLeft++;
+                updateContent(leftContentEl, contentListLeft, currentIndexLeft);
+                currentIndexRight++;
+                updateContent(rightContentEl, contentListRight, currentIndexRight);
+            }, 5000);
+        
+            const updateClock = () => {
+                clockEl.textContent = new Date().toLocaleTimeString('pt-BR');
+            };
+            updateClock();
+            intervalClockInterval = setInterval(updateClock, 1000);
+            
+            const startBreakConfetti = () => {
+                const duration = 15 * 1000;
+                const animationEnd = Date.now() + duration;
+                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1001 };
+        
+                function randomInRange(min:number, max:number) {
+                    return Math.random() * (max - min) + min;
                 }
-            }, 500);
-
+        
+                breakConfettiInterval = setInterval(function() {
+                    if (typeof confetti !== 'function') {
+                        clearInterval(breakConfettiInterval);
+                        return;
+                    }
+                    let timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0 && DOMElements.eventBreakModal.classList.contains('hidden')) {
+                         return clearInterval(breakConfettiInterval);
+                    }
+                    let particleCount = 50 * (Math.max(timeLeft, 5000) / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 350);
+            }
+            startBreakConfetti();
+        
             document.getElementById('close-break-modal-btn')!.addEventListener('click', () => {
                 clearInterval(intervalContentInterval);
                 clearInterval(intervalClockInterval);
@@ -3266,238 +3162,408 @@ function showSettingsModal() {
             });
         }
         
-function openRoundEditModal(gameNumber: string) {
-    DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
-    const game = gamesData[gameNumber];
-    if (!game) return;
-
-    (document.getElementById('round-edit-title') as HTMLElement).textContent = `Editar Rodada ${gameNumber}`;
-    const prizesContainer = document.getElementById('round-edit-prizes-container')!;
-    prizesContainer.innerHTML = ''; 
-
-    Object.keys(game.prizes).forEach((prizeKey, index) => {
-        const labelKey = `prize${index + 1}Label` as keyof typeof appLabels;
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = `
-            <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${appLabels[labelKey]}</label>
-            <input type="text" id="round-edit-${prizeKey}" data-prize-key="${prizeKey}" value="${game.prizes[prizeKey as keyof typeof game.prizes]}" class="w-full bg-gray-900 text-white p-2 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
-        `;
-        prizesContainer.appendChild(wrapper);
-    });
-    
-    const descriptionTextarea = document.getElementById('round-edit-description') as HTMLTextAreaElement;
-    descriptionTextarea.value = game.description || '';
-
-    DOMElements.roundEditModal.classList.remove('hidden');
-
-    document.getElementById('save-round-edit-btn')!.addEventListener('click', () => {
-        prizesContainer.querySelectorAll('input').forEach(input => {
-            const prizeKey = input.dataset.prizeKey as keyof typeof game.prizes;
-            game.prizes[prizeKey] = input.value;
-        });
-        game.description = descriptionTextarea.value;
+        function resetEvent() {
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            if (!isLocalMode && dbRef) {
+                deleteDoc(dbRef).then(() => {
+                    window.location.reload();
+                }).catch(err => {
+                    console.error("Failed to delete cloud data, reloading anyway.", err);
+                    window.location.reload();
+                });
+            } else {
+                window.location.reload();
+            }
+        }
         
-        DOMElements.roundEditModal.classList.add('hidden');
-        renderUIFromState();
-        debouncedSave();
-    });
-
-    document.getElementById('cancel-round-edit-btn')!.addEventListener('click', () => {
-        DOMElements.roundEditModal.classList.add('hidden');
-    });
-}
-
-function initializeFirebase() {
-    const firebaseConfig = {
-        apiKey: window.VITE_API_KEY,
-        authDomain: window.VITE_AUTH_DOMAIN,
-        projectId: window.VITE_PROJECT_ID,
-        storageBucket: window.VITE_STORAGE_BUCKET,
-        messagingSenderId: window.VITE_MESSAGING_SENDER_ID,
-        appId: window.VITE_APP_ID,
-    };
-    
-    if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            DOMElements.connectionIndicator.classList.remove('bg-yellow-500');
-            DOMElements.connectionIndicator.classList.add('bg-green-500');
-            
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    userId = user.uid;
-                    dbRef = doc(db, "bingoEvents", userId);
-                    firebaseReady = true;
-                    loadInitialState();
-                } else {
-                    signInAnonymously(auth).catch(error => {
-                        console.error("Anonymous sign-in failed:", error);
-                        showAlert("Falha na autenticação. O salvamento em nuvem não funcionará.");
-                    });
-                }
+        function handlePrizeDrawSubmit(e: Event) {
+            e.preventDefault();
+            const ticketInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
+            const nameInput = document.getElementById('prize-draw-name') as HTMLInputElement;
+            const descInput = document.getElementById('prize-draw-description') as HTMLInputElement;
+        
+            const ticketNumber = ticketInput.value;
+            if (!ticketNumber) {
+                showAlert("O número da cartela é obrigatório para registrar um brinde.");
+                return;
+            }
+        
+            if (!gamesData['Brindes']) {
+                gamesData['Brindes'] = { winners: [] };
+            }
+            gamesData['Brindes'].winners.push({
+                id: Date.now(),
+                name: nameInput.value || `Ganhador #${ticketNumber}`,
+                prize: descInput.value || 'Brinde',
+                gameNumber: 'Brinde',
+                bingoType: 'Sorteio',
+                cartela: ticketNumber
             });
-        } catch(e) {
-             console.error("Firebase initialization failed: ", e);
-             isLocalMode = true;
-             firebaseReady = false;
-             DOMElements.connectionStatusText.innerHTML = "<strong>Modo Local</strong> (Firebase não configurado)";
-             DOMElements.connectionIndicator.title = "O salvamento na nuvem está desativado. Suas alterações serão salvas apenas neste navegador. Para ativar a nuvem, configure as variáveis do Firebase no arquivo index.html.";
-             loadInitialState();
-        }
-    } else {
-        console.log("Firebase config not found. Running in local mode.");
-        isLocalMode = true;
-        firebaseReady = false;
-        DOMElements.connectionStatusText.innerHTML = "<strong>Modo Local</strong> (Firebase não configurado)";
-        DOMElements.connectionIndicator.title = "O salvamento na nuvem está desativado. Suas alterações serão salvas apenas neste navegador. Para ativar a nuvem, configure as variáveis do Firebase no arquivo index.html.";
-        loadInitialState();
-    }
-}
-
-
-async function initApp() {
-    renderUpdateInfo();
-
-    const savedMode = localStorage.getItem(MODE_STORAGE_KEY);
-    const modeModal = document.getElementById('mode-selection-modal')!;
-    const changeModeBtn = document.getElementById('change-mode-btn')!;
-
-    changeModeBtn.addEventListener('click', () => {
-        localStorage.removeItem(MODE_STORAGE_KEY);
-        showAlert("Modo de salvamento redefinido. A seleção aparecerá na próxima vez que a página for carregada.");
-    });
-    
-    const startApplication = (mode: 'local' | 'online') => {
-        isLocalMode = mode === 'local';
-        localStorage.setItem(MODE_STORAGE_KEY, mode);
-        modeModal.classList.add('hidden');
-        changeModeBtn.classList.remove('hidden');
-
-        if (isLocalMode) {
-             DOMElements.connectionIndicator.classList.remove('bg-blue-500');
-             DOMElements.connectionIndicator.classList.add('bg-yellow-500');
+        
+            if (DOMElements.noRepeatPrizeDrawCheckbox.checked) {
+                drawnPrizeNumbers.push(parseInt(ticketNumber, 10));
+            }
+        
+            renderAllWinners();
+            showCongratsModal(nameInput.value || `Ganhador #${ticketNumber}`, descInput.value || 'Brinde', true, ticketNumber);
+            debouncedSave();
+            
+            ticketInput.value = '';
+            nameInput.value = '';
+            descInput.value = '';
         }
         
-        initializeFirebase();
-    };
-
-    if (!savedMode) {
-        modeModal.classList.remove('hidden');
-        document.getElementById('select-online-mode-btn')!.addEventListener('click', () => startApplication('online'));
-        document.getElementById('select-local-mode-btn')!.addEventListener('click', () => startApplication('local'));
-    } else {
-        startApplication(savedMode as 'local' | 'online');
-    }
-}
-
-// --- Event Listeners ---
-document.addEventListener('DOMContentLoaded', () => {
-    initApp();
-    
-    document.getElementById('show-changelog-btn')!.addEventListener('click', showChangelogModal);
-    document.getElementById('show-settings-btn')!.addEventListener('click', showSettingsModal);
-    document.getElementById('save-local-btn')!.addEventListener('click', saveStateToFile);
-    document.getElementById('load-local-input')!.addEventListener('change', loadStateFromFile);
-    
-    DOMElements.intervalBtn.addEventListener('click', showIntervalScreen);
-    DOMElements.editMenuBtn.addEventListener('click', showMenuEditModal);
-    DOMElements.shareBtn.addEventListener('click', showProofOptions);
-    
-    DOMElements.endEventBtn.addEventListener('click', () => {
-        appConfig.isEventClosed = true;
-        debouncedSave();
-        const allWinners = Object.values(gamesData).flatMap(game => (game as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
-        startFinalWinnerSlide(allWinners);
-    });
-    
-    DOMElements.resetEventBtn.addEventListener('click', () => {
-        DOMElements.resetConfirmModal.innerHTML = getModalTemplates().resetConfirm;
-        DOMElements.resetConfirmModal.classList.remove('hidden');
-        document.getElementById('confirm-reset-btn')!.addEventListener('click', async () => {
-             const savePromise = isLocalMode ? Promise.resolve(localStorage.removeItem(LOCAL_STORAGE_KEY)) : deleteDoc(doc(db, "bingoEvents", userId));
-             await savePromise;
-             window.location.reload();
-        });
-        document.getElementById('cancel-reset-btn')!.addEventListener('click', () => {
-            DOMElements.resetConfirmModal.classList.add('hidden');
-        });
-    });
-
-    (document.getElementById('board-zoom-slider') as HTMLInputElement).addEventListener('input', (e) => {
-        const scale = parseInt((e.target as HTMLInputElement).value, 10);
-        appConfig.boardScale = scale;
-        applyBoardZoom(scale);
-        debouncedSave();
-    });
-    (document.getElementById('display-zoom-slider') as HTMLInputElement).addEventListener('input', (e) => {
-        const scale = parseInt((e.target as HTMLInputElement).value, 10);
-        appConfig.displayScale = scale;
-        applyDisplayZoom(scale);
-        debouncedSave();
-    });
-
-    DOMElements.manualInputForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleManualSubmit();
-    });
-
-    // Universal buttons
-    document.getElementById('auto-draw-btn-top')?.addEventListener('click', handleAutoDraw);
-    document.getElementById('auto-draw-btn-bottom')?.addEventListener('click', handleAutoDraw);
-    document.getElementById('verify-btn-top')?.addEventListener('click', showVerificationPanel);
-    document.getElementById('verify-btn-bottom')?.addEventListener('click', showVerificationPanel);
-    
-    const setupClearRoundButtons = () => {
-        const showClearRoundModal = () => {
-            if (activeGameNumber) {
+        function handleRandomPrizeDraw() {
+            const min = parseInt((document.getElementById('prize-draw-min') as HTMLInputElement).value, 10);
+            const max = parseInt((document.getElementById('prize-draw-max') as HTMLInputElement).value, 10);
+            
+            if (isNaN(min) || isNaN(max) || min >= max) {
+                showAlert("Por favor, insira um intervalo válido para o sorteio.");
+                return;
+            }
+        
+            let availableNumbers = [];
+            for (let i = min; i <= max; i++) {
+                availableNumbers.push(i);
+            }
+            
+            if (DOMElements.noRepeatPrizeDrawCheckbox.checked) {
+                availableNumbers = availableNumbers.filter(n => !drawnPrizeNumbers.includes(n));
+            }
+        
+            if (availableNumbers.length === 0) {
+                showAlert("Todos os números neste intervalo já foram sorteados.");
+                return;
+            }
+        
+            const drawnNumber = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+        
+            const displayContainer = DOMElements.prizeDrawDisplayContainer as HTMLElement;
+            displayContainer.classList.remove('hidden');
+            (DOMElements.currentNumberEl as HTMLElement).style.visibility = 'hidden';
+            DOMElements.mainDisplayLabel.textContent = "Cartela Sorteada";
+            
+            const roundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
+            displayContainer.innerHTML = `<div id="prize-draw-display" class="font-black text-white flex justify-center items-center rounded-2xl w-full max-w-lg h-64 text-[150px] transition-all duration-300" style="background-color: ${roundColor};"></div>`;
+            const displayEl = document.getElementById('prize-draw-display') as HTMLElement;
+        
+            let iterations = 0;
+            const interval = setInterval(() => {
+                displayEl.textContent = Math.floor(Math.random() * (max - min + 1) + min).toString();
+                iterations++;
+                if (iterations > 20) {
+                    clearInterval(interval);
+                    displayEl.textContent = drawnNumber.toString();
+                    displayEl.classList.add('pulse-glow-animation');
+                    (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value = drawnNumber.toString();
+                }
+            }, 100);
+        }
+        
+        function showDrawnPrizesModal() {
+            DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
+            const listContainer = document.getElementById('drawn-prizes-list')!;
+            const subtitleEl = document.getElementById('drawn-prizes-subtitle')!;
+            listContainer.innerHTML = '';
+            
+            const roundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
+            (document.getElementById('drawn-prizes-title') as HTMLElement).style.color = roundColor;
+            
+            const drawnPrizes = gamesData['Brindes']?.winners || [];
+            subtitleEl.textContent = `Total de ${drawnPrizes.length} brindes registrados.`;
+            
+            if (drawnPrizes.length > 0) {
+                drawnPrizes.slice().reverse().forEach((winner: any) => {
+                    const prizeEl = document.createElement('div');
+                    prizeEl.className = 'bg-gray-700 p-2 rounded-lg text-sm text-left';
+                    const isLast = drawnPrizeNumbers.length > 0 && winner.cartela == drawnPrizeNumbers[drawnPrizeNumbers.length - 1];
+                    if (isLast) {
+                        prizeEl.classList.add('border-2', 'border-amber-400');
+                    }
+        
+                    prizeEl.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="font-bold text-lg text-white">Cartela #${winner.cartela}</span>
+                                <p class="text-slate-300">${winner.name}</p>
+                                <p class="text-xs text-yellow-400">${winner.prize}</p>
+                            </div>
+                            <button class="text-red-500 hover:text-red-400 font-bold" data-id="${winner.id}">X</button>
+                        </div>
+                    `;
+                    prizeEl.querySelector('button')?.addEventListener('click', () => {
+                        gamesData['Brindes'].winners = gamesData['Brindes'].winners.filter((w: any) => w.id !== winner.id);
+                        drawnPrizeNumbers = drawnPrizeNumbers.filter(n => n.toString() !== winner.cartela);
+                        debouncedSave();
+                        showDrawnPrizesModal(); // Refresh the modal
+                    });
+                    listContainer.appendChild(prizeEl);
+                });
+            } else {
+                listContainer.textContent = "Nenhum brinde registrado ainda.";
+            }
+        
+            DOMElements.drawnPrizesModal.classList.remove('hidden');
+            document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
+                DOMElements.drawnPrizesModal.classList.add('hidden');
+            });
+        }
+        
+        function handleAuctionSubmit(e: Event) {
+            e.preventDefault();
+            const itemNameInput = document.getElementById('auction-item-name') as HTMLInputElement;
+            const winnerNameInput = document.getElementById('auction-winner-name') as HTMLInputElement;
+            const bidInput = document.getElementById('auction-item-current-bid') as HTMLInputElement;
+        
+            const itemName = itemNameInput.value;
+            const winnerName = winnerNameInput.value;
+            const bid = bidInput.value;
+        
+            if (!itemName || !winnerName || !bid || parseInt(bid) <= 0) {
+                showAlert("Preencha todos os campos do leilão (item, arrematador e lance) para registrar a venda.");
+                return;
+            }
+        
+            if (!gamesData['Leilão']) {
+                gamesData['Leilão'] = { winners: [] };
+            }
+            gamesData['Leilão'].winners.push({
+                id: Date.now(),
+                name: winnerName,
+                prize: `Leilão: ${itemName} (R$ ${bid})`,
+                gameNumber: 'Leilão',
+                bingoType: 'Leilão',
+                itemName: itemName,
+                bid: bid
+            });
+        
+            const gavelIcon = document.getElementById('gavel-icon')!;
+            gavelIcon.classList.remove('hidden', 'animate-gavel-strike');
+            void gavelIcon.offsetWidth; 
+            gavelIcon.classList.add('animate-gavel-strike');
+        
+            renderAllWinners();
+            showCongratsModal(winnerName, `Arrematou "${itemName}" por R$ ${bid}`);
+            debouncedSave();
+        
+            setTimeout(() => {
+                (DOMElements.auctionForm as HTMLFormElement).reset();
+                updateAuctionBidDisplay(0);
+                gavelIcon.classList.add('hidden');
+            }, 1500);
+        }
+        
+        function showRoundEditModal(gameNumber: string) {
+            DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
+            const game = gamesData[gameNumber];
+            if (!game) return;
+        
+            const titleEl = document.getElementById('round-edit-title')!;
+            const prizesContainer = document.getElementById('round-edit-prizes-container')!;
+            const descriptionTextarea = document.getElementById('round-edit-description') as HTMLTextAreaElement;
+        
+            titleEl.textContent = `Editar Rodada ${gameNumber}`;
+            descriptionTextarea.value = game.description || '';
+            prizesContainer.innerHTML = '';
+        
+            Object.keys(game.prizes).forEach((prizeKey, index) => {
+                const prizeLabelKey = `prize${index + 1}Label` as keyof typeof appLabels;
+                const prizeWrapper = document.createElement('div');
+                prizeWrapper.innerHTML = `
+                    <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${appLabels[prizeLabelKey]}</label>
+                    <input type="text" id="round-edit-${prizeKey}" value="${game.prizes[prizeKey as keyof typeof game.prizes]}" class="w-full text-base font-bold p-2 border-2 border-gray-600 bg-gray-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                `;
+                prizesContainer.appendChild(prizeWrapper);
+            });
+        
+            DOMElements.roundEditModal.classList.remove('hidden');
+        
+            document.getElementById('save-round-edit-btn')!.addEventListener('click', () => {
+                Object.keys(game.prizes).forEach(prizeKey => {
+                    const input = document.getElementById(`round-edit-${prizeKey}`) as HTMLInputElement;
+                    game.prizes[prizeKey as keyof typeof game.prizes] = input.value;
+                });
+                game.description = descriptionTextarea.value;
+                
+                DOMElements.roundEditModal.classList.add('hidden');
+                renderUIFromState();
+                debouncedSave();
+            });
+        
+            document.getElementById('cancel-round-edit-btn')!.addEventListener('click', () => {
+                DOMElements.roundEditModal.classList.add('hidden');
+            });
+        }
+        
+        // --- Event Listeners ---
+        function setupEventListeners() {
+            DOMElements.showSettingsBtn.addEventListener('click', showSettingsModal);
+            DOMElements.showChangelogBtn.addEventListener('click', showChangelogModal);
+            DOMElements.showDonationModalBtn.addEventListener('click', showDonationModal);
+            document.getElementById('show-tutorial-btn')!.addEventListener('click', () => {
+                if (appConfig.tutorialVideoLink) window.open(appConfig.tutorialVideoLink, '_blank');
+            });
+        
+            document.getElementById('save-local-btn')!.addEventListener('click', saveStateToFile);
+            document.getElementById('load-local-input')!.addEventListener('change', loadStateFromFile);
+        
+            DOMElements.manualInputForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleManualSubmit();
+            });
+        
+            const confirmClearRound = () => {
                 DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
                 DOMElements.clearRoundConfirmModal.classList.remove('hidden');
                 document.getElementById('confirm-clear-round-btn')!.addEventListener('click', () => {
                     startNewRound();
                     DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                }, { once: true });
+                });
                 document.getElementById('cancel-clear-round-btn')!.addEventListener('click', () => {
                     DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                }, { once: true });
-            } else {
-                showAlert("Nenhuma rodada ativa para limpar.");
+                });
+            };
+            DOMElements.clearRoundBtnTop.addEventListener('click', confirmClearRound);
+            DOMElements.clearRoundBtnBottom.addEventListener('click', confirmClearRound);
+        
+            document.getElementById('auto-draw-btn-top')!.addEventListener('click', handleAutoDraw);
+            document.getElementById('auto-draw-btn-bottom')!.addEventListener('click', handleAutoDraw);
+            document.getElementById('verify-btn-top')!.addEventListener('click', showVerificationPanel);
+            document.getElementById('verify-btn-bottom')!.addEventListener('click', showVerificationPanel);
+            
+            const boardZoomSlider = document.getElementById('board-zoom-slider') as HTMLInputElement;
+            const displayZoomSlider = document.getElementById('display-zoom-slider') as HTMLInputElement;
+            boardZoomSlider.addEventListener('input', (e) => {
+                appConfig.boardScale = parseInt((e.target as HTMLInputElement).value, 10);
+                applyBoardZoom(appConfig.boardScale);
+            });
+            boardZoomSlider.addEventListener('change', debouncedSave);
+            displayZoomSlider.addEventListener('input', (e) => {
+                appConfig.displayScale = parseInt((e.target as HTMLInputElement).value, 10);
+                applyDisplayZoom(appConfig.displayScale);
+            });
+            displayZoomSlider.addEventListener('change', debouncedSave);
+        
+            DOMElements.intervalBtn.addEventListener('click', showEventBreakModal);
+            DOMElements.editMenuBtn.addEventListener('click', showMenuEditModal);
+            DOMElements.shareBtn.addEventListener('click', showProofOptions);
+            DOMElements.resetEventBtn.addEventListener('click', () => {
+                DOMElements.resetConfirmModal.innerHTML = getModalTemplates().resetConfirm;
+                DOMElements.resetConfirmModal.classList.remove('hidden');
+                document.getElementById('confirm-reset-btn')!.addEventListener('click', () => {
+                    DOMElements.resetConfirmModal.classList.add('hidden');
+                    resetEvent();
+                });
+                document.getElementById('cancel-reset-btn')!.addEventListener('click', () => DOMElements.resetConfirmModal.classList.add('hidden'));
+            });
+            DOMElements.endEventBtn.addEventListener('click', () => {
+                const allWinners = Object.values(gamesData).flatMap(game => (game as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
+                if (allWinners.length > 0) {
+                    startFinalWinnerSlide(allWinners);
+                } else {
+                    showAlert("Nenhum vencedor de rodada para exibir.");
+                }
+            });
+        
+            DOMElements.addExtraGameBtn.addEventListener('click', addExtraGame);
+            DOMElements.activeRoundPanel.addEventListener('click', () => {
+                if (activeGameNumber) showRoundEditModal(activeGameNumber);
+            });
+        
+            DOMElements.prizeDrawForm.addEventListener('submit', handlePrizeDrawSubmit);
+            document.getElementById('prize-draw-random-btn')!.addEventListener('click', handleRandomPrizeDraw);
+            DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
+            
+            DOMElements.auctionForm.addEventListener('submit', handleAuctionSubmit);
+            document.getElementById('add-50-bid')!.addEventListener('click', () => incrementAuctionBid(50));
+            document.getElementById('add-100-bid')!.addEventListener('click', () => incrementAuctionBid(100));
+            document.getElementById('add-custom-bid-btn')!.addEventListener('click', () => {
+                const customBidInput = document.getElementById('custom-bid-input') as HTMLInputElement;
+                const amount = parseInt(customBidInput.value, 10);
+                if (!isNaN(amount) && amount > 0) {
+                    incrementAuctionBid(amount);
+                    customBidInput.value = '';
+                }
+            });
+            document.getElementById('reset-auction-btn')!.addEventListener('click', () => {
+                (DOMElements.auctionForm as HTMLFormElement).reset();
+                updateAuctionBidDisplay(0);
+            });
+        
+            window.addEventListener('keydown', handleKeydown);
+        }
+        
+        // --- Firebase & App Initialization ---
+        function initializeFirebase() {
+            const firebaseConfig = {
+                apiKey: window.VITE_API_KEY,
+                authDomain: window.VITE_AUTH_DOMAIN,
+                projectId: window.VITE_PROJECT_ID,
+                storageBucket: window.VITE_STORAGE_BUCKET,
+                messagingSenderId: window.VITE_MESSAGING_SENDER_ID,
+                appId: window.VITE_APP_ID,
+            };
+            if (Object.values(firebaseConfig).every(v => v)) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    signInAnonymously(auth).catch(error => console.error("Anonymous sign-in failed:", error));
+                    return true;
+                } catch (error) {
+                    console.error("Firebase initialization failed:", error);
+                    return false;
+                }
             }
-        };
-        DOMElements.clearRoundBtnTop?.addEventListener('click', showClearRoundModal);
-        DOMElements.clearRoundBtnBottom?.addEventListener('click', showClearRoundModal);
-    };
-    setupClearRoundButtons();
-
-
-    DOMElements.prizeDrawForm.addEventListener('submit', registerPrize);
-    document.getElementById('prize-draw-random-btn')!.addEventListener('click', drawPrizeNumber);
-    DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
-
-    DOMElements.auctionForm.addEventListener('submit', sellAuctionItem);
-    document.getElementById('add-50-bid')!.addEventListener('click', () => incrementAuctionBid(50));
-    document.getElementById('add-100-bid')!.addEventListener('click', () => incrementAuctionBid(100));
-    document.getElementById('add-custom-bid-btn')!.addEventListener('click', () => {
-        const customAmount = parseInt((document.getElementById('custom-bid-input') as HTMLInputElement).value, 10);
-        if (!isNaN(customAmount) && customAmount > 0) {
-            incrementAuctionBid(customAmount);
-            (document.getElementById('custom-bid-input') as HTMLInputElement).value = '';
+            return false;
         }
-    });
-     document.getElementById('reset-auction-btn')!.addEventListener('click', () => {
-        (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
-        updateAuctionBidDisplay(0);
-    });
-
-    DOMElements.addExtraGameBtn.addEventListener('click', addExtraGame);
-    DOMElements.showDonationModalBtn.addEventListener('click', showDonationModal);
-    
-    DOMElements.activeRoundPanel.addEventListener('click', () => {
-        if (activeGameNumber) {
-            openRoundEditModal(activeGameNumber);
+        
+        async function main() {
+            setupEventListeners();
+        
+            const firebaseAvailable = initializeFirebase();
+            let preferredMode = localStorage.getItem(MODE_STORAGE_KEY);
+        
+            const handleModeSelection = (mode: 'local' | 'online') => {
+                isLocalMode = mode === 'local';
+                localStorage.setItem(MODE_STORAGE_KEY, mode);
+                document.getElementById('mode-selection-modal')!.classList.add('hidden');
+                
+                if (isLocalMode) {
+                    DOMElements.connectionIndicator.classList.remove('bg-blue-500');
+                    DOMElements.connectionIndicator.classList.add('bg-yellow-500');
+                    loadInitialState();
+                } else {
+                     onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            dbRef = doc(db, 'bingoEvents', userId);
+                            firebaseReady = true;
+                            DOMElements.connectionIndicator.classList.remove('bg-blue-500');
+                            DOMElements.connectionIndicator.classList.add('bg-green-500');
+                            loadInitialState();
+                        }
+                    });
+                }
+            };
+        
+            if (preferredMode) {
+                if (preferredMode === 'online' && !firebaseAvailable) {
+                    console.warn("Firebase not configured. Forcing local mode.");
+                    preferredMode = 'local';
+                }
+                handleModeSelection(preferredMode as 'local' | 'online');
+            } else {
+                if (!firebaseAvailable) {
+                    handleModeSelection('local');
+                } else {
+                    const modeModal = document.getElementById('mode-selection-modal')!;
+                    modeModal.classList.remove('hidden');
+                    document.getElementById('select-online-mode-btn')!.onclick = () => handleModeSelection('online');
+                    document.getElementById('select-local-mode-btn')!.onclick = () => handleModeSelection('local');
+                }
+            }
         }
-    });
-
-    document.addEventListener('keydown', handleKeydown);
-});
+        
+        main();
+        
