@@ -16,8 +16,8 @@
 
         /* Animações */
         @keyframes logo-glow {
-            0%, 100% { filter: drop-shadow(0 0 4px #FFD700); transform: scale(1); }
-            55% { filter: drop-shadow(0 0 12px #fef08a); transform: scale(1.05); }
+            0%, 100% { filter: drop-shadow(0 0 4px #38bdf8); transform: scale(1); }
+            55% { filter: drop-shadow(0 0 12px #7dd3fc); transform: scale(1.05); }
         }
         .logo-animation {
             animation: logo-glow 3s ease-in-out infinite;
@@ -63,6 +63,35 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
+        
+        /* NOVA ANIMAÇÃO PARA RODADA EXTRA */
+        @keyframes fade-in-down {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-down { animation: fade-in-down 0.5s ease-out forwards; }
+        
+        /* ANIMAÇÃO VIBRANTE PARA BRINDE SORTEADO */
+        @keyframes pulse-glow {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2);
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 30px 15px rgba(255, 255, 255, 0.8), 0 0 50px 10px rgba(253, 224, 71, 0.6);
+                filter: brightness(1.5) saturate(1.2);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2);
+                filter: brightness(1);
+            }
+        }
+        .pulse-glow-animation {
+            animation: pulse-glow 2.5s ease-in-out infinite;
+        }
 
         @keyframes pulse-border {
             0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
@@ -272,7 +301,7 @@
         <header class="text-center py-4 flex-shrink-0 relative mt-6">
             <div class="flex flex-col items-center justify-center">
                 <!-- App Logo (será preenchido dinamicamente) -->
-                <div id="app-logo" class="w-32 h-32 sm:w-48 sm:h-48 mb-2">
+                <div id="app-logo" class="w-32 h-32 sm:w-48 sm:h-48 mb-2 logo-animation">
                     <!-- O logo customizado será inserido aqui, ou o SVG padrão será mostrado -->
                 </div>
                 
@@ -312,7 +341,12 @@
                     <button id="save-local-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="saveToFileButton">Salvar no Computador</button>
                     <label for="load-local-input" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all text-center cursor-pointer" data-label-key="loadFromFileButton">Carregar do Computador</label>
                     <input type="file" id="load-local-input" class="hidden" accept=".json,application/json">
-                    <button id="interval-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="intervalButton">Intervalo</button>
+                    <div class="flex gap-2">
+                        <button id="interval-btn" class="flex-grow bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="intervalButton">Intervalo</button>
+                        <button id="edit-menu-btn" title="Editar Cardápio" class="flex-shrink-0 bg-gray-600 hover:bg-gray-500 text-white font-bold p-2 rounded-lg text-sm shadow-lg transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
                     <button id="share-btn" class="hidden w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-base shadow-lg transition-all" data-label-key="generateProofButton">Gerar Prova</button>
                     <button id="end-event-btn" class="hidden w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="endEventButton">Encerrar Evento</button>
                     <button id="reset-event-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="resetEventButton">Reiniciar Evento</button>
@@ -410,11 +444,14 @@
                     </div>
                     
                     <!-- NÚMERO ANUNCIADO -->
-                    <div class="lg:col-span-3 bg-gray-800 rounded-2xl shadow-2xl p-6 flex flex-col justify-center items-center h-full">
+                    <div class="lg:col-span-3 bg-gray-800 rounded-2xl shadow-2xl p-6 flex flex-col justify-center items-center h-full relative">
                         <p id="main-display-label" class="text-xl sm:text-2xl font-bold text-slate-400 tracking-wider uppercase" data-label-key="announcedNumberLabel">Número Anunciado</p>
                         <!-- Wrapper do Zoom para o Número Anunciado -->
                         <div id="current-number-wrapper" class="my-4 flex justify-center items-center w-full">
+                             <!-- Container para o número do bingo e para o número do brinde -->
                             <div id="current-number" class="font-black flex justify-center items-center gap-x-2 sm:gap-x-4 rounded-full w-64 h-64 sm:w-80 sm:h-80" style="font-size: clamp(6rem, 25vw, 15rem); line-height: 1; visibility: hidden;"></div>
+                             <!-- Container separado para o sorteio de brinde, para não interferir com o do bingo -->
+                            <div id="prize-draw-display-container" class="absolute inset-0 flex items-center justify-center hidden"></div>
                         </div>
                         <div class="mt-4 text-center">
                             <h3 class="text-xl font-bold text-slate-300 mb-3" data-label-key="lastNumbersLabel">Últimos 5 Números</h3>
@@ -449,100 +486,107 @@
                 <section class="bg-gray-800 p-6 rounded-2xl shadow-xl">
                     <h2 class="text-2xl font-bold text-slate-300 mb-4 text-center" data-label-key="auctionTitle">Leilão</h2>
                     <form id="auction-form" class="space-y-3 max-w-lg mx-auto">
-                        <input type="text" id="auction-item-name" placeholder="Nome do Item" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
-                        <div class="relative">
-                            <div id="bid-feedback-container" class="absolute inset-0 flex justify-center items-center"></div>
-                            <input type="number" id="auction-item-current-bid" placeholder="Lance Inicial (R$)" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
-                            <div id="gavel-icon" class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hidden">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gavel" viewBox="0 0 16 16"><path d="M8.625 0a.627.627 0 0 0-.442.183L6.938 1.432c-.084.084-.15.18-.202.283-.146.285-.233.61-.233.957v.013a.626.626 0 0 0 .131.393l.394.437-3.931 3.932a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L8.53 4.101l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052.199-.118.283-.202l1.249-1.25a.627.627 0 0 0 .183-.442V1.25a.625.625 0 0 0-.625-.625h-2.5zm-2.43 3.362L4.35 1.517a.125.125 0 0 1 .088-.212h2.5a.125.125 0 0 1 .125.125v2.5a.125.125 0 0 1-.212.088L7.02 2.194l-2.828 2.828L5.38 3.834a.627.627 0 0 0-1.187-.22zM12.293.453l2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672-.087-.957.233-.103-.052-.199-.118-.283-.202L11 2.828l2.02-2.02a.125.125 0 0 1 .177 0l-.884.884-3.931-3.931a.625.625 0 0 0 0-.884l-.043-.043a.625.625 0 0 0-.884 0L1.313 7.02l.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.25-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013a1.625 1.625 0 0 0-.957.233c-.103.052-.199.118-.283.202L4.01 13.98l-2.122 2.12a.625.625 0 0 0 0 .884l.043.043a.625.625 0 0 0 .884 0L4.938 15l1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202L9.194 12l-2.828-2.828 1.25-1.25.414.393a.625.625 0 0 0 .393.131h.013c.347 0 .672-.087.957-.233.103-.052-.199-.118-.283-.202l1.249-1.25 2.828 2.828-1.25 1.25-.414-.393a.625.625 0 0 0-.393-.131h-.013c-.347 0-.672-.087-.957.233-.103-.052-.199-.118-.283-.202L9.844 9l2.828-2.828L15.5 8.999a.625.625 0 0 0 .884 0l.043-.043a.625.625 0 0 0 0-.884L13.599 5.24l.414-.393a.625.625 0 0 0 .131-.393v-.013a1.625 1.625 0 0 0-.233-.957c-.052-.103-.118-.199-.202-.283L12.48.983a.627.627 0 0 0-.187-.217z"/></svg>
-                            </div>
+                        <input type="text" id="auction-item-name" placeholder="Nome do Item" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <div class="relative text-center">
+                            <div id="bid-feedback-container" class="absolute inset-0 z-10 pointer-events-none"></div>
+                            <div id="auction-current-bid-display" class="text-7xl font-black text-amber-400 py-2">R$ 0,00</div>
+                            <input type="hidden" id="auction-item-current-bid" value="0">
                         </div>
-                        <div class="flex items-center justify-center gap-2 pt-2">
-                             <button type="button" id="add-50-bid" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-1 px-3 text-xs rounded-full">+ R$ 50</button>
-                             <button type="button" id="add-100-bid" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-1 px-3 text-xs rounded-full">+ R$ 100</button>
-                             <div class="flex items-center gap-1">
-                                <input type="number" id="custom-bid-input" placeholder="Valor" class="w-20 text-center text-xs font-bold p-1 border-2 border-gray-600 bg-gray-700 rounded-lg">
-                                <button type="button" id="add-custom-bid-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-1 px-2 text-xs rounded-full">Adicionar</button>
-                             </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" id="add-50-bid" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-lg">+ R$ 50</button>
+                            <button type="button" id="add-100-bid" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-lg">+ R$ 100</button>
                         </div>
-                        <!-- LANCE ATUAL EM DESTAQUE -->
-                        <div class="text-center mt-4">
-                            <p class="text-slate-400 text-lg uppercase tracking-wider">Lance Atual</p>
-                            <p id="auction-current-bid-display" class="font-black text-amber-400 text-7xl sm:text-8xl transition-all duration-200" style="text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);">R$ 0</p>
-                        </div>
-                        <input type="text" id="auction-winner-name" placeholder="Nome do Arrematador" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
                         <div class="flex gap-2">
-                            <button type="button" id="reset-auction-btn" class="w-1/3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg">Limpar</button>
-                            <button type="submit" class="w-2/3 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg" data-label-key="sellItemButton">Vender Item</button>
+                            <input type="number" id="custom-bid-input" placeholder="Valor" class="flex-grow text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            <button type="button" id="add-custom-bid-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-bold p-2 px-4 rounded-lg">Adicionar</button>
+                        </div>
+                        <input type="text" id="auction-winner-name" placeholder="Nome do Arrematador" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <div class="flex gap-2 pt-2">
+                            <button type="button" id="reset-auction-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg">Limpar</button>
+                            <button type="submit" class="flex-grow bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg text-xl flex items-center justify-center gap-2">
+                                <span data-label-key="sellItemButton">Vender Item</span>
+                                <span id="gavel-icon" class="hidden text-2xl">🔨</span>
+                            </button>
                         </div>
                     </form>
                 </section>
             </div>
 
-            <!-- BARRA LATERAL DIREITA: APOIO, RODADAS E INSCREVA-SE -->
-            <aside class="lg:col-span-1 flex flex-col gap-6">
-                <!-- 1. APOIE O SEMINARISTA -->
-                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl flex-shrink-0">
-                    <h3 class="text-base font-bold text-yellow-400 mb-2 text-center" data-label-key="supportTitle">Apoie o Seminarista 🤝</h3>
-                    <p class="text-center text-xs text-slate-400 mb-3">O programa sempre será GRATUITO, gostaria de ajudar de alguma forma neste projeto?</p>
-                    <button id="show-donation-modal-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-lg" data-label-key="supportButton">Faça sua Doação</button>
+            <!-- BARRA LATERAL DIREITA: RODADAS, PRÊMIOS E APOIO -->
+            <aside class="lg:col-span-1 bg-gray-800 rounded-2xl shadow-2xl p-6 flex flex-col">
+                <!-- RODADAS E PRÊMIOS -->
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-300 mb-4" data-label-key="roundsAndPrizesTitle">Rodadas e Prêmios</h2>
+                    <div id="games-list" class="space-y-4">
+                        <!-- As rodadas serão inseridas dinamicamente aqui -->
+                    </div>
                 </div>
                 
-                <!-- 3. RODADAS E PRÊMIOS (CONTEÚDO FLEXÍVEL) -->
-                <div class="bg-gray-800 rounded-2xl shadow-xl p-6 flex-grow flex flex-col">
-                        <h2 class="text-2xl font-bold text-slate-300 mb-4 flex-shrink-0" data-label-key="roundsAndPrizesTitle">Rodadas e Prêmios</h2>
-                        <!-- BOTÃO ADICIONAR RODADA EXTRA -->
-                        <button id="add-extra-game-btn" class="w-full bg-sky-700 hover:bg-sky-800 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all mb-4 flex-shrink-0" data-label-key="addExtraRoundButton">Adicionar Rodada Extra</button>
-                        <!-- A lista de jogos continua rolável, mas agora ocupa a altura do pai que está esticado -->
-                        <div id="games-list" class="space-y-3 pr-2 flex-grow overflow-y-auto"></div>
-                </div>
-
-                <!-- 4. INSCREVA-SE NO CANAL (SEMPRE NO FINAL) -->
-                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl flex-shrink-0 mt-auto">
-                    <h3 class="text-base font-bold text-red-500 mb-2 text-center" data-label-key="subscribeTitle">Inscreva-se no Canal</h3>
-                    <a href="https://www.youtube.com/@showdepremiosbingo?sub_confirmation=1" target="_blank" id="subscribe-btn" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-lg" data-label-key="subscribeButton">
-                        Inscrever-se no Canal
-                    </a>
+                <!-- CONTROLES DE RODADA E APOIO -->
+                <div class="flex-shrink-0 mt-6 space-y-4">
+                     <button id="add-extra-game-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl text-base shadow-lg transition-all" data-label-key="addExtraRoundButton">Adicionar Rodada Extra</button>
+                    
+                    <!-- APOIO -->
+                    <div class="bg-gray-700 p-4 rounded-xl text-center">
+                        <h3 class="text-base font-bold text-sky-400 mb-3" data-label-key="supportTitle">Apoie o Seminarista 🤝</h3>
+                        <button id="show-donation-modal-btn" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="supportButton">Faça sua Doação</button>
+                    </div>
+                    
+                    <!-- INSCREVA-SE -->
+                    <div class="bg-gray-700 p-4 rounded-xl text-center">
+                        <h3 class="text-base font-bold text-sky-400 mb-3" data-label-key="subscribeTitle">Inscreva-se no Canal</h3>
+                        <a href="https://www.youtube.com/@iaecatolico" target="_blank" class="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="subscribeButton">Inscrever-se no Canal</a>
+                    </div>
                 </div>
             </aside>
         </main>
         
-        <footer class="text-center p-4 mt-auto text-xs text-slate-500 flex-shrink-0">
-            <p>
-                <span id="version-text">Bingo Cloud v<span id="version">6.6.0</span></span> | 
-                <span id="last-updated"></span> | 
-                <a href="https://github.com/flavio-m-macedo/bingo-cloud" target="_blank" class="hover:text-sky-400">GitHub</a> |
-                <a href="https://1drv.ms/b/s!AqxRfy_aD-0FgdJ2gH3tQk3Fq-7HDA?e=a3S65N" target="_blank" class="hover:text-sky-400">Trabalho de Conclusão de Curso</a>
+        <footer class="text-center py-6 px-4 text-xs text-slate-400 flex-shrink-0">
+            <p class="max-w-4xl mx-auto">
+                Este programa é o resultado do Trabalho de Conclusão de Curso de <a href="https://www.instagram.com/oalison.rodrigues" target="_blank" class="text-sky-400 hover:underline">Alison Fernando Rodrigues dos Santos</a>, sob orientação do <a href="https://www.instagram.com/danilonobresant" target="_blank" class="text-sky-400 hover:underline">Prof. Pe. Dr. Danilo Nobre dos Santos</a> Título: "E O VERBO SE FEZ I.A.? DA REFLEXÃO TEOLÓGICA E COMUNICATIVA AO DESENVOLVIMENTO DE SOLUÇÕES PASTORAIS COM INTELIGÊNCIA ARTIFICIAL". (<a href="https://drive.google.com/file/d/14uPBeHCT5aP1ACPLlPpIjfD5J1iLQfyD/view?usp=drive_link" target="_blank" class="text-sky-400 hover:underline">Link para acessar</a>)
+                <br>
+                Desenvolvido inteiramente com a Inteligência Artificial Gemini 2.5 PRO da Google, este projeto demonstra como é possível criar soluções pastorais inovadoras com criatividade e ferramentas de baixo custo ou gratuitas, mesmo sem conhecimentos prévios em programação.
+            </p>
+            <p class="mt-2">
+                Versão <span id="version">6.8</span> - <span id="last-updated">Última atualização do programa: carregando...</span>
             </p>
         </footer>
     </div>
+    
+    <!-- MODAIS (INICIALMENTE OCULTOS) -->
+    <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="floating-number-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="sponsor-display-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="winner-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="custom-alert-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="congrats-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="event-break-modal" class="fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="menu-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="winner-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="clear-round-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="proof-options-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="spinning-wheel-modal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden"></div>
+    <div id="reset-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="drawn-prizes-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="donation-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="final-winners-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="changelog-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="round-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
 
-    <!-- Modals (Initially Hidden, but present in the DOM for JS to find) -->
-    <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="floating-number-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="sponsor-display-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="winner-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="custom-alert-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="congrats-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="event-break-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="menu-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="winner-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="delete-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="clear-round-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="proof-options-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="spinning-wheel-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="reset-confirm-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="drawn-prizes-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="donation-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="final-winners-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="changelog-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    <div id="round-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden p-4"></div>
-    
-    <!-- Script principal da aplicação -->
-    <script type="module" src="./index.tsx"></script>
-    
-    <!-- Biblioteca de Confetti para animações de vitória -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script>
+        // Injeta as variáveis de ambiente do Firebase no escopo global. 
+        // Se não forem definidas, a aplicação entrará em modo local.
+        window.VITE_API_KEY = undefined;
+        window.VITE_AUTH_DOMAIN = undefined;
+        window.VITE_PROJECT_ID = undefined;
+        window.VITE_STORAGE_BUCKET = undefined;
+        window.VITE_MESSAGING_SENDER_ID = undefined;
+        window.VITE_APP_ID = undefined;
+    </script>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>
