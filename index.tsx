@@ -267,6 +267,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let firebaseReady = false;
         let isLocalMode = false;
         const LOCAL_STORAGE_KEY = 'bingoCloudState';
+        const MODE_STORAGE_KEY = 'bingoCloudMode';
 
         // --- Seletores de Elementos ---
         const DOMElements = {
@@ -778,7 +779,7 @@ function populateSettingsShortcutsTab() {
         }
         
         function getAppState() {
-            return {
+            const state = {
                 gamesData,
                 gameCount,
                 activeGameNumber,
@@ -789,6 +790,22 @@ function populateSettingsShortcutsTab() {
                 appConfig,
                 appLabels,
             };
+        
+            // Se estiver no modo online, remove as imagens dos patrocinadores para não sobrecarregar o Firestore.
+            if (!isLocalMode) {
+                const configCopy = JSON.parse(JSON.stringify(appConfig));
+                if (configCopy.sponsorsByNumber) {
+                    for (const num in configCopy.sponsorsByNumber) {
+                        if (configCopy.sponsorsByNumber[num].image) {
+                            // Mantém o nome, mas remove a imagem base64
+                            delete configCopy.sponsorsByNumber[num].image;
+                        }
+                    }
+                }
+                state.appConfig = configCopy;
+            }
+        
+            return state;
         }
 
         function loadAppState(state: any) {
@@ -1087,7 +1104,7 @@ function applyDisplayZoom(scale: number) {
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appState));
                  if (isLocalMode) {
                     const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    DOMElements.connectionStatusText.textContent = `Modo Local (Salvo às ${time})`;
+                    DOMElements.connectionStatusText.innerHTML = `<strong>Modo Local</strong> (Salvo às ${time})`;
                 }
             } catch (error) {
                 console.error("Falha ao salvar estado no localStorage:", error);
@@ -1120,7 +1137,7 @@ function applyDisplayZoom(scale: number) {
             try {
                 await setDoc(dbRef, appState);
                 const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                DOMElements.connectionStatusText.textContent = `Conectado (Salvo às ${time})`;
+                DOMElements.connectionStatusText.textContent = `Modo Online (Salvo às ${time})`;
                 renderUpdateInfo(); 
 
                 if (areAllGamesComplete() && !appConfig.isEventClosed) { 
@@ -3234,20 +3251,12 @@ function showSettingsModal() {
                 clockEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             }, 1000);
             
-            // Inicia confetes de fundo contínuos
-            const duration = 15 * 1000;
-            const animationEnd = Date.now() + duration;
-            const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-            breakConfettiInterval = setInterval(function() {
-                if (typeof confetti !== 'function') {
-                    clearInterval(breakConfettiInterval);
-                    return;
+            breakConfettiInterval = setInterval(() => {
+                if (typeof confetti === 'function') {
+                    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+                    confetti({ particleCount: 5, startVelocity: 15, spread: 360, origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }, zIndex: 0 });
                 }
-                const particleCount = 20;
-                // Dispara confetes de cantos aleatórios
-                confetti({ particleCount, startVelocity: 25, spread: 360, origin: { x: randomInRange(0, 1), y: Math.random() - 0.2 }, zIndex: -1 });
-            }, 800);
+            }, 500);
 
             document.getElementById('close-break-modal-btn')!.addEventListener('click', () => {
                 clearInterval(intervalContentInterval);
@@ -3256,471 +3265,239 @@ function showSettingsModal() {
                 DOMElements.eventBreakModal.classList.add('hidden');
             });
         }
+        
+function openRoundEditModal(gameNumber: string) {
+    DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
+    const game = gamesData[gameNumber];
+    if (!game) return;
 
-        function showRoundEditModal(gameNumber: string) {
-            DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
-            const game = gamesData[gameNumber];
-            if (!game) return;
+    (document.getElementById('round-edit-title') as HTMLElement).textContent = `Editar Rodada ${gameNumber}`;
+    const prizesContainer = document.getElementById('round-edit-prizes-container')!;
+    prizesContainer.innerHTML = ''; 
 
-            (document.getElementById('round-edit-title') as HTMLElement).textContent = `Editar Rodada ${gameNumber}`;
-            const prizesContainer = document.getElementById('round-edit-prizes-container')!;
-            const descriptionTextarea = document.getElementById('round-edit-description') as HTMLTextAreaElement;
+    Object.keys(game.prizes).forEach((prizeKey, index) => {
+        const labelKey = `prize${index + 1}Label` as keyof typeof appLabels;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `
+            <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${appLabels[labelKey]}</label>
+            <input type="text" id="round-edit-${prizeKey}" data-prize-key="${prizeKey}" value="${game.prizes[prizeKey as keyof typeof game.prizes]}" class="w-full bg-gray-900 text-white p-2 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
+        `;
+        prizesContainer.appendChild(wrapper);
+    });
+    
+    const descriptionTextarea = document.getElementById('round-edit-description') as HTMLTextAreaElement;
+    descriptionTextarea.value = game.description || '';
 
-            prizesContainer.innerHTML = '';
-            Object.keys(game.prizes).forEach((prizeKey, index) => {
-                const prizeLabel = appLabels[('prize' + (index + 1) + 'Label') as keyof typeof appLabels];
-                const inputWrapper = document.createElement('div');
-                inputWrapper.innerHTML = `
-                    <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${prizeLabel}</label>
-                    <input type="text" id="round-edit-${prizeKey}" value="${game.prizes[prizeKey]}" class="w-full bg-gray-900 text-white p-2 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500" data-prize-key="${prizeKey}">
-                `;
-                prizesContainer.appendChild(inputWrapper);
-            });
+    DOMElements.roundEditModal.classList.remove('hidden');
+
+    document.getElementById('save-round-edit-btn')!.addEventListener('click', () => {
+        prizesContainer.querySelectorAll('input').forEach(input => {
+            const prizeKey = input.dataset.prizeKey as keyof typeof game.prizes;
+            game.prizes[prizeKey] = input.value;
+        });
+        game.description = descriptionTextarea.value;
+        
+        DOMElements.roundEditModal.classList.add('hidden');
+        renderUIFromState();
+        debouncedSave();
+    });
+
+    document.getElementById('cancel-round-edit-btn')!.addEventListener('click', () => {
+        DOMElements.roundEditModal.classList.add('hidden');
+    });
+}
+
+function initializeFirebase() {
+    const firebaseConfig = {
+        apiKey: window.VITE_API_KEY,
+        authDomain: window.VITE_AUTH_DOMAIN,
+        projectId: window.VITE_PROJECT_ID,
+        storageBucket: window.VITE_STORAGE_BUCKET,
+        messagingSenderId: window.VITE_MESSAGING_SENDER_ID,
+        appId: window.VITE_APP_ID,
+    };
+    
+    if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            DOMElements.connectionIndicator.classList.remove('bg-yellow-500');
+            DOMElements.connectionIndicator.classList.add('bg-green-500');
             
-            descriptionTextarea.value = game.description || '';
-            
-            DOMElements.roundEditModal.classList.remove('hidden');
-
-            document.getElementById('save-round-edit-btn')!.addEventListener('click', () => {
-                prizesContainer.querySelectorAll('input').forEach(input => {
-                    const key = input.dataset.prizeKey!;
-                    game.prizes[key] = input.value;
-                });
-                game.description = descriptionTextarea.value;
-                
-                DOMElements.roundEditModal.classList.add('hidden');
-                renderUIFromState(); // Re-render a lista de jogos e o painel ativo
-                debouncedSave();
-            });
-
-            document.getElementById('cancel-round-edit-btn')!.addEventListener('click', () => {
-                DOMElements.roundEditModal.classList.add('hidden');
-            });
-        }
-
-
-        // --- Função de Inicialização ---
-        async function initApp() {
-            const firebaseConfig = {
-                apiKey: window.VITE_API_KEY,
-                authDomain: window.VITE_AUTH_DOMAIN,
-                projectId: window.VITE_PROJECT_ID,
-                storageBucket: window.VITE_STORAGE_BUCKET,
-                messagingSenderId: window.VITE_MESSAGING_SENDER_ID,
-                appId: window.VITE_APP_ID,
-            };
-
-            if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    
-                    onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            dbRef = doc(db, "bingoEvents", userId);
-                            firebaseReady = true;
-                            await loadInitialState();
-                        } else {
-                           await signInAnonymously(auth);
-                        }
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    userId = user.uid;
+                    dbRef = doc(db, "bingoEvents", userId);
+                    firebaseReady = true;
+                    loadInitialState();
+                } else {
+                    signInAnonymously(auth).catch(error => {
+                        console.error("Anonymous sign-in failed:", error);
+                        showAlert("Falha na autenticação. O salvamento em nuvem não funcionará.");
                     });
-                } catch (error) {
-                    console.error("Firebase initialization failed:", error);
-                    isLocalMode = true;
-                    DOMElements.connectionIndicator.classList.remove('bg-blue-500');
-                    DOMElements.connectionIndicator.classList.add('bg-yellow-500');
-                    DOMElements.connectionStatusText.innerHTML = `Modo Local. <strong class="underline">Dados não são salvos na nuvem.</strong>`;
-                    await loadInitialState();
-                }
-            } else {
-                isLocalMode = true;
-                DOMElements.connectionIndicator.classList.remove('bg-blue-500');
-                DOMElements.connectionIndicator.classList.add('bg-yellow-500');
-                DOMElements.connectionStatusText.innerHTML = `Modo Local. <strong class="underline">Use "Salvar/Carregar" para backup.</strong>`;
-                await loadInitialState();
-            }
-
-            // --- ATTACH EVENT LISTENERS ---
-            DOMElements.manualInputForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleManualSubmit();
-            });
-            document.getElementById('save-local-btn')!.addEventListener('click', saveStateToFile);
-            document.getElementById('load-local-input')!.addEventListener('change', loadStateFromFile);
-            DOMElements.intervalBtn!.addEventListener('click', showIntervalScreen);
-            DOMElements.editMenuBtn!.addEventListener('click', showMenuEditModal);
-            DOMElements.shareBtn!.addEventListener('click', showProofOptions);
-            DOMElements.endEventBtn!.addEventListener('click', () => {
-                 const allWinners = Object.values(gamesData).flatMap(g => (g as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
-                 if (allWinners.length > 0) startFinalWinnerSlide(allWinners);
-                 else showAlert("Nenhum vencedor de rodada para exibir.");
-            });
-            DOMElements.resetEventBtn!.addEventListener('click', () => {
-                DOMElements.resetConfirmModal.innerHTML = getModalTemplates().resetConfirm;
-                DOMElements.resetConfirmModal.classList.remove('hidden');
-                document.getElementById('confirm-reset-btn')!.addEventListener('click', async () => {
-                    if (!isLocalMode) await deleteDoc(dbRef);
-                    localStorage.removeItem(LOCAL_STORAGE_KEY);
-                    window.location.reload();
-                });
-                document.getElementById('cancel-reset-btn')!.addEventListener('click', () => {
-                    DOMElements.resetConfirmModal.classList.add('hidden');
-                });
-            });
-            DOMElements.showChangelogBtn!.addEventListener('click', showChangelogModal);
-            DOMElements.showSettingsBtn!.addEventListener('click', showSettingsModal);
-            DOMElements.addExtraGameBtn!.addEventListener('click', addExtraGame);
-            
-            const setupClearRoundButton = (btn: HTMLElement) => {
-                btn.addEventListener('click', () => {
-                     if (activeGameNumber) {
-                        DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
-                        DOMElements.clearRoundConfirmModal.classList.remove('hidden');
-                        document.getElementById('confirm-clear-round-btn')!.addEventListener('click', () => {
-                            startNewRound();
-                            DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                        });
-                        document.getElementById('cancel-clear-round-btn')!.addEventListener('click', () => {
-                            DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                        });
-                    } else {
-                        showAlert("Nenhuma rodada ativa para limpar.");
-                    }
-                });
-            }
-            setupClearRoundButton(DOMElements.clearRoundBtnTop!);
-            setupClearRoundButton(DOMElements.clearRoundBtnBottom!);
-            
-            (document.getElementById('auto-draw-btn-top') as HTMLButtonElement).addEventListener('click', handleAutoDraw);
-            (document.getElementById('auto-draw-btn-bottom') as HTMLButtonElement).addEventListener('click', handleAutoDraw);
-            (document.getElementById('verify-btn-top') as HTMLButtonElement).addEventListener('click', showVerificationPanel);
-            (document.getElementById('verify-btn-bottom') as HTMLButtonElement).addEventListener('click', showVerificationPanel);
-
-            (document.getElementById('board-zoom-slider') as HTMLInputElement).addEventListener('input', (e) => {
-                const scale = parseInt((e.target as HTMLInputElement).value, 10);
-                appConfig.boardScale = scale;
-                applyBoardZoom(scale);
-                debouncedSave();
-            });
-             (document.getElementById('display-zoom-slider') as HTMLInputElement).addEventListener('input', (e) => {
-                const scale = parseInt((e.target as HTMLInputElement).value, 10);
-                appConfig.displayScale = scale;
-                applyDisplayZoom(scale);
-                debouncedSave();
-            });
-
-            DOMElements.checkDrawnPrizesBtn!.addEventListener('click', showDrawnPrizesModal);
-            (document.getElementById('prize-draw-random-btn') as HTMLButtonElement).addEventListener('click', drawPrizeNumber);
-            DOMElements.prizeDrawForm.addEventListener('submit', registerPrize);
-            DOMElements.auctionForm.addEventListener('submit', sellAuctionItem);
-            (document.getElementById('reset-auction-btn') as HTMLButtonElement).addEventListener('click', () => {
-                DOMElements.auctionForm.reset();
-                (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
-                updateAuctionBidDisplay(0);
-            });
-
-            DOMElements.showDonationModalBtn!.addEventListener('click', showDonationModal);
-            DOMElements.activeRoundPanel!.addEventListener('click', () => {
-                if (activeGameNumber) showRoundEditModal(activeGameNumber);
-            });
-
-            (document.getElementById('add-50-bid') as HTMLButtonElement).addEventListener('click', () => incrementAuctionBid(50));
-            (document.getElementById('add-100-bid') as HTMLButtonElement).addEventListener('click', () => incrementAuctionBid(100));
-            (document.getElementById('add-custom-bid-btn') as HTMLButtonElement).addEventListener('click', () => {
-                const customInput = document.getElementById('custom-bid-input') as HTMLInputElement;
-                const amount = parseInt(customInput.value, 10);
-                if (!isNaN(amount) && amount > 0) {
-                    incrementAuctionBid(amount);
-                    customInput.value = '';
                 }
             });
-
-            document.addEventListener('keydown', handleKeydown);
+        } catch(e) {
+             console.error("Firebase initialization failed: ", e);
+             isLocalMode = true;
+             firebaseReady = false;
+             DOMElements.connectionStatusText.innerHTML = "<strong>Modo Local</strong> (Firebase não configurado)";
+             DOMElements.connectionIndicator.title = "O salvamento na nuvem está desativado. Suas alterações serão salvas apenas neste navegador. Para ativar a nuvem, configure as variáveis do Firebase no arquivo index.html.";
+             loadInitialState();
         }
+    } else {
+        console.log("Firebase config not found. Running in local mode.");
+        isLocalMode = true;
+        firebaseReady = false;
+        DOMElements.connectionStatusText.innerHTML = "<strong>Modo Local</strong> (Firebase não configurado)";
+        DOMElements.connectionIndicator.title = "O salvamento na nuvem está desativado. Suas alterações serão salvas apenas neste navegador. Para ativar a nuvem, configure as variáveis do Firebase no arquivo index.html.";
+        loadInitialState();
+    }
+}
 
-        // Inicia a aplicação
-        initApp();
-        
-        
-        
-        
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-.
+async function initApp() {
+    renderUpdateInfo();
+
+    const savedMode = localStorage.getItem(MODE_STORAGE_KEY);
+    const modeModal = document.getElementById('mode-selection-modal')!;
+    const changeModeBtn = document.getElementById('change-mode-btn')!;
+
+    changeModeBtn.addEventListener('click', () => {
+        localStorage.removeItem(MODE_STORAGE_KEY);
+        showAlert("Modo de salvamento redefinido. A seleção aparecerá na próxima vez que a página for carregada.");
+    });
+    
+    const startApplication = (mode: 'local' | 'online') => {
+        isLocalMode = mode === 'local';
+        localStorage.setItem(MODE_STORAGE_KEY, mode);
+        modeModal.classList.add('hidden');
+        changeModeBtn.classList.remove('hidden');
+
+        if (isLocalMode) {
+             DOMElements.connectionIndicator.classList.remove('bg-blue-500');
+             DOMElements.connectionIndicator.classList.add('bg-yellow-500');
+        }
+        
+        initializeFirebase();
+    };
+
+    if (!savedMode) {
+        modeModal.classList.remove('hidden');
+        document.getElementById('select-online-mode-btn')!.addEventListener('click', () => startApplication('online'));
+        document.getElementById('select-local-mode-btn')!.addEventListener('click', () => startApplication('local'));
+    } else {
+        startApplication(savedMode as 'local' | 'online');
+    }
+}
+
+// --- Event Listeners ---
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+    
+    document.getElementById('show-changelog-btn')!.addEventListener('click', showChangelogModal);
+    document.getElementById('show-settings-btn')!.addEventListener('click', showSettingsModal);
+    document.getElementById('save-local-btn')!.addEventListener('click', saveStateToFile);
+    document.getElementById('load-local-input')!.addEventListener('change', loadStateFromFile);
+    
+    DOMElements.intervalBtn.addEventListener('click', showIntervalScreen);
+    DOMElements.editMenuBtn.addEventListener('click', showMenuEditModal);
+    DOMElements.shareBtn.addEventListener('click', showProofOptions);
+    
+    DOMElements.endEventBtn.addEventListener('click', () => {
+        appConfig.isEventClosed = true;
+        debouncedSave();
+        const allWinners = Object.values(gamesData).flatMap(game => (game as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
+        startFinalWinnerSlide(allWinners);
+    });
+    
+    DOMElements.resetEventBtn.addEventListener('click', () => {
+        DOMElements.resetConfirmModal.innerHTML = getModalTemplates().resetConfirm;
+        DOMElements.resetConfirmModal.classList.remove('hidden');
+        document.getElementById('confirm-reset-btn')!.addEventListener('click', async () => {
+             const savePromise = isLocalMode ? Promise.resolve(localStorage.removeItem(LOCAL_STORAGE_KEY)) : deleteDoc(doc(db, "bingoEvents", userId));
+             await savePromise;
+             window.location.reload();
+        });
+        document.getElementById('cancel-reset-btn')!.addEventListener('click', () => {
+            DOMElements.resetConfirmModal.classList.add('hidden');
+        });
+    });
+
+    (document.getElementById('board-zoom-slider') as HTMLInputElement).addEventListener('input', (e) => {
+        const scale = parseInt((e.target as HTMLInputElement).value, 10);
+        appConfig.boardScale = scale;
+        applyBoardZoom(scale);
+        debouncedSave();
+    });
+    (document.getElementById('display-zoom-slider') as HTMLInputElement).addEventListener('input', (e) => {
+        const scale = parseInt((e.target as HTMLInputElement).value, 10);
+        appConfig.displayScale = scale;
+        applyDisplayZoom(scale);
+        debouncedSave();
+    });
+
+    DOMElements.manualInputForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleManualSubmit();
+    });
+
+    // Universal buttons
+    document.getElementById('auto-draw-btn-top')?.addEventListener('click', handleAutoDraw);
+    document.getElementById('auto-draw-btn-bottom')?.addEventListener('click', handleAutoDraw);
+    document.getElementById('verify-btn-top')?.addEventListener('click', showVerificationPanel);
+    document.getElementById('verify-btn-bottom')?.addEventListener('click', showVerificationPanel);
+    
+    const setupClearRoundButtons = () => {
+        const showClearRoundModal = () => {
+            if (activeGameNumber) {
+                DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
+                DOMElements.clearRoundConfirmModal.classList.remove('hidden');
+                document.getElementById('confirm-clear-round-btn')!.addEventListener('click', () => {
+                    startNewRound();
+                    DOMElements.clearRoundConfirmModal.classList.add('hidden');
+                }, { once: true });
+                document.getElementById('cancel-clear-round-btn')!.addEventListener('click', () => {
+                    DOMElements.clearRoundConfirmModal.classList.add('hidden');
+                }, { once: true });
+            } else {
+                showAlert("Nenhuma rodada ativa para limpar.");
+            }
+        };
+        DOMElements.clearRoundBtnTop?.addEventListener('click', showClearRoundModal);
+        DOMElements.clearRoundBtnBottom?.addEventListener('click', showClearRoundModal);
+    };
+    setupClearRoundButtons();
+
+
+    DOMElements.prizeDrawForm.addEventListener('submit', registerPrize);
+    document.getElementById('prize-draw-random-btn')!.addEventListener('click', drawPrizeNumber);
+    DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
+
+    DOMElements.auctionForm.addEventListener('submit', sellAuctionItem);
+    document.getElementById('add-50-bid')!.addEventListener('click', () => incrementAuctionBid(50));
+    document.getElementById('add-100-bid')!.addEventListener('click', () => incrementAuctionBid(100));
+    document.getElementById('add-custom-bid-btn')!.addEventListener('click', () => {
+        const customAmount = parseInt((document.getElementById('custom-bid-input') as HTMLInputElement).value, 10);
+        if (!isNaN(customAmount) && customAmount > 0) {
+            incrementAuctionBid(customAmount);
+            (document.getElementById('custom-bid-input') as HTMLInputElement).value = '';
+        }
+    });
+     document.getElementById('reset-auction-btn')!.addEventListener('click', () => {
+        (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
+        updateAuctionBidDisplay(0);
+    });
+
+    DOMElements.addExtraGameBtn.addEventListener('click', addExtraGame);
+    DOMElements.showDonationModalBtn.addEventListener('click', showDonationModal);
+    
+    DOMElements.activeRoundPanel.addEventListener('click', () => {
+        if (activeGameNumber) {
+            openRoundEditModal(activeGameNumber);
+        }
+    });
+
+    document.addEventListener('keydown', handleKeydown);
+});
