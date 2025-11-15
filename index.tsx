@@ -1,4 +1,5 @@
 
+
         // FIX: Added declaration for the 'confetti' library function to resolve "Cannot find name 'confetti'" errors.
         declare var confetti: any;
         
@@ -153,6 +154,7 @@
             clearRoundConfirmButton: "Limpar",
             clearRoundCancelButton: "Cancelar",
             modalBackButton: "Voltar ao App",
+            announceButton: "Anunciar Número",
             winnerModalNamePlaceholder: "Nome do Ganhador",
             winnerModalRegisterButton: "Registrar Ganhador",
             alertModalTitle: "Atenção",
@@ -206,21 +208,21 @@
             shortcutLabelSellAuction: "Vender Leilão",
             shortcutLabelShowInterval: "Abrir Intervalo",
             settingsLogoTitle: "Logo do Evento",
-            settingsLogoDescription: "Selecione uma imagem do seu computador (PNG, JPG). A imagem será redimensionada para caber no espaço.",
+            settingsLogoDescription: "Selecione uma imagem (PNG, JPG) para ser o logotipo do seu evento. A imagem será redimensionada para se ajustar ao cabeçalho.",
             settingsLogoRemoveButton: "Remover Logo",
             settingsGlobalSponsorTitle: "Patrocinador Global",
-            settingsGlobalSponsorDescription: "Este patrocinador será exibido para qualquer número sorteado que não tenha um patrocinador individual cadastrado.",
+            settingsGlobalSponsorDescription: "Defina um nome e imagem que aparecerão para qualquer número sorteado que não tenha um patrocinador específico.",
             removeGlobalSponsorButton: "Remover Patrocinador Global",
             settingsSponsorsByNumberTitle: "Patrocinadores por Número",
             settingsSponsorsByNumberEnable: "Habilitar exibição de patrocinador ao sortear número",
-            settingsSponsorsByNumberDescription: "Cadastre um nome e uma imagem para cada número. Eles aparecerão em um modal especial durante o sorteio.",
+            settingsSponsorsByNumberDescription: "Cadastre um patrocinador para números específicos (de 1 a 75). O nome e a imagem aparecerão em destaque quando o número for sorteado.",
             settingsSponsorNumberLabel: "Nº",
             settingsSponsorNameLabel: "Nome do Patrocinador",
             settingsSponsorImageLabel: "Imagem do Patrocinador",
             settingsBingoTitleLabel: "Título do Grito de Vitória",
-            settingsBingoTitleDescription: "Mude o 'BINGO!' para 'AJUDE!'. Isso também altera as letras no painel.",
+            settingsBingoTitleDescription: "Personalize o 'grito de vitória'. Mudar para 'AJUDE!' também altera as letras do painel (A-J-U-D-E), ideal para bingos beneficentes.",
             settingsBoardColorLabel: "Cor de Fundo da Cartela",
-            settingsBoardColorDescription: "Cor base dos números não sorteados.",
+            settingsBoardColorDescription: "Escolha a cor de fundo para os números que ainda não foram sorteados no painel principal.",
             settingsBoardColorResetButton: "Limpar Cor",
             settingsDrawnNumberTitle: "Aparência do Número Sorteado",
             settingsDrawnTextColorLabel: "Cor do Texto (Letra e Número)",
@@ -293,6 +295,7 @@
             currentNumberWrapper: document.getElementById('current-number-wrapper'),
             auctionForm: document.getElementById('auction-form') as HTMLFormElement,
             roundEditModal: document.getElementById('round-edit-modal'),
+            nextRoundModal: document.getElementById('next-round-modal'),
         };
         const confettiCtx = DOMElements.confettiCanvas.getContext('2d');
 
@@ -390,7 +393,11 @@ function populateSettingsLabelsTab() {
 
     container.innerHTML = '';
 
+    const keysToExclude = ['prize1Label', 'prize2Label', 'prize3Label'];
+
     Object.keys(appLabels).forEach(key => {
+        if (keysToExclude.includes(key)) return;
+
         const labelKey = key as keyof typeof appLabels;
 
         const wrapper = document.createElement('div');
@@ -525,12 +532,15 @@ function populateSettingsShortcutsTab() {
                                         <div id="floating-number-display" class="font-black text-white flex justify-center items-center w-full h-full gap-x-2 sm:gap-x-4 mx-auto rounded-full shadow-inner my-4 animate-bounce-in" style="font-size: 240px; line-height: 1; text-shadow: 2px 2px 5px #000;"></div>
                                     </div>
                                     <div class="flex-shrink-0 mt-4 flex flex-col items-center z-10">
-                                         <div class="my-2 max-w-xs mx-auto w-full flex items-center justify-center gap-2">
+                                        <div class="my-2 max-w-xs mx-auto w-full flex items-center justify-center gap-2">
                                            <button id="zoom-out-btn-floating" class="bg-gray-700 w-10 h-10 rounded-full font-bold text-2xl">-</button>
                                            <span id="floating-number-zoom-value" class="font-bold text-lg w-16 text-center">100%</span>
                                            <button id="zoom-in-btn-floating" class="bg-gray-700 w-10 h-10 rounded-full font-bold text-2xl">+</button>
                                        </div>
-                                        <button id="close-floating-btn" class="mt-2 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-full text-lg">${appLabels.modalBackButton}</button>
+                                        <div class="flex items-center justify-center gap-4 mt-2">
+                                           <button id="cancel-floating-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-full text-base">${appLabels.modalBackButton}</button>
+                                           <button id="confirm-floating-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-full text-base">${appLabels.announceButton}</button>
+                                       </div>
                                     </div>
                                 </div>`,
                 sponsorDisplay: `<div class="modal-content text-center flex flex-col items-center justify-center p-4">
@@ -549,7 +559,10 @@ function populateSettingsShortcutsTab() {
                                            <span id="sponsor-display-zoom-value" class="font-bold text-lg w-16 text-center">100%</span>
                                            <button id="zoom-in-btn-sponsor" class="bg-gray-700 w-10 h-10 rounded-full font-bold text-2xl">+</button>
                                        </div>
-                                        <button id="close-sponsor-display-btn" class="mt-2 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-full text-lg">${appLabels.modalBackButton}</button>
+                                        <div class="flex items-center justify-center gap-4 mt-2">
+                                           <button id="cancel-sponsor-display-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-full text-base">${appLabels.modalBackButton}</button>
+                                           <button id="confirm-sponsor-display-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-full text-base">${appLabels.announceButton}</button>
+                                       </div>
                                     </div>
                                 </div>`,
                 winner: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-2xl w-full text-center relative">
@@ -725,6 +738,25 @@ function populateSettingsShortcutsTab() {
                         </div>
                         
                         <div id="tab-content-labels" class="hidden">
+                            <div class="border-b border-gray-700 pb-4 mb-4 space-y-4">
+                                <h3 class="text-xl font-bold text-slate-300">Nomenclatura dos Prêmios</h3>
+                                <div>
+                                    <label for="label-prize1Label" class="text-base font-medium text-slate-300">Prêmio 1 (ex: Quina)</label>
+                                    <input type="text" id="label-prize1Label" class="w-full bg-gray-900 text-white p-2 mt-1 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
+                                    <p class="text-xs text-slate-400 mt-1">O nome do primeiro prêmio a ser ganho na rodada. Geralmente uma linha ou quina.</p>
+                                </div>
+                                <div>
+                                    <label for="label-prize2Label" class="text-base font-medium text-slate-300">Prêmio 2 (ex: Cartela Cheia)</label>
+                                    <input type="text" id="label-prize2Label" class="w-full bg-gray-900 text-white p-2 mt-1 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
+                                    <p class="text-xs text-slate-400 mt-1">O nome do prêmio principal, que geralmente encerra a rodada.</p>
+                                </div>
+                                <div>
+                                    <label for="label-prize3Label" class="text-base font-medium text-slate-300">Prêmio 3 (ex: Azarão)</label>
+                                    <input type="text" id="label-prize3Label" class="w-full bg-gray-900 text-white p-2 mt-1 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
+                                    <p class="text-xs text-slate-400 mt-1">Um prêmio opcional, como para quem fica por uma bola ou tem a cartela com mais números no final.</p>
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-300 mt-6 mb-4">Todos os Textos</h3>
                              <div id="labels-form-container" class="space-y-4 text-left grid grid-cols-1 md:grid-cols-2 gap-4">
                              </div>
                         </div>
@@ -746,6 +778,10 @@ function populateSettingsShortcutsTab() {
                 roundEdit: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-lg w-full">
                     <h2 id="round-edit-title" class="text-3xl font-bold text-white mb-6">Editar Rodada</h2>
                     <div class="space-y-4">
+                        <div>
+                            <label for="round-edit-name" class="block text-sm font-medium text-slate-400 mb-1">Nome da Rodada</label>
+                            <input type="text" id="round-edit-name" class="w-full text-lg font-bold p-2 border border-gray-600 bg-gray-900 text-white rounded-md focus:ring-sky-500 focus:border-sky-500">
+                        </div>
                         <div id="round-edit-prizes-container" class="space-y-4">
                             <!-- Inputs de prêmios serão inseridos dinamicamente aqui -->
                         </div>
@@ -758,7 +794,26 @@ function populateSettingsShortcutsTab() {
                         <button id="cancel-round-edit-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-full">${appLabels.modalCancelButton}</button>
                         <button id="save-round-edit-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-full">${appLabels.modalSaveButton}</button>
                     </div>
-                </div>`
+                </div>`,
+                nextRound: `<div class="modal-content next-round-modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-lg w-full text-center overflow-hidden">
+                    <h2 class="text-3xl font-bold text-sky-400 mb-4">Troca de Rodada!</h2>
+                    <div class="flex items-center justify-center gap-4 text-xl my-6">
+                        <div class="flex-1 text-right p-3 bg-red-900/50 rounded-lg">
+                            <p class="text-sm text-red-300">Encerrada</p>
+                            <p id="completed-round-name" class="font-bold text-white"></p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                        <div class="flex-1 text-left p-3 bg-green-900/50 rounded-lg">
+                            <p class="text-sm text-green-300">Próxima</p>
+                            <p id="next-round-name" class="font-bold text-white"></p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5 mt-6">
+                      <div id="next-round-progress" class="bg-sky-500 h-2.5 rounded-full" style="width: 100%; transition: width 5s linear;"></div>
+                    </div>
+                 </div>`
             };
         }
         
@@ -805,6 +860,7 @@ function populateSettingsShortcutsTab() {
 
             for (let i = 1; i <= gameCount; i++) {
                 gamesData[i] = {
+                    name: `Rodada de Teste ${i}`,
                     prizes: {
                         prize1: predefinedPrizes[i - 1]?.prize1 || '',
                         prize2: predefinedPrizes[i - 1]?.prize2 || '',
@@ -1195,6 +1251,7 @@ function applyDisplayZoom(scale: number) {
                 gamesData = {};
                 for (let i = 1; i <= gameCount; i++) {
                     gamesData[i] = {
+                        name: `Rodada ${i}`,
                         prizes: {
                             prize1: predefinedPrizes[i - 1]?.prize1 || '',
                             prize2: predefinedPrizes[i - 1]?.prize2 || '',
@@ -1366,9 +1423,10 @@ function applyDisplayZoom(scale: number) {
             const floatingNumberDisplay = document.getElementById('floating-number-display') as HTMLElement;
             const displayWrapper = document.getElementById('floating-number-display-wrapper') as HTMLElement;
             const zoomValue = document.getElementById('floating-number-zoom-value')!;
-            const closeFloatingBtn = document.getElementById('close-floating-btn')!;
             const zoomOutBtn = document.getElementById('zoom-out-btn-floating')!;
             const zoomInBtn = document.getElementById('zoom-in-btn-floating')!;
+            const confirmFloatingBtn = document.getElementById('confirm-floating-btn')!;
+            const cancelFloatingBtn = document.getElementById('cancel-floating-btn')!;
 
             const letter = getLetterForNumber(number);
             const roundColor = game.color;
@@ -1400,18 +1458,40 @@ function applyDisplayZoom(scale: number) {
             zoomOutBtn.addEventListener('click', () => adjustZoom(-5));
 
             DOMElements.floatingNumberModal.classList.remove('hidden');
-            closeFloatingBtn.addEventListener('click', () => {
-                DOMElements.floatingNumberModal.classList.add('hidden');
+
+            const cleanup = () => {
+                document.removeEventListener('keydown', handleKeydown);
                 clearTimeout(floatingNumberTimeout as ReturnType<typeof setTimeout>);
+            };
+
+            const confirmAndClose = () => {
+                cleanup();
+                DOMElements.floatingNumberModal.classList.add('hidden');
                 announceNumber(number);
-            });
+            };
+
+            const cancelAndClose = () => {
+                cleanup();
+                DOMElements.floatingNumberModal.classList.add('hidden');
+            };
+
+            const handleKeydown = (e: KeyboardEvent) => {
+                switch (e.key) {
+                    case '+': e.preventDefault(); adjustZoom(5); break;
+                    case '-': e.preventDefault(); adjustZoom(-5); break;
+                    case 'Enter': e.preventDefault(); confirmAndClose(); break;
+                    case 'Escape': e.preventDefault(); cancelAndClose(); break;
+                }
+            };
+            document.addEventListener('keydown', handleKeydown);
+
+            confirmFloatingBtn.addEventListener('click', confirmAndClose);
+            cancelFloatingBtn.addEventListener('click', cancelAndClose);
+
             clearTimeout(floatingNumberTimeout as ReturnType<typeof setTimeout>);
 
             if (appConfig.enableModalAutoclose) {
-                floatingNumberTimeout = setTimeout(() => {
-                    DOMElements.floatingNumberModal.classList.add('hidden');
-                    announceNumber(number);
-                }, appConfig.modalAutocloseSeconds * 1000);
+                floatingNumberTimeout = setTimeout(confirmAndClose, appConfig.modalAutocloseSeconds * 1000);
             }
         }
 
@@ -1428,11 +1508,13 @@ function applyDisplayZoom(scale: number) {
             const numberDisplay = document.getElementById('sponsor-number-display') as HTMLElement;
             const imageEl = document.getElementById('sponsor-image') as HTMLImageElement;
             const nameEl = document.getElementById('sponsor-name') as HTMLElement;
-            const closeBtn = document.getElementById('close-sponsor-display-btn')!;
             const zoomValue = document.getElementById('sponsor-display-zoom-value')!;
             const displayWrapper = document.getElementById('sponsor-display-content-wrapper') as HTMLElement;
             const zoomOutBtn = document.getElementById('zoom-out-btn-sponsor')!;
             const zoomInBtn = document.getElementById('zoom-in-btn-sponsor')!;
+            const confirmBtn = document.getElementById('confirm-sponsor-display-btn')!;
+            const cancelBtn = document.getElementById('cancel-sponsor-display-btn')!;
+
 
             const letter = getLetterForNumber(number);
             const roundColor = game.color;
@@ -1469,18 +1551,40 @@ function applyDisplayZoom(scale: number) {
 
             DOMElements.sponsorDisplayModal.classList.remove('hidden');
 
-            const closeModal = () => {
-                DOMElements.sponsorDisplayModal.classList.add('hidden');
+            const cleanup = () => {
+                document.removeEventListener('keydown', handleKeydown);
                 clearTimeout(floatingNumberTimeout as ReturnType<typeof setTimeout>);
-                announceNumber(number);
             };
 
-            closeBtn.addEventListener('click', closeModal);
+            const confirmAndAnnounce = () => {
+                cleanup();
+                DOMElements.sponsorDisplayModal.classList.add('hidden');
+                announceNumber(number);
+            };
+        
+            const cancelDraw = () => {
+                cleanup();
+                DOMElements.sponsorDisplayModal.classList.add('hidden');
+            };
+
+            const handleKeydown = (e: KeyboardEvent) => {
+                switch (e.key) {
+                    case '+': e.preventDefault(); adjustZoom(5); break;
+                    case '-': e.preventDefault(); adjustZoom(-5); break;
+                    case 'Enter': e.preventDefault(); confirmAndAnnounce(); break;
+                    case 'Escape': e.preventDefault(); cancelDraw(); break;
+                }
+            };
+            document.addEventListener('keydown', handleKeydown);
+
+            confirmBtn.addEventListener('click', confirmAndAnnounce);
+            cancelBtn.addEventListener('click', cancelDraw);
+
             clearTimeout(floatingNumberTimeout as ReturnType<typeof setTimeout>);
 
             if (appConfig.enableModalAutoclose) {
                 const sponsorDuration = (appConfig.modalAutocloseSeconds + 3) * 1000; 
-                floatingNumberTimeout = setTimeout(closeModal, sponsorDuration); 
+                floatingNumberTimeout = setTimeout(confirmAndAnnounce, sponsorDuration); 
             }
         }
 
@@ -1656,7 +1760,7 @@ function applyDisplayZoom(scale: number) {
             const prizesEl = document.getElementById('active-round-prizes')!;
             const descriptionContainer = document.getElementById('active-round-description-display')!;
             
-            nameEl.textContent = `Rodada ${gameNumber}`;
+            nameEl.textContent = game.name || `Rodada ${gameNumber}`;
             prizesEl.innerHTML = '';
             
             const createPrizeEl = (label: string, value: string) => {
@@ -1868,7 +1972,7 @@ function applyDisplayZoom(scale: number) {
             header.className = 'flex justify-between items-center';
             const title = document.createElement('h3');
             title.className = 'text-lg font-bold text-white';
-            title.textContent = `Rodada ${gameNumber}`;
+            title.textContent = gamesData[gameNumber]?.name || `Rodada ${gameNumber}`;
 
             const controlsWrapper = document.createElement('div');
             controlsWrapper.className = 'flex items-center gap-2';
@@ -1937,6 +2041,7 @@ function applyDisplayZoom(scale: number) {
         function addExtraGame() {
             gameCount++;
             gamesData[gameCount] = {
+                name: `Rodada ${gameCount}`,
                 prizes: { prize1: '', prize2: '', prize3: '' },
                 description: '',
                 calledNumbers: [],
@@ -1953,7 +2058,8 @@ function applyDisplayZoom(scale: number) {
 
         function confirmDeleteRound(gameNumber: string) {
             DOMElements.deleteConfirmModal.innerHTML = getModalTemplates().deleteConfirm;
-            (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja excluir a Rodada ${gameNumber}? Esta ação não pode ser desfeita.`;
+            const roundName = gamesData[gameNumber]?.name || `Rodada ${gameNumber}`;
+            (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja excluir a rodada "${roundName}"? Esta ação não pode ser desfeita.`;
             (document.getElementById('confirm-delete-btn') as HTMLElement).textContent = "Excluir Rodada";
             DOMElements.deleteConfirmModal.classList.remove('hidden');
         
@@ -2008,17 +2114,21 @@ function applyDisplayZoom(scale: number) {
                 showAlert("Nenhum número foi sorteado nesta rodada.");
                 return;
             }
-
+        
             DOMElements.verificationModal.innerHTML = getModalTemplates().verification;
             const verificationNumbersContainer = document.getElementById('verification-numbers') as HTMLElement;
             const zoomValue = document.getElementById('verification-zoom-value')!;
             const zoomInBtn = document.getElementById('zoom-in-btn-verification')!;
             const zoomOutBtn = document.getElementById('zoom-out-btn-verification')!;
-            
+            const prize1Btn = document.getElementById('confirm-prize1-btn') as HTMLButtonElement;
+            const prize2Btn = document.getElementById('confirm-prize2-btn') as HTMLButtonElement;
+            const prize3Btn = document.getElementById('confirm-prize3-btn') as HTMLButtonElement;
+            const rejectBtn = document.getElementById('reject-bingo-btn')!;
+        
             verificationNumbersContainer.innerHTML = '';
             
             const sortedNumbers = [...game.calledNumbers].sort((a, b) => a - b);
-
+        
             const applyZoom = (scale: number) => {
                 const baseSize = 96; 
                 const baseFontSize = 48; 
@@ -2041,8 +2151,7 @@ function applyDisplayZoom(scale: number) {
                 applyZoom(newZoom);
                 debouncedSave();
             };
-
-
+        
             sortedNumbers.forEach((num: number) => {
                 const letter = getLetterForNumber(num);
                 const numberEl = document.createElement('div');
@@ -2058,1426 +2167,641 @@ function applyDisplayZoom(scale: number) {
                 });
                 verificationNumbersContainer.appendChild(numberEl);
             });
-
+        
             const initialZoom = appConfig.verificationPanelZoom || 100;
             applyZoom(initialZoom);
-
+        
             zoomInBtn.addEventListener('click', () => adjustZoom(5));
             zoomOutBtn.addEventListener('click', () => adjustZoom(-5));
-            
+        
             DOMElements.verificationModal.classList.remove('hidden');
-
-            document.getElementById('confirm-prize1-btn')!.addEventListener('click', () => handlePrizeConfirmation('prize1'));
-            document.getElementById('confirm-prize2-btn')!.addEventListener('click', () => handlePrizeConfirmation('prize2'));
-            document.getElementById('confirm-prize3-btn')!.addEventListener('click', () => handlePrizeConfirmation('prize3'));
-            document.getElementById('reject-bingo-btn')!.addEventListener('click', () => DOMElements.verificationModal.classList.add('hidden'));
-
-             const prize1Btn = document.getElementById('confirm-prize1-btn') as HTMLButtonElement;
-             const prize2Btn = document.getElementById('confirm-prize2-btn') as HTMLButtonElement;
-             const prize3Btn = document.getElementById('confirm-prize3-btn') as HTMLButtonElement;
+        
+            const cleanup = () => {
+                document.removeEventListener('keydown', handleKeydown);
+            };
+        
+            const handleKeydown = (e: KeyboardEvent) => {
+                e.preventDefault();
+                switch(e.key) {
+                    case '+': adjustZoom(5); break;
+                    case '-': adjustZoom(-5); break;
+                    case 'Escape': rejectBtn.click(); break;
+                    case '1': if (!prize1Btn.disabled) prize1Btn.click(); break;
+                    case '2': if (!prize2Btn.disabled) prize2Btn.click(); break;
+                    case '3': if (!prize3Btn.disabled) prize3Btn.click(); break;
+                }
+            };
+            document.addEventListener('keydown', handleKeydown);
+        
+            prize1Btn.addEventListener('click', () => {
+                cleanup();
+                handleBingoConfirmation('prize1');
+            });
+            prize2Btn.addEventListener('click', () => {
+                cleanup();
+                handleBingoConfirmation('prize2');
+            });
+            prize3Btn.addEventListener('click', () => {
+                cleanup();
+                handleBingoConfirmation('prize3');
+            });
+            rejectBtn.addEventListener('click', () => {
+                cleanup();
+                DOMElements.verificationModal.classList.add('hidden');
+            });
+        
+            prize1Btn.disabled = !game.prizes.prize1;
+            prize2Btn.disabled = !game.prizes.prize2;
+            prize3Btn.disabled = !game.prizes.prize3;
+        }
+        
+        function areAllPrizesWon(game: any) {
+             const hasPrize1 = !!game.prizes.prize1;
+             const hasPrize2 = !!game.prizes.prize2;
+             const hasPrize3 = !!game.prizes.prize3;
              
-             const hasPrize2Winner = game.winners?.some((w: any) => w.bingoType === 'prize2');
+             const wonPrize1 = game.winners.some((w: any) => w.bingoType === 'prize1');
+             const wonPrize2 = game.winners.some((w: any) => w.bingoType === 'prize2');
+             const wonPrize3 = game.winners.some((w: any) => w.bingoType === 'prize3');
 
-            // Se a Cartela Cheia (prêmio 2) já foi ganha, a rodada terminou. Desabilita outros prêmios.
-            if (hasPrize2Winner) {
-                prize1Btn.disabled = true;
-                prize2Btn.disabled = true;
-                prize3Btn.disabled = true;
-            } else {
-                if (!game.prizes.prize1) prize1Btn.disabled = true;
-                if (!game.prizes.prize2) prize2Btn.disabled = true;
-                if (!game.prizes.prize3) prize3Btn.disabled = true;
-            }
+             return (!hasPrize1 || wonPrize1) && (!hasPrize2 || wonPrize2) && (!hasPrize3 || wonPrize3);
         }
 
-        function handlePrizeConfirmation(bingoType: 'prize1' | 'prize2' | 'prize3') {
-            DOMElements.verificationModal.classList.add('hidden');
+        function showNextRoundModal(completedRound: string, nextRound: string) {
+            const modal = DOMElements.nextRoundModal;
+            if (!modal) return;
+        
+            DOMElements.nextRoundModal.innerHTML = getModalTemplates().nextRound;
+        
+            (document.getElementById('completed-round-name') as HTMLElement).textContent = completedRound;
+            (document.getElementById('next-round-name') as HTMLElement).textContent = nextRound;
+            
+            modal.classList.remove('hidden');
+        
+            const progressBar = document.getElementById('next-round-progress') as HTMLElement;
+            
+            // Forçar reflow para garantir que a transição funcione
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '100%';
+            
+            setTimeout(() => {
+                progressBar.style.transition = 'width 5s linear';
+                progressBar.style.width = '0%';
+            }, 50); 
+        
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 5000);
+        }
+
+        function handleBingoConfirmation(prizeType: string) {
             if (!activeGameNumber) return;
-            currentBingoType = bingoType;
             const game = gamesData[activeGameNumber];
             if (!game) return;
-
-            triggerBingoWinConfetti();
-
+            currentBingoType = prizeType;
+            DOMElements.verificationModal.classList.add('hidden');
+            
             DOMElements.winnerModal.innerHTML = getModalTemplates().winner;
-            (document.getElementById('winner-title-display') as HTMLElement).textContent = appLabels.congratsModalTitle;
-            (document.getElementById('game-text-winner') as HTMLElement).textContent = `Rodada ${activeGameNumber}`;
-            let prizeLabelKey = 'prize1Label';
-            if (bingoType === 'prize2') prizeLabelKey = 'prize2Label';
-            if (bingoType === 'prize3') prizeLabelKey = 'prize3Label';
-
-            const prizeLabel = appLabels[prizeLabelKey as keyof typeof appLabels];
-            (document.getElementById('prize-text-winner') as HTMLElement).textContent = `${prizeLabel}: ${game.prizes[bingoType]}`;
+            (document.getElementById('winner-title-display') as HTMLElement).textContent = appConfig.bingoTitle + '!';
+            (document.getElementById('game-text-winner') as HTMLElement).textContent = game.name || `Rodada ${activeGameNumber}`;
+            (document.getElementById('prize-text-winner') as HTMLElement).textContent = appLabels[`${prizeType}Label` as keyof typeof appLabels] + ': ' + game.prizes[prizeType];
 
             DOMElements.winnerModal.classList.remove('hidden');
+            document.getElementById('winner-name-input')!.focus();
 
+            triggerBingoWinConfetti();
+            
             const winnerNameInput = document.getElementById('winner-name-input') as HTMLInputElement;
-            const countdownEl = document.getElementById('winner-countdown-timer')!;
-            winnerNameInput.focus();
-
+            const registerWinnerBtn = document.getElementById('register-winner-btn')!;
             let countdown = 20;
-            countdownEl.textContent = countdown.toString();
+            const timerEl = document.getElementById('winner-countdown-timer')!;
+            timerEl.textContent = countdown.toString();
             
-            const closeModal = () => {
-                clearInterval(countdownInterval);
-                window.removeEventListener('keydown', keydownHandler);
-                DOMElements.winnerModal.classList.add('hidden');
-            };
-            
-            const registerAndClose = () => {
-                registerWinner(winnerNameInput.value);
-                closeModal();
-            };
-
             const countdownInterval = setInterval(() => {
                 countdown--;
-                countdownEl.textContent = countdown.toString();
+                timerEl.textContent = countdown.toString();
                 if (countdown <= 0) {
-                    registerAndClose();
+                    clearInterval(countdownInterval);
+                    DOMElements.winnerModal.classList.add('hidden');
+                    if (confettiAnimationId) clearInterval(confettiAnimationId);
                 }
             }, 1000);
+
+            const registerAndClose = () => {
+                clearInterval(countdownInterval);
+                const winnerName = winnerNameInput.value.trim();
+                const winnerId = Date.now();
+                
+                const winnerData = {
+                    id: winnerId,
+                    name: winnerName || "Ganhador Anônimo",
+                    prize: game.prizes[prizeType],
+                    gameNumber: activeGameNumber,
+                    bingoType: prizeType,
+                    numbers: [...game.calledNumbers].sort((a,b) => a-b)
+                };
+                
+                game.winners.push(winnerData);
+                renderWinner(winnerData);
+                
+                DOMElements.winnerModal.classList.add('hidden');
+                 if (confettiAnimationId) clearInterval(confettiAnimationId);
+                
+                const gameItem = DOMElements.gamesListEl.querySelector(`.game-item[data-game-number="${activeGameNumber}"]`);
+                if (gameItem && areAllPrizesWon(game)) {
+                    game.isComplete = true;
+                    updateGameItemUI(gameItem, true);
+                    triggerConfetti({ particleCount: 200, spread: 360 });
+
+                    const nextGameNumber = findNextGameNumber();
+                    if (nextGameNumber) {
+                        const completedRoundName = game.name || `Rodada ${activeGameNumber}`;
+                        const nextRoundName = gamesData[nextGameNumber].name || `Rodada ${nextGameNumber}`;
+                        showNextRoundModal(completedRoundName, nextRoundName);
+                        
+                        document.querySelectorAll('.game-item').forEach(el => el.classList.remove('active-round-highlight'));
+                        const nextGameItem = DOMElements.gamesListEl.querySelector(`.game-item[data-game-number="${nextGameNumber}"]`);
+                        if (nextGameItem) {
+                            nextGameItem.classList.add('active-round-highlight');
+                            const playBtn = nextGameItem.querySelector('.play-btn');
+                            if (playBtn) {
+                                playBtn.textContent = 'Jogando...';
+                                playBtn.classList.add('playing-btn');
+                            }
+                        }
+                        loadRoundState(nextGameNumber.toString());
+                    } else if (areAllGamesComplete()) {
+                        appConfig.isEventClosed = true;
+                        showFinalWinnersModal();
+                    }
+                }
+                
+                DOMElements.shareBtn.classList.remove('hidden');
+                DOMElements.endEventBtn.classList.remove('hidden');
+                debouncedSave();
+            };
+
+            registerWinnerBtn.addEventListener('click', registerAndClose);
             
-            const keydownHandler = (e: KeyboardEvent) => {
+            const handleKeydown = (e: KeyboardEvent) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     registerAndClose();
+                    document.removeEventListener('keydown', handleKeydown);
                 } else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    closeModal();
+                    DOMElements.winnerModal.classList.add('hidden');
+                    if (confettiAnimationId) clearInterval(confettiAnimationId);
+                    clearInterval(countdownInterval);
+                    document.removeEventListener('keydown', handleKeydown);
                 }
             };
-            
-            window.addEventListener('keydown', keydownHandler);
-            document.getElementById('register-winner-btn')!.addEventListener('click', registerAndClose);
+            document.addEventListener('keydown', handleKeydown);
         }
         
-        function registerWinner(winnerName: string) {
-            if (!winnerName.trim()) {
-                showAlert("O nome do ganhador não pode estar vazio.");
-                return;
-            }
-            if (!activeGameNumber || !currentBingoType) return;
-            const game = gamesData[activeGameNumber];
-            if (!game) return;
-            
-            const winnerData = {
-                id: Date.now(),
-                name: winnerName,
-                prize: game.prizes[currentBingoType as keyof typeof game.prizes],
-                gameNumber: activeGameNumber,
-                bingoType: currentBingoType,
-                numbers: [...game.calledNumbers] 
-            };
-            
-            if (!game.winners) game.winners = [];
-            game.winners.push(winnerData);
-            
-            const prizeLabelKey = (currentBingoType + 'Label') as keyof typeof appLabels;
-            const prizeLabel = appLabels[prizeLabelKey];
+        function renderWinner(winnerData: any) {
+            const winnerCard = document.createElement('div');
+            winnerCard.className = 'winner-card bg-gray-700 p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105';
+            winnerCard.dataset.winnerId = winnerData.id.toString();
 
-            if (currentBingoType === 'prize2' || currentBingoType === 'prize3' || (currentBingoType === 'prize1' && !game.prizes.prize2)) {
-                game.isComplete = true;
-                const gameEl = document.querySelector(`.game-item[data-game-number="${activeGameNumber}"]`);
-                if (gameEl) updateGameItemUI(gameEl, true);
-                
-                const nextGame = findNextGameNumber();
-                 if (nextGame) {
-                     setTimeout(() => {
-                         const nextGameButton = document.querySelector(`.game-item[data-game-number="${nextGame}"] .play-btn`) as HTMLElement;
-                         if (nextGameButton) nextGameButton.click();
-                     }, 1000);
-                 } else {
-                     if (areAllGamesComplete() && !appConfig.isEventClosed) {
-                         appConfig.isEventClosed = true;
-                         debouncedSave(); 
-                         const allWinners = Object.values(gamesData).flatMap(g => (g as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
-                         if (allWinners.length > 0) startFinalWinnerSlide(allWinners);
-                     }
-                 }
-            }
-
-            DOMElements.winnerModal.classList.add('hidden');
-            renderAllWinners();
-            debouncedSave();
+            const prizeText = winnerData.bingoType === 'Sorteio' ? winnerData.prize : `${appLabels[winnerData.bingoType + 'Label' as keyof typeof appLabels]} (${winnerData.prize})`;
+            winnerCard.innerHTML = `<h4 class="text-lg font-bold text-white">${winnerData.name}</h4>
+                                     <p class="text-sm text-amber-300">${prizeText}</p>
+                                     <p class="text-xs text-slate-400 mt-1">${winnerData.gameNumber === 'Brinde' || winnerData.gameNumber === 'Leilão' ? '' : gamesData[winnerData.gameNumber]?.name || `Rodada ${winnerData.gameNumber}`}</p>`;
+            
+            winnerCard.addEventListener('click', () => showWinnerEditModal(winnerData.id));
+            
+            DOMElements.winnersContainer.prepend(winnerCard);
         }
-
+        
         function renderAllWinners() {
             DOMElements.winnersContainer.innerHTML = '';
-            const allWinners = Object.values(gamesData).flatMap(game => (game as any).winners || []).reverse();
-            if (allWinners.length > 0) {
-                 DOMElements.shareBtn.classList.remove('hidden');
-                 DOMElements.endEventBtn.classList.remove('hidden');
-            } else {
-                 DOMElements.shareBtn.classList.add('hidden');
-                 DOMElements.endEventBtn.classList.add('hidden');
-            }
-            allWinners.forEach(winner => {
-                const winnerCard = document.createElement('div');
-                winnerCard.className = 'winner-card bg-gray-700 p-3 rounded-lg shadow-md transition-transform transform hover:scale-105';
-                winnerCard.dataset.winnerId = winner.id.toString();
-
-                const winnerNameEl = document.createElement('p');
-                winnerNameEl.className = 'font-bold text-white text-base';
-                winnerNameEl.textContent = winner.name;
-                
-                const prizeEl = document.createElement('p');
-                prizeEl.className = 'text-sm text-yellow-400';
-                
-                if (winner.bingoType === 'Sorteio') {
-                    prizeEl.textContent = `Brinde: ${winner.prize || 'Não especificado'}`;
-                } else if (winner.bingoType === 'Leilão') {
-                     prizeEl.textContent = `Leilão: ${winner.itemName} (R$ ${winner.bid})`;
-                } else {
-                    const prizeLabelKey = (winner.bingoType + 'Label') as keyof typeof appLabels;
-                    const prizeLabel = appLabels[prizeLabelKey] || winner.bingoType;
-                    prizeEl.textContent = `Rodada ${winner.gameNumber} - ${prizeLabel}`;
+            const allWinners: any[] = [];
+            Object.values(gamesData).forEach(game => {
+                if (game.winners && game.winners.length > 0) {
+                    allWinners.push(...game.winners);
                 }
-
-                winnerCard.appendChild(winnerNameEl);
-                winnerCard.appendChild(prizeEl);
-                DOMElements.winnersContainer.appendChild(winnerCard);
-
-                winnerCard.addEventListener('click', () => openWinnerEditModal(winner));
             });
+            allWinners.sort((a, b) => b.id - a.id);
+            allWinners.forEach(winner => renderWinner(winner));
         }
         
-        // --- Funções dos Modals ---
-
-function generateProof(selectedOptions: { [key: string]: boolean }) {
-    let proofContent = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Prova do Evento - ${document.title}</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <style>
-                @media print {
-                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    .no-print { display: none; }
-                }
-                .break-inside-avoid { page-break-inside: avoid; }
-            </style>
-        </head>
-        <body class="bg-gray-100 text-gray-800 font-sans p-8">
-            <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-                <header class="text-center border-b pb-4 mb-8">
-                    <h1 class="text-4xl font-bold">Bingo Show - Prova do Evento</h1>
-                    <p class="text-gray-600">Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-                </header>
-                <main>`;
-
-    const sortedGameKeys = Object.keys(gamesData).sort((a, b) => {
-        if (a === 'Brindes' || a === 'Leilão') return 1;
-        if (b === 'Brindes' || b === 'Leilão') return -1;
-        return parseInt(a) - parseInt(b);
-    });
-
-    for (const gameKey of sortedGameKeys) {
-        if (selectedOptions[gameKey]) {
-            const game = gamesData[gameKey];
-            if (!game) continue;
-
-            if (!isNaN(parseInt(gameKey))) { 
-                proofContent += `
-                    <section class="mb-8 break-inside-avoid">
-                        <h2 class="text-2xl font-bold text-sky-700 border-b-2 border-sky-200 pb-2 mb-4">Rodada ${gameKey}</h2>
-                        <div class="grid grid-cols-2 gap-x-8">
-                            <div>
-                                <h3 class="font-bold text-lg mb-2">Prêmios:</h3>
-                                <ul class="list-disc list-inside">
-                                    ${game.prizes.prize1 ? `<li><strong>${appLabels.prize1Label}:</strong> ${game.prizes.prize1}</li>` : ''}
-                                    ${game.prizes.prize2 ? `<li><strong>${appLabels.prize2Label}:</strong> ${game.prizes.prize2}</li>` : ''}
-                                    ${game.prizes.prize3 ? `<li><strong>${appLabels.prize3Label}:</strong> ${game.prizes.prize3}</li>` : ''}
-                                </ul>
-                            </div>
-                             <div>
-                                <h3 class="font-bold text-lg mb-2">Vencedores:</h3>
-                                ${game.winners && game.winners.length > 0 ?
-                                    `<ul class="list-disc list-inside">${game.winners.map((w: any) => `<li><strong>${w.name}</strong> (${appLabels[(w.bingoType + 'Label') as keyof typeof appLabels] || w.bingoType})</li>`).join('')}</ul>` :
-                                    '<p class="text-gray-500">Nenhum vencedor registrado.</p>'
-                                }
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                             <h3 class="font-bold text-lg mb-2">Números Sorteados (${game.calledNumbers.length}):</h3>
-                             <div class="flex flex-wrap gap-2 text-sm">
-                                ${game.calledNumbers.map((n: number) => `<span class="bg-gray-200 font-mono rounded px-2 py-1">${getLetterForNumber(n)}-${n}</span>`).join(' ')}
-                             </div>
-                        </div>
-                    </section>`;
-            } else { 
-                 proofContent += `
-                    <section class="mb-8 break-inside-avoid">
-                        <h2 class="text-2xl font-bold text-amber-700 border-b-2 border-amber-200 pb-2 mb-4">${gameKey}</h2>
-                         ${game.winners && game.winners.length > 0 ?
-                            `<ul class="list-disc list-inside space-y-1">${game.winners.map((w: any) => {
-                                let details = '';
-                                if (w.bingoType === 'Sorteio') details = `Cartela: ${w.cartela || 'N/A'}, Brinde: ${w.prize || 'N/A'}`;
-                                if (w.bingoType === 'Leilão') details = `Item: ${w.itemName}, Arremate: R$ ${w.bid}`;
-                                return `<li><strong>${w.name}:</strong> ${details}</li>`;
-                            }).join('')}</ul>` :
-                            '<p class="text-gray-500">Nenhum registro.</p>'
-                        }
-                    </section>`;
-            }
-        }
-    }
-
-    proofContent += `
-                </main>
-                 <footer class="text-center mt-8 pt-4 border-t">
-                    <p class="text-sm text-gray-500">Bingo Show - ${currentVersion}</p>
-                </footer>
-            </div>
-             <div class="no-print max-w-4xl mx-auto text-center mt-4">
-                <button onclick="window.print()" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg">Imprimir</button>
-            </div>
-        </body>
-        </html>`;
-
-    const proofWindow = window.open('', '_blank');
-    if (proofWindow) {
-        proofWindow.document.write(proofContent);
-        proofWindow.document.close();
-    } else {
-        showAlert("Não foi possível abrir a janela de prova. Verifique se o seu navegador está bloqueando pop-ups.");
-    }
-}
-
-function showProofOptions() {
-    DOMElements.proofOptionsModal.innerHTML = getModalTemplates().proofOptions;
-    const listContainer = document.getElementById('proof-options-list')!;
-    listContainer.innerHTML = ''; 
-
-    listContainer.innerHTML = `
-        <div class="flex items-center p-2 rounded-lg bg-gray-900 border-b border-gray-700">
-            <input id="proof-select-all" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-            <label for="proof-select-all" class="ml-3 block text-base font-bold text-white">Selecionar Tudo</label>
-        </div>
-    `;
-
-    const createCheckbox = (id: string, label: string) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'flex items-center p-2 rounded-lg hover:bg-gray-700';
-        wrapper.innerHTML = `
-            <input id="proof-option-${id}" name="proof-option" value="${id}" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 proof-option-checkbox">
-            <label for="proof-option-${id}" class="ml-3 block text-base font-medium text-slate-300">${label}</label>
-        `;
-        return wrapper;
-    };
-
-    const sortedGameNumbers = Object.keys(gamesData).filter(key => !isNaN(parseInt(key))).sort((a, b) => parseInt(a) - parseInt(b));
-    sortedGameNumbers.forEach(gameNum => {
-        listContainer.appendChild(createCheckbox(gameNum, `Rodada ${gameNum}`));
-    });
-
-    if (gamesData['Brindes'] && gamesData['Brindes'].winners && gamesData['Brindes'].winners.length > 0) {
-        listContainer.appendChild(createCheckbox('Brindes', 'Sorteio de Brindes'));
-    }
-    if (gamesData['Leilão'] && gamesData['Leilão'].winners && gamesData['Leilão'].winners.length > 0) {
-        listContainer.appendChild(createCheckbox('Leilão', 'Leilão'));
-    }
-
-    DOMElements.proofOptionsModal.classList.remove('hidden');
-
-    const selectAllCheckbox = document.getElementById('proof-select-all') as HTMLInputElement;
-    const allCheckboxes = listContainer.querySelectorAll('.proof-option-checkbox') as NodeListOf<HTMLInputElement>;
-    
-    selectAllCheckbox.addEventListener('change', () => {
-        allCheckboxes.forEach(cb => {
-            cb.checked = selectAllCheckbox.checked;
-        });
-    });
-
-    document.getElementById('cancel-proof-btn')!.addEventListener('click', () => {
-        DOMElements.proofOptionsModal.classList.add('hidden');
-    });
-
-    document.getElementById('generate-selected-proof-btn')!.addEventListener('click', () => {
-        const selectedOptions: { [key: string]: boolean } = {};
-        allCheckboxes.forEach(cb => {
-            if (cb.checked) {
-                selectedOptions[cb.value] = true;
-            }
-        });
-        
-        if (Object.keys(selectedOptions).length === 0) {
-            showAlert("Selecione pelo menos uma rodada para gerar a prova.");
-            return;
-        }
-
-        generateProof(selectedOptions);
-        DOMElements.proofOptionsModal.classList.add('hidden');
-    });
-}
-
-function updateGameItemUI(gameEl: Element, isComplete: boolean) {
-    if (!gameEl) return;
-    const buttonContainer = gameEl.querySelector('.mt-3');
-    if (!buttonContainer) return;
-    
-    buttonContainer.innerHTML = ''; 
-
-    if (isComplete) {
-        gameEl.classList.add('game-completed-style');
-        const statusText = document.createElement('p');
-        statusText.className = 'text-center text-green-400 font-bold py-2';
-        statusText.textContent = 'Concluída';
-        
-        const reopenBtn = document.createElement('button');
-        reopenBtn.textContent = 'Reabrir Rodada';
-        reopenBtn.className = 'w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded-lg text-xs transition-all';
-        reopenBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const gameNumber = (gameEl as HTMLElement).dataset.gameNumber;
-            if (gameNumber && gamesData[gameNumber]) {
-                gamesData[gameNumber].isComplete = false;
-                updateGameItemUI(gameEl, false);
-                debouncedSave();
-            }
-        });
-
-        buttonContainer.appendChild(statusText);
-        buttonContainer.appendChild(reopenBtn);
-        (gameEl.querySelectorAll('.prize-input') as NodeListOf<HTMLInputElement>).forEach(input => input.disabled = true);
-    } else {
-        gameEl.classList.remove('game-completed-style');
-        const playBtn = document.createElement('button');
-        playBtn.className = 'play-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-transform transform hover:scale-105';
-        
-        const gameNumber = (gameEl as HTMLElement).dataset.gameNumber;
-        if (gameNumber === activeGameNumber) {
-             playBtn.textContent = 'Jogando...';
-             playBtn.classList.add('playing-btn');
-        } else {
-            playBtn.textContent = 'Jogar';
-        }
-
-        playBtn.addEventListener('click', () => {
-            document.querySelectorAll('.game-item').forEach(el => {
-                const btn = el.querySelector('.play-btn');
-                if (btn) {
-                    btn.textContent = 'Jogar';
-                    btn.classList.remove('playing-btn');
-                }
-                el.classList.remove('active-round-highlight');
-            });
-            
-            if (activeGameNumber === gameNumber) {
-                activeGameNumber = null;
-                loadRoundState(null);
-            } else {
-                gameEl.classList.add('active-round-highlight');
-                playBtn.textContent = 'Jogando...';
-                playBtn.classList.add('playing-btn');
-                loadRoundState(gameNumber as string);
-            }
-            debouncedSave();
-        });
-
-        buttonContainer.appendChild(playBtn);
-        (gameEl.querySelectorAll('.prize-input') as NodeListOf<HTMLInputElement>).forEach(input => input.disabled = false);
-    }
-}
-
-
-function openWinnerEditModal(winner: any) {
-    DOMElements.winnerEditModal.innerHTML = getModalTemplates().winnerEdit;
-    
-    const nameInput = document.getElementById('edit-winner-name') as HTMLInputElement;
-    const prizeInput = document.getElementById('edit-winner-prize') as HTMLInputElement;
-
-    nameInput.value = winner.name;
-    prizeInput.value = winner.prize || (winner.itemName ? `${winner.itemName} (R$ ${winner.bid})` : '');
-
-    DOMElements.winnerEditModal.classList.remove('hidden');
-
-    document.getElementById('save-winner-changes-btn')!.addEventListener('click', () => {
-        const game = gamesData[winner.gameNumber];
-        if (game && game.winners) {
-            const winnerToUpdate = game.winners.find((w: any) => w.id === winner.id);
-            if (winnerToUpdate) {
-                winnerToUpdate.name = nameInput.value;
-                winnerToUpdate.prize = prizeInput.value;
-            }
-        }
-        DOMElements.winnerEditModal.classList.add('hidden');
-        renderAllWinners();
-        debouncedSave();
-    });
-
-    document.getElementById('remove-winner-btn')!.addEventListener('click', () => {
-        DOMElements.deleteConfirmModal.innerHTML = getModalTemplates().deleteConfirm;
-        (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o vencedor "${winner.name}"?`;
-        DOMElements.deleteConfirmModal.classList.remove('hidden');
-        
-        document.getElementById('confirm-delete-btn')!.addEventListener('click', () => {
-             const game = gamesData[winner.gameNumber];
-             if (game && game.winners) {
-                 game.winners = game.winners.filter((w: any) => w.id !== winner.id);
-             }
-             DOMElements.deleteConfirmModal.classList.add('hidden');
-             DOMElements.winnerEditModal.classList.add('hidden');
-             renderAllWinners();
-             debouncedSave();
-        });
-        
-        document.getElementById('cancel-delete-btn')!.addEventListener('click', () => {
-            DOMElements.deleteConfirmModal.classList.add('hidden');
-        });
-    });
-
-    document.getElementById('cancel-winner-edit-btn')!.addEventListener('click', () => {
-        DOMElements.winnerEditModal.classList.add('hidden');
-    });
-}
-
-function startInfiniteConfetti() {
-    if (typeof confetti !== 'function') return;
-    const defaults = { startVelocity: 25, spread: 360, ticks: 90, zIndex: 999 };
-    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-    finalConfettiInterval = setInterval(() => {
-        const particleCount = 40;
-        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 } });
-    }, 400);
-}
-
-function startFinalWinnerSlide(allWinners: any[]) {
-    if (allWinners.length === 0) {
-        showAlert("Nenhum vencedor de rodada para exibir.");
-        return;
-    }
-
-    DOMElements.finalWinnersModal.innerHTML = getModalTemplates().finalWinners;
-    DOMElements.finalWinnersModal.classList.remove('hidden');
-    startInfiniteConfetti();
-
-    const winnerCard = document.getElementById('current-winner-card')!;
-    let currentIndex = 0;
-    let winnerInterval: any;
-
-    const displayWinner = (index: number) => {
-        const winner = allWinners[index];
-        if (!winner) return;
-        
-        const prizeLabelKey = (winner.bingoType + 'Label') as keyof typeof appLabels;
-        const prizeLabel = appLabels[prizeLabelKey] || winner.bingoType;
-
-        winnerCard.innerHTML = `
-            <p class="text-3xl font-bold text-white mb-2">${winner.name}</p>
-            <p class="text-xl text-yellow-400">Rodada ${winner.gameNumber} - ${prizeLabel}</p>
-            <p class="text-2xl font-bold text-amber-300 mt-1">${winner.prize}</p>
-        `;
-        winnerCard.classList.remove('scale-90', 'opacity-0');
-        winnerCard.classList.add('scale-100', 'opacity-100');
-
-        setTimeout(() => {
-            winnerCard.classList.remove('scale-100', 'opacity-100');
-            winnerCard.classList.add('scale-90', 'opacity-0');
-        }, 4500);
-    };
-
-    const cycleWinners = () => {
-        displayWinner(currentIndex);
-        currentIndex = (currentIndex + 1) % allWinners.length;
-    };
-    
-    const sponsorsContainer = document.getElementById('final-sponsors-list')!;
-    const allSponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.name || s.image);
-    if (appConfig.globalSponsor && (appConfig.globalSponsor.name || appConfig.globalSponsor.image)) {
-        allSponsors.unshift(appConfig.globalSponsor);
-    }
-    const uniqueSponsors = Array.from(new Map(allSponsors.map(item => [item.name, item])).values());
-
-
-    if (uniqueSponsors.length > 0) {
-        uniqueSponsors.forEach(sponsor => {
-            if (!sponsor.name && !sponsor.image) return;
-            const sponsorEl = document.createElement('div');
-            sponsorEl.className = 'flex items-center gap-2 bg-gray-800 p-2 rounded';
-            if (sponsor.image) {
-                sponsorEl.innerHTML += `<img src="${sponsor.image}" class="w-8 h-8 rounded-full object-cover">`;
-            }
-            if (sponsor.name) {
-                sponsorEl.innerHTML += `<span class="text-sm font-medium text-slate-300">${sponsor.name}</span>`;
-            }
-            sponsorsContainer.appendChild(sponsorEl);
-        });
-    } else {
-        document.getElementById('final-sponsors-section')!.classList.add('hidden');
-    }
-
-    cycleWinners();
-    winnerInterval = setInterval(cycleWinners, 5000);
-
-    document.getElementById('close-final-modal-btn')!.addEventListener('click', () => {
-        clearInterval(winnerInterval);
-        clearInterval(finalConfettiInterval);
-        DOMElements.finalWinnersModal.classList.add('hidden');
-    });
-
-    document.getElementById('generate-proof-final-btn')!.addEventListener('click', showProofOptions);
-    document.getElementById('donation-final-btn')!.addEventListener('click', showDonationModal);
-}
-        
-function showDonationModal() {
-    DOMElements.donationModal.innerHTML = getModalTemplates().donation;
-    (document.getElementById('pix-key-display') as HTMLElement).textContent = appConfig.pixKey;
-    DOMElements.donationModal.classList.remove('hidden');
-
-    document.getElementById('copy-pix-btn')!.addEventListener('click', (e) => {
-        navigator.clipboard.writeText(appConfig.pixKey);
-        const btn = e.target as HTMLButtonElement;
-        const originalText = btn.textContent;
-        btn.textContent = 'Copiado!';
-        setTimeout(() => { btn.textContent = originalText; }, 2000);
-    });
-
-    document.getElementById('close-donation-btn')!.addEventListener('click', () => {
-        DOMElements.donationModal.classList.add('hidden');
-    });
-}
-
-function showMenuEditModal() {
-    DOMElements.menuEditModal.innerHTML = getModalTemplates().menuEdit;
-    DOMElements.menuEditModal.classList.remove('hidden');
-
-    const textarea = document.getElementById('menu-textarea') as HTMLTextAreaElement;
-    textarea.value = menuItems.join('\n');
-
-    document.getElementById('save-menu-btn')!.addEventListener('click', () => {
-        menuItems = textarea.value.split('\n').map(item => item.trim()).filter(item => item.length > 0);
-        debouncedSave();
-        DOMElements.menuEditModal.classList.add('hidden');
-    });
-
-    document.getElementById('cancel-menu-edit-btn')!.addEventListener('click', () => {
-        DOMElements.menuEditModal.classList.add('hidden');
-    });
-}
-
-function showChangelogModal() {
-    DOMElements.changelogModal.innerHTML = getModalTemplates().changelog;
-    const historyContainer = document.getElementById('version-history-content')!;
-    
-    let htmlContent = versionHistory.trim().split('\n\n').map(block => {
-        if (block.startsWith('**v')) {
-            return `<h3 class="text-lg font-bold text-sky-400 mt-4 first:mt-0">${block.replace(/\*\*/g, '')}</h3>`;
-        }
-        return `<ul>${block.split('\n').map(line => `<li class="ml-4 list-disc">${line.replace(/^- /, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</li>`).join('')}</ul>`;
-    }).join('');
-
-    historyContainer.innerHTML = htmlContent;
-    
-    DOMElements.changelogModal.classList.remove('hidden');
-    document.getElementById('close-changelog-btn')!.addEventListener('click', () => {
-        DOMElements.changelogModal.classList.add('hidden');
-    });
-}
-
-function confirmDeleteSponsor(num: string) {
-    const modal = DOMElements.deleteConfirmModal;
-    modal.innerHTML = getModalTemplates().deleteConfirm;
-    (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o patrocinador do número ${num}?`;
-    (document.getElementById('confirm-delete-btn') as HTMLElement).textContent = "Remover Patrocinador";
-    
-    modal.classList.add('z-[60]'); // Garante que o modal de confirmação fique sobre o de configurações
-    modal.classList.remove('hidden');
-
-    document.getElementById('confirm-delete-btn')!.onclick = async () => {
-        delete appConfig.sponsorsByNumber[num as any];
-        await deleteSponsorImage(num);
-
-        const sponsorItem = document.getElementById(`sponsor-item-${num}`);
-        if (sponsorItem) {
-            (sponsorItem.querySelector(`input[data-field="name"]`) as HTMLInputElement).value = '';
-            (sponsorItem.querySelector(`#sponsor-preview-${num}`) as HTMLImageElement).src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-            (sponsorItem.querySelector(`#sponsor-status-${num}`) as HTMLElement).textContent = 'Vazio';
-            (sponsorItem as HTMLDetailsElement).open = false;
-        }
-        
-        renderMasterBoard();
-        
-        modal.classList.add('hidden');
-        modal.classList.remove('z-[60]');
-        debouncedSave();
-    };
-    
-    document.getElementById('cancel-delete-btn')!.onclick = () => {
-        modal.classList.add('hidden');
-        modal.classList.remove('z-[60]');
-    };
-}
-
-function confirmDeleteGlobalSponsor() {
-    const modal = DOMElements.deleteConfirmModal;
-    modal.innerHTML = getModalTemplates().deleteConfirm;
-    (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o patrocinador global?`;
-    (document.getElementById('confirm-delete-btn') as HTMLElement).textContent = "Remover Patrocinador";
-
-    modal.classList.add('z-[60]');
-    modal.classList.remove('hidden');
-
-    document.getElementById('confirm-delete-btn')!.onclick = async () => {
-        appConfig.globalSponsor = { name: '', image: '' };
-        await deleteSponsorImage('global');
-
-        const nameInput = document.getElementById('global-sponsor-name') as HTMLInputElement;
-        const previewImg = document.getElementById('global-sponsor-preview') as HTMLImageElement;
-        if (nameInput) nameInput.value = '';
-        if (previewImg) previewImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-        
-        modal.classList.add('hidden');
-        modal.classList.remove('z-[60]');
-        debouncedSave();
-    };
-    
-    document.getElementById('cancel-delete-btn')!.onclick = () => {
-        modal.classList.add('hidden');
-        modal.classList.remove('z-[60]');
-    };
-}
-
-
-function populateSettingsSponsorsTab() {
-    const container = document.getElementById('sponsors-by-number-container')!;
-    const enableCheckbox = document.getElementById('enable-sponsors-by-number-checkbox') as HTMLInputElement;
-
-    // Global Sponsor Elements
-    const globalSponsorPreview = document.getElementById('global-sponsor-preview') as HTMLImageElement;
-    const globalSponsorNameInput = document.getElementById('global-sponsor-name') as HTMLInputElement;
-    const globalSponsorUpload = document.getElementById('global-sponsor-upload') as HTMLInputElement;
-    
-    if (appConfig.globalSponsor.image) globalSponsorPreview.src = appConfig.globalSponsor.image;
-    if (appConfig.globalSponsor.name) globalSponsorNameInput.value = appConfig.globalSponsor.name;
-    
-    globalSponsorNameInput.addEventListener('change', e => {
-        appConfig.globalSponsor.name = (e.target as HTMLInputElement).value;
-        debouncedSave();
-    });
-
-    globalSponsorUpload.addEventListener('change', async e => {
-        const file = (e.target as HTMLInputElement).files![0];
-        if (file) {
-            const base64 = await fileToBase64(file);
-            appConfig.globalSponsor.image = base64;
-            globalSponsorPreview.src = base64;
-            debouncedSave();
-        }
-    });
-
-
-    // Individual Sponsors
-    enableCheckbox.checked = appConfig.enableSponsorsByNumber;
-    enableCheckbox.addEventListener('change', e => {
-        appConfig.enableSponsorsByNumber = (e.target as HTMLInputElement).checked;
-        renderMasterBoard();
-        debouncedSave();
-    });
-
-    container.innerHTML = '';
-    for (let i = 1; i <= 75; i++) {
-        const sponsor = appConfig.sponsorsByNumber[i] || { name: '', image: '' };
-        
-        const wrapper = document.createElement('details');
-        wrapper.className = 'bg-gray-900 rounded-lg p-2 sponsor-item';
-        wrapper.id = `sponsor-item-${i}`;
-        
-        const summary = document.createElement('summary');
-        summary.className = 'font-bold text-slate-300 cursor-pointer flex justify-between items-center';
-        summary.innerHTML = `<span>${appLabels.settingsSponsorNumberLabel} ${i}</span> <span class="text-xs font-normal text-amber-400" id="sponsor-status-${i}">${sponsor.name || 'Vazio'}</span>`;
-        
-        const formContent = document.createElement('div');
-        formContent.className = 'mt-2 p-2 border-t border-gray-700 space-y-2';
-
-        formContent.innerHTML = `
-            <div class="flex justify-between items-center">
-                 <label class="text-sm font-medium text-slate-400">${appLabels.settingsSponsorNameLabel}</label>
-                 <button class="delete-sponsor-btn text-xs bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-2 rounded-lg" data-number="${i}">Remover</button>
-            </div>
-            <input type="text" value="${sponsor.name}" class="mt-1 w-full text-sm p-1 bg-gray-800 text-white rounded" data-number="${i}" data-field="name">
-            <div>
-                 <label class="text-sm font-medium text-slate-400">${appLabels.settingsSponsorImageLabel}</label>
-                <input type="file" accept="image/*" class="mt-1 block w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" data-number="${i}" data-field="image-upload">
-                <img src="${sponsor.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" class="mt-1 h-16 w-16 object-cover rounded bg-gray-700" id="sponsor-preview-${i}" />
-            </div>
-        `;
-
-        wrapper.appendChild(summary);
-        wrapper.appendChild(formContent);
-        container.appendChild(wrapper);
-
-        const nameInput = wrapper.querySelector('input[data-field="name"]') as HTMLInputElement;
-        const fileInput = wrapper.querySelector('input[data-field="image-upload"]') as HTMLInputElement;
-        const previewImg = wrapper.querySelector(`#sponsor-preview-${i}`) as HTMLImageElement;
-        const deleteBtn = wrapper.querySelector('.delete-sponsor-btn') as HTMLElement;
-
-        deleteBtn.addEventListener('click', (e) => {
-            const num = (e.currentTarget as HTMLElement).dataset.number!;
-            confirmDeleteSponsor(num);
-        });
-
-        nameInput.addEventListener('change', e => {
-            const num = (e.target as HTMLElement).dataset.number!;
-            if (!appConfig.sponsorsByNumber[num as any]) appConfig.sponsorsByNumber[num as any] = { name: '', image: '' };
-            appConfig.sponsorsByNumber[num as any].name = (e.target as HTMLInputElement).value;
-            document.getElementById(`sponsor-status-${num}`)!.textContent = appConfig.sponsorsByNumber[num as any].name || 'Vazio';
-            debouncedSave();
-        });
-
-        fileInput.addEventListener('change', async e => {
-            const file = (e.target as HTMLInputElement).files![0];
-            const num = (e.target as HTMLElement).dataset.number!;
-            if (file) {
-                const base64 = await fileToBase64(file);
-                if (!appConfig.sponsorsByNumber[num as any]) appConfig.sponsorsByNumber[num as any] = { name: '', image: '' };
-                appConfig.sponsorsByNumber[num as any].image = base64;
-                previewImg.src = base64;
-                renderMasterBoard();
-                debouncedSave();
-            }
-        });
-    }
-}
-
-function showSettingsModal() {
-    DOMElements.settingsModal.innerHTML = getModalTemplates().settings;
-
-    const tabs = ['appearance', 'sponsors', 'labels', 'shortcuts'];
-    tabs.forEach(tabId => {
-        document.getElementById(`tab-${tabId}`)!.addEventListener('click', () => {
-            tabs.forEach(id => {
-                const btn = document.getElementById(`tab-${id}`)!;
-                btn.classList.remove('border-sky-500', 'text-sky-400');
-                btn.classList.add('border-transparent', 'text-gray-400');
-            });
-            const activeBtn = document.getElementById(`tab-${tabId}`)!;
-            activeBtn.classList.add('border-sky-500', 'text-sky-400');
-            activeBtn.classList.remove('border-transparent', 'text-gray-400');
-            tabs.forEach(id => {
-                document.getElementById(`tab-content-${id}`)!.classList.add('hidden');
-            });
-            document.getElementById(`tab-content-${tabId}`)!.classList.remove('hidden');
-        });
-    });
-
-    const customLogoPreview = document.getElementById('custom-logo-preview') as HTMLImageElement;
-    if (appConfig.customLogoBase64) {
-        customLogoPreview.src = appConfig.customLogoBase64;
-    }
-    document.getElementById('custom-logo-upload')!.addEventListener('change', async (e) => {
-        const file = (e.target as HTMLInputElement).files![0];
-        if (file) {
-            appConfig.customLogoBase64 = await fileToBase64(file);
-            customLogoPreview.src = appConfig.customLogoBase64;
-            renderCustomLogo();
-            debouncedSave();
-        }
-    });
-    document.getElementById('remove-custom-logo-btn')!.addEventListener('click', () => {
-        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4NCiAgICA8ZGVmcz4NCiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4NCiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkRGODg7IiAvPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkM3MDA7IiAvPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRjVCMzAwOyIgLz4NCiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPg0KICAgICAgICAgICAgPGZlTWVyZ2U+DQogICAgICAgICAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJjb2xvcmVkQmx1ciIvPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPg0KICAgICAgICAgICAgPC9mZU1lcmdlPg0KICAgICAgICA8L2ZpbHRlcj4NCiAgICA8L2RlZnM+DQogICAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9IiMxMTE4MjciIHJ4PSI1MCIgLz4NCiAgICA8ZyBmaWx0ZXI9InVybCgjZ2xvdykiPg0KICAgICAgICA8cGF0aCBkPSJNMjU2LDEwMS40bDM1LjgsMTA5LjloMTE1LjZsLTkzLjUsNjcuOWwzNS44LDEwOS45TDI1NiwzMjEuMmwtOTMuNSw2Ny45bDM1LjgtMTA5LjlsLTkzLjUtNjcuOWgxMTUuNkwyNTYsMTAxLjR6IiBmaWxsPSJ1cmwoI2dvbGRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNCIvPg0KICAgICAgICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE2MCIgc3Ryb2tlPSIjRkZDNzAwIiBzdHJva2Utd2lkdGg9IjgiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuNiIvPg0KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjQ1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOTAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjZ29sZEdyYWRpZW50KSIgbGV0dGVyLXNwYWNpbmc9IjIiPg0KICAgICAgICAgICAgQklOR08NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjY1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjRjVCMzAwIiBzdHJva2Utd2lkdGg9IjQiIGxldHRlci1zcGFjaW5nPSI1Ij4NCiAgICAgICAgICAgIFNIT1cNCiAgICAgICAgPC90ZXh0Pg0KICAgIDwvZz4NCjwvc3ZnPg==';
-        customLogoPreview.src = appConfig.customLogoBase64;
-        renderCustomLogo();
-        debouncedSave();
-    });
-
-    const autocloseCheckbox = document.getElementById('enable-modal-autoclose') as HTMLInputElement;
-    autocloseCheckbox.checked = appConfig.enableModalAutoclose;
-    autocloseCheckbox.addEventListener('change', e => {
-        appConfig.enableModalAutoclose = (e.target as HTMLInputElement).checked;
-        debouncedSave();
-    });
-
-    const autocloseTimer = document.getElementById('modal-autoclose-timer') as HTMLInputElement;
-    const autocloseValue = document.getElementById('modal-autoclose-value')!;
-    autocloseTimer.value = appConfig.modalAutocloseSeconds.toString();
-    if(autocloseValue) autocloseValue.textContent = appConfig.modalAutocloseSeconds.toString();
-    autocloseTimer.addEventListener('input', e => {
-        const seconds = parseInt((e.target as HTMLInputElement).value, 10);
-        appConfig.modalAutocloseSeconds = seconds;
-        if(autocloseValue) autocloseValue.textContent = seconds.toString();
-        debouncedSave();
-    });
-
-    const bingoTitleSelect = document.getElementById('bingo-title-select') as HTMLSelectElement;
-    bingoTitleSelect.value = appConfig.bingoTitle;
-    bingoTitleSelect.addEventListener('change', e => {
-        appConfig.bingoTitle = (e.target as HTMLSelectElement).value;
-        DYNAMIC_LETTERS = appConfig.bingoTitle === 'AJUDE' ? DYNAMIC_LETTERS_AJUDE : ['B', 'I', 'N', 'G', 'O'];
-        updateProgramTitle();
-        renderAppName();
-        renderUIFromState();
-        debouncedSave();
-    });
-    
-    const boardColorPicker = document.getElementById('board-color-picker') as HTMLInputElement;
-    boardColorPicker.value = appConfig.boardColor === 'default' ? '#334155' : appConfig.boardColor;
-    boardColorPicker.addEventListener('input', e => {
-        appConfig.boardColor = (e.target as HTMLInputElement).value;
-        renderUIFromState();
-        debouncedSave();
-    });
-    document.getElementById('reset-board-color-btn')!.addEventListener('click', () => {
-        appConfig.boardColor = 'default';
-        boardColorPicker.value = '#334155';
-        renderUIFromState();
-        debouncedSave();
-    });
-    const textColorPicker = document.getElementById('drawn-text-color-picker') as HTMLInputElement;
-    textColorPicker.value = appConfig.drawnTextColor;
-    textColorPicker.addEventListener('input', e => {
-        appConfig.drawnTextColor = (e.target as HTMLInputElement).value;
-        loadRoundState(activeGameNumber); 
-        debouncedSave();
-    });
-    const strokeColorPicker = document.getElementById('drawn-stroke-color-picker') as HTMLInputElement;
-    strokeColorPicker.value = appConfig.drawnTextStrokeColor;
-    strokeColorPicker.addEventListener('input', e => {
-        appConfig.drawnTextStrokeColor = (e.target as HTMLInputElement).value;
-        loadRoundState(activeGameNumber);
-        debouncedSave();
-    });
-    const strokeWidthSlider = document.getElementById('drawn-stroke-width-slider') as HTMLInputElement;
-    const strokeWidthValue = document.getElementById('drawn-stroke-width-value')!;
-    strokeWidthSlider.value = appConfig.drawnTextStrokeWidth.toString();
-    if(strokeWidthValue) strokeWidthValue.textContent = appConfig.drawnTextStrokeWidth.toString();
-    strokeWidthSlider.addEventListener('input', e => {
-        const width = parseInt((e.target as HTMLInputElement).value, 10);
-        appConfig.drawnTextStrokeWidth = width;
-        if(strokeWidthValue) strokeWidthValue.textContent = width.toString();
-        loadRoundState(activeGameNumber);
-        debouncedSave();
-    });
-
-    populateSettingsSponsorsTab();
-    populateSettingsLabelsTab();
-    populateSettingsShortcutsTab();
-    
-    document.getElementById('remove-global-sponsor-btn')!.addEventListener('click', confirmDeleteGlobalSponsor);
-    document.getElementById('generate-test-data-btn')!.addEventListener('click', generateTestData);
-    document.getElementById('close-settings-btn')!.addEventListener('click', () => {
-        DOMElements.settingsModal.classList.add('hidden');
-        applyLabels(); 
-        renderUIFromState(); 
-    });
-
-    DOMElements.settingsModal.classList.remove('hidden');
-}
-
         function showAlert(message: string) {
             DOMElements.customAlertModal.innerHTML = getModalTemplates().alert;
-            (document.getElementById('custom-alert-message') as HTMLElement).textContent = message;
+            document.getElementById('custom-alert-message')!.textContent = message;
             DOMElements.customAlertModal.classList.remove('hidden');
             document.getElementById('custom-alert-close-btn')!.addEventListener('click', () => {
                 DOMElements.customAlertModal.classList.add('hidden');
             });
         }
-
-        function showCongratsModal(winnerName: string, prize: string, isPrizeDraw = false, cartela = '') {
+        
+        function showCongratsModal(winnerName: string, prize: string) {
             DOMElements.congratsModal.innerHTML = getModalTemplates().congrats;
-            const winnerNameEl = document.getElementById('congrats-winner-name')!;
-            const prizeValueEl = document.getElementById('congrats-prize-value')!;
-            winnerNameEl.textContent = winnerName;
-            
-            if (isPrizeDraw) {
-                const cartelaText = cartela ? ` | Cartela Nº ${cartela}` : '';
-                prizeValueEl.innerHTML = `<strong>${appLabels.congratsModalPrizeLabel}</strong> ${prize}${cartelaText}`;
-            } else {
-                prizeValueEl.textContent = prize;
-            }
-            
+            (document.getElementById('congrats-winner-name') as HTMLElement).textContent = winnerName;
+            (document.getElementById('congrats-prize-value') as HTMLElement).textContent = `Ganhou: ${prize}`;
             DOMElements.congratsModal.classList.remove('hidden');
+            document.getElementById('close-congrats-modal-btn')!.addEventListener('click', () => DOMElements.congratsModal.classList.add('hidden'));
             triggerConfetti();
-            document.getElementById('close-congrats-modal-btn')!.addEventListener('click', () => {
-                DOMElements.congratsModal.classList.add('hidden');
-                winnerNameEl.setAttribute('contenteditable', 'false');
-                prizeValueEl.setAttribute('contenteditable', 'false');
-            });
-        }
-        
-        function adjustSlider(sliderId: string, adjustment: number) {
-            const slider = document.getElementById(sliderId) as HTMLInputElement;
-            if (!slider) return;
-            
-            const currentValue = parseInt(slider.value, 10);
-            const min = parseInt(slider.min, 10);
-            const max = parseInt(slider.max, 10);
-            
-            let newValue = currentValue + adjustment;
-            
-            if (newValue < min) newValue = min;
-            if (newValue > max) newValue = max;
-            
-            slider.value = newValue.toString();
-            
-            slider.dispatchEvent(new Event('input', { bubbles: true }));
-            debouncedSave(); 
         }
 
-        function buildShortcutString(e: KeyboardEvent): string {
-            let shortcut = '';
-            if (e.ctrlKey) shortcut += 'Control+';
-            if (e.altKey) shortcut += 'Alt+';
-            if (e.shiftKey) shortcut += 'Shift+';
-
-            let key = e.key;
-            if (key === ' ') key = 'Space';
-            else if (key.length === 1) key = key.toUpperCase();
-            else key = key.charAt(0).toUpperCase() + key.slice(1);
-            
-            if (!['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
-                shortcut += key;
-            }
-            return shortcut;
-        }
-
-        function handleManualSubmit() {
-            const letter = DOMElements.letterInput.value.toUpperCase();
-            const numberStr = DOMElements.numberInput.value;
-
-            if (!numberStr) {
-                showError("Por favor, digite um número.");
-                return;
-            }
-            const number = parseInt(numberStr, 10);
-            if (isNaN(number) || number < 1 || number > 75) {
-                showError(`Número inválido. Digite um valor entre 1 e 75.`);
-                return;
-            }
-            const expectedLetter = getLetterForNumber(number);
-            if (letter && letter !== expectedLetter) {
-                showError(`O número ${number} pertence à coluna ${expectedLetter}, não ${letter}.`);
-                return;
-            }
-            showFloatingNumber(number);
-            DOMElements.numberInput.value = '';
-            DOMElements.letterInput.value = '';
-            DOMElements.letterInput.focus();
-        }
-
-        function handleKeydown(e: KeyboardEvent) {
-            if (!DOMElements.verificationModal.classList.contains('hidden')) {
-                e.preventDefault();
-                switch (e.key) {
-                    case '1': (document.getElementById('confirm-prize1-btn') as HTMLButtonElement)?.click(); break;
-                    case '2': (document.getElementById('confirm-prize2-btn') as HTMLButtonElement)?.click(); break;
-                    case '3': (document.getElementById('confirm-prize3-btn') as HTMLButtonElement)?.click(); break;
-                    case 'Escape': (document.getElementById('reject-bingo-btn') as HTMLButtonElement)?.click(); break;
-                    case '+': case '=': (document.getElementById('zoom-in-btn-verification') as HTMLButtonElement)?.click(); break;
-                    case '-': (document.getElementById('zoom-out-btn-verification') as HTMLButtonElement)?.click(); break;
-                }
-                return;
-            }
-        
-            if (!DOMElements.sponsorDisplayModal.classList.contains('hidden')) {
-                e.preventDefault();
-                switch (e.key) {
-                    case '+': case '=': (document.getElementById('zoom-in-btn-sponsor') as HTMLButtonElement)?.click(); break;
-                    case '-': (document.getElementById('zoom-out-btn-sponsor') as HTMLButtonElement)?.click(); break;
-                    case 'Escape': (document.getElementById('close-sponsor-display-btn') as HTMLButtonElement)?.click(); break;
-                }
-                return;
-            }
-            
-            if (!DOMElements.floatingNumberModal.classList.contains('hidden')) {
-                e.preventDefault();
-                switch (e.key) {
-                    case '+': case '=': (document.getElementById('zoom-in-btn-floating') as HTMLButtonElement)?.click(); break;
-                    case '-': (document.getElementById('zoom-out-btn-floating') as HTMLButtonElement)?.click(); break;
-                    case 'Escape': (document.getElementById('close-floating-btn') as HTMLButtonElement)?.click(); break;
-                }
-                return;
-            }
-
-            const keyString = buildShortcutString(e);
-            const activeEl = document.activeElement;
-            const isInputFocused = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.getAttribute('contenteditable') === 'true');
-
-            if (isInputFocused) {
-                if (e.key === 'Escape') {
-                    (activeEl as HTMLElement).blur();
-                }
-                return;
-            }
-        
-            switch (keyString) {
-                case appConfig.shortcuts.autoDraw:
-                    e.preventDefault();
-                    handleAutoDraw();
-                    break;
-                case appConfig.shortcuts.verify:
-                    e.preventDefault();
-                    showVerificationPanel();
-                    break;
-                case appConfig.shortcuts.clearRound:
-                    e.preventDefault();
-                    (DOMElements.clearRoundBtnBottom as HTMLButtonElement).click();
-                    break;
-                case appConfig.shortcuts.drawPrize:
-                    e.preventDefault();
-                    (document.getElementById('prize-draw-random-btn') as HTMLButtonElement)?.click();
-                    break;
-                case appConfig.shortcuts.registerPrize:
-                    e.preventDefault();
-                    DOMElements.prizeDrawForm.requestSubmit();
-                    break;
-                case appConfig.shortcuts.sellAuction:
-                    e.preventDefault();
-                    DOMElements.auctionForm.requestSubmit();
-                    break;
-                case appConfig.shortcuts.showInterval:
-                    e.preventDefault();
-                    (DOMElements.intervalBtn as HTMLButtonElement).click();
-                    break;
-            }
-        }
-        
-        function showEventBreakModal() {
+        function showIntervalModal() {
             DOMElements.eventBreakModal.innerHTML = getModalTemplates().eventBreak;
             DOMElements.eventBreakModal.classList.remove('hidden');
-        
+            
             const leftContentEl = document.getElementById('break-left-content')!;
             const rightContentEl = document.getElementById('break-right-content')!;
-            const clockEl = document.getElementById('break-clock')!;
-            const leftTitleEl = document.getElementById('break-left-title')!;
             const rightTitleEl = document.getElementById('break-right-title')!;
-        
-            const sponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.name);
-            const contentListRight = sponsors.length > 0 ? sponsors.map(s => s.name) : Object.values(gamesData).flatMap(g => (g as any).winners || []).filter(Boolean).map((w:any) => w.name);
-            const titleRight = sponsors.length > 0 ? "Patrocinadores" : "Vencedores";
-        
-            const contentListLeft = menuItems;
-            let currentIndexLeft = 0;
-            let currentIndexRight = 0;
-        
-            const updateContent = (el: HTMLElement, list: string[], index: number) => {
-                if (!list || list.length === 0) {
-                    el.textContent = '...';
-                    return;
-                }
-                el.classList.add('opacity-0');
-                setTimeout(() => {
-                    el.textContent = list[index % list.length];
-                    el.classList.remove('opacity-0');
-                }, 500);
-            };
-        
-            leftTitleEl.textContent = "Cardápio";
-            rightTitleEl.textContent = titleRight;
+            const clockEl = document.getElementById('break-clock')!;
+
+            const allWinners = Object.values(gamesData).flatMap(g => g.winners || []);
+            const allSponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.image && s.name);
+            if (appConfig.globalSponsor.image && appConfig.globalSponsor.name) {
+                allSponsors.push(appConfig.globalSponsor);
+            }
             
-            updateContent(leftContentEl, contentListLeft, currentIndexLeft);
-            updateContent(rightContentEl, contentListRight, currentIndexRight);
-        
-            intervalContentInterval = setInterval(() => {
-                currentIndexLeft++;
-                updateContent(leftContentEl, contentListLeft, currentIndexLeft);
-                currentIndexRight++;
-                updateContent(rightContentEl, contentListRight, currentIndexRight);
-            }, 5000);
-        
-            const updateClock = () => {
-                clockEl.textContent = new Date().toLocaleTimeString('pt-BR');
+            // Prioriza exibir patrocinadores. Se não houver, exibe vencedores.
+            const rightColumnContent = allSponsors.length > 0 ? allSponsors : allWinners;
+            rightTitleEl.textContent = allSponsors.length > 0 ? "Apoio" : "Vencedores";
+
+            let leftIndex = 0;
+            let rightIndex = 0;
+
+            const updateContent = () => {
+                // Coluna Esquerda: Cardápio
+                leftContentEl.classList.add('opacity-0');
+                setTimeout(() => {
+                    leftContentEl.innerHTML = menuItems[leftIndex % menuItems.length];
+                    leftContentEl.classList.remove('opacity-0');
+                    leftIndex++;
+                }, 500);
+
+                // Coluna Direita: Patrocinadores ou Vencedores
+                if (rightColumnContent.length > 0) {
+                    rightContentEl.classList.add('opacity-0');
+                    setTimeout(() => {
+                        const item = rightColumnContent[rightIndex % rightColumnContent.length];
+                        if (item.image) { // É um patrocinador
+                            rightContentEl.innerHTML = `<img src="${item.image}" class="max-h-64 object-contain mb-4 rounded-lg shadow-lg"><p>${item.name}</p>`;
+                        } else { // É um vencedor
+                            rightContentEl.innerHTML = `<p>${item.name}</p><p class="text-amber-400 text-5xl mt-2">${item.prize}</p>`;
+                        }
+                        rightContentEl.classList.remove('opacity-0');
+                        rightIndex++;
+                    }, 500);
+                } else {
+                     rightContentEl.innerHTML = `<p class="text-3xl text-slate-400">Ainda não há vencedores ou patrocinadores cadastrados.</p>`;
+                }
             };
+
+            const updateClock = () => {
+                clockEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            };
+
+            updateContent();
             updateClock();
+            
+            intervalContentInterval = setInterval(updateContent, 6000);
             intervalClockInterval = setInterval(updateClock, 1000);
             
-            const startBreakConfetti = () => {
-                const duration = 15 * 1000;
-                const animationEnd = Date.now() + duration;
-                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1001 };
-        
-                function randomInRange(min: number, max: number) {
-                    return Math.random() * (max - min) + min;
-                }
-        
-                breakConfettiInterval = setInterval(function() {
-                    if (typeof confetti !== 'function') {
-                        clearInterval(breakConfettiInterval);
-                        return;
-                    }
-                    const timeLeft = animationEnd - Date.now();
-        
-                    if (timeLeft <= 0) {
-                        return clearInterval(breakConfettiInterval);
-                    }
-                    
-                    const particleCount = 50 * (timeLeft / duration);
-                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-                }, 350);
-            }
-            startBreakConfetti();
-        
+            const startConfetti = () => confetti({ particleCount: 5, startVelocity: 10, spread: 360, origin: { x: Math.random(), y: Math.random() - 0.2 }, zIndex: 0 });
+            breakConfettiInterval = setInterval(startConfetti, 500);
+
             document.getElementById('close-break-modal-btn')!.addEventListener('click', () => {
+                DOMElements.eventBreakModal.classList.add('hidden');
                 clearInterval(intervalContentInterval);
                 clearInterval(intervalClockInterval);
                 clearInterval(breakConfettiInterval);
-                DOMElements.eventBreakModal.classList.add('hidden');
             });
         }
         
-        // --- Sorteio de Brindes e Leilão ---
-        function handlePrizeDraw() {
-            const min = parseInt((document.getElementById('prize-draw-min') as HTMLInputElement).value, 10);
-            const max = parseInt((document.getElementById('prize-draw-max') as HTMLInputElement).value, 10);
-        
-            if (isNaN(min) || isNaN(max) || min < 1 || max <= min) {
-                showAlert("Por favor, insira um intervalo de números válido para o sorteio de brindes.");
-                return;
+        function updateGameItemUI(gameItem: Element, isComplete: boolean) {
+            let buttonContainer = gameItem.querySelector('.mt-3');
+            if (!buttonContainer) {
+                 buttonContainer = document.createElement('div');
+                 buttonContainer.className = 'mt-3';
+                 gameItem.appendChild(buttonContainer);
             }
-        
-            const noRepeat = DOMElements.noRepeatPrizeDrawCheckbox.checked;
-            let availableNumbers = [];
-        
-            for (let i = min; i <= max; i++) {
-                if (!noRepeat || !drawnPrizeNumbers.includes(i)) {
-                    availableNumbers.push(i);
-                }
-            }
-        
-            if (availableNumbers.length === 0) {
-                showAlert("Todos os números neste intervalo já foram sorteados.");
-                return;
-            }
-        
-            const drawnNumber = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
-            
-            const displayContainer = DOMElements.prizeDrawDisplayContainer as HTMLElement;
-            displayContainer.innerHTML = '';
-            displayContainer.classList.remove('hidden');
-            DOMElements.mainDisplayLabel.textContent = 'Cartela Sorteada!';
-            
-            const roundColor = activeGameNumber ? gamesData[activeGameNumber]?.color : roundColors[0];
-            
-            const numberDisplay = document.createElement('div');
-            numberDisplay.className = 'prize-draw-number-display text-9xl font-black text-white p-6 rounded-full w-80 h-80 flex items-center justify-center';
-            numberDisplay.style.backgroundColor = roundColor;
-            numberDisplay.style.textShadow = '0 0 20px rgba(0,0,0,0.5)';
-            displayContainer.appendChild(numberDisplay);
-        
-            let start = 0;
-            const end = drawnNumber;
-            const duration = 1500;
-            const frameDuration = 1000 / 60;
-            const totalFrames = Math.round(duration / frameDuration);
-            let frame = 0;
-        
-            const animateCount = () => {
-                frame++;
-                const progress = frame / totalFrames;
-                const currentNum = Math.round(end * (1 - Math.pow(1 - progress, 3))); // Easing function
-                numberDisplay.textContent = currentNum.toString();
-        
-                if (frame < totalFrames) {
-                    requestAnimationFrame(animateCount);
-                } else {
-                    numberDisplay.textContent = end.toString();
-                    numberDisplay.classList.add('pulse-glow-animation');
-                    (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value = end.toString();
-                    if (noRepeat) {
-                        drawnPrizeNumbers.push(end);
-                        debouncedSave();
-                    }
-                }
-            };
-        
-            requestAnimationFrame(animateCount);
-        }
 
-        function registerPrizeWinner() {
-            const cartela = (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value;
-            const name = (document.getElementById('prize-draw-name') as HTMLInputElement).value;
-            const prize = (document.getElementById('prize-draw-description') as HTMLInputElement).value;
-
-            if (!cartela.trim()) {
-                showAlert("O número da cartela é obrigatório para registrar um brinde.");
-                return;
-            }
-            
-            if (!gamesData['Brindes']) gamesData['Brindes'] = { winners: [] };
-            const winnerData = {
-                id: Date.now(),
-                name: name || `Ganhador #${cartela}`,
-                prize: prize || "Brinde",
-                gameNumber: 'Brinde',
-                bingoType: 'Sorteio',
-                cartela: cartela,
-            };
-            gamesData['Brindes'].winners.push(winnerData);
-            
-            showCongratsModal(winnerData.name, winnerData.prize, true, winnerData.cartela);
-            renderAllWinners();
-            debouncedSave();
-
-            (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value = '';
-            (document.getElementById('prize-draw-name') as HTMLInputElement).value = '';
-            (document.getElementById('prize-draw-description') as HTMLInputElement).value = '';
-            
-            DOMElements.prizeDrawDisplayContainer.classList.add('hidden');
-            (DOMElements.currentNumberEl as HTMLElement).style.visibility = activeGameNumber ? 'visible' : 'hidden';
-            DOMElements.mainDisplayLabel.textContent = appLabels.announcedNumberLabel;
-        }
-
-        function showDrawnPrizesModal() {
-            DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
-            const listContainer = document.getElementById('drawn-prizes-list')!;
-            const subtitleEl = document.getElementById('drawn-prizes-subtitle')!;
-            listContainer.innerHTML = '';
-
-            const allPrizeWinners = gamesData['Brindes']?.winners || [];
-            subtitleEl.textContent = `Total de ${allPrizeWinners.length} brindes registrados.`;
-
-            if (allPrizeWinners.length > 0) {
-                allPrizeWinners.slice().reverse().forEach((winner: any, index: number) => {
-                    const winnerEl = document.createElement('div');
-                    winnerEl.className = `bg-gray-800 p-3 rounded-lg text-left w-full max-w-sm transition-all duration-300`;
-                     if (index === 0) {
-                        winnerEl.classList.add('animate-custom-flash', 'border-2', 'border-yellow-400');
-                    }
-                    winnerEl.innerHTML = `
-                        <div class="flex justify-between items-start">
-                             <div>
-                                <p class="font-bold text-white text-lg">${winner.name}</p>
-                                <p class="text-sm text-yellow-400">${winner.prize}</p>
-                                <p class="text-xs text-slate-400">Cartela: ${winner.cartela}</p>
-                             </div>
-                             <button data-winner-id="${winner.id}" class="delete-prize-btn text-red-500 hover:text-red-400 text-xl font-bold p-1">✖</button>
-                        </div>
-                    `;
-                    listContainer.appendChild(winnerEl);
-                });
+            if (isComplete) {
+                gameItem.classList.add('game-completed-style');
+                gameItem.classList.remove('cursor-pointer');
+                buttonContainer.innerHTML = `<button class="w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg text-sm cursor-pointer reopen-btn">Reabrir Rodada</button>`;
+                gameItem.classList.add('animate-flash-complete');
+                setTimeout(() => gameItem.classList.remove('animate-flash-complete'), 1000);
             } else {
-                listContainer.textContent = 'Nenhum brinde foi registrado ainda.';
+                gameItem.classList.remove('game-completed-style');
+                gameItem.classList.add('cursor-pointer');
+                const gameNumber = gameItem.getAttribute('data-game-number');
+                const isActive = activeGameNumber === gameNumber;
+                
+                buttonContainer.innerHTML = `<button class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-lg play-btn">${isActive ? 'Jogando...' : 'Jogar'}</button>`;
+                 if (isActive) {
+                    const playBtn = buttonContainer.querySelector('.play-btn');
+                    if(playBtn) playBtn.classList.add('playing-btn');
+                }
             }
-
-            DOMElements.drawnPrizesModal.classList.remove('hidden');
-
-            document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
-                DOMElements.drawnPrizesModal.classList.add('hidden');
-            });
-            
-            document.querySelectorAll('.delete-prize-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const winnerId = parseInt((e.currentTarget as HTMLElement).dataset.winnerId!, 10);
-                    gamesData['Brindes'].winners = gamesData['Brindes'].winners.filter((w:any) => w.id !== winnerId);
-                    
-                    // Também remove o número da cartela da lista de "já sorteados" para que possa ser sorteado novamente
-                    const winnerToRemove = allPrizeWinners.find((w:any) => w.id === winnerId);
-                    if (winnerToRemove && winnerToRemove.cartela) {
-                        const cartelaNum = parseInt(winnerToRemove.cartela, 10);
-                        if (!isNaN(cartelaNum)) {
-                            drawnPrizeNumbers = drawnPrizeNumbers.filter(n => n !== cartelaNum);
-                        }
-                    }
-                    
-                    debouncedSave();
-                    showDrawnPrizesModal(); // Recarrega o modal para refletir a exclusão
-                });
-            });
-            
-             const roundColor = activeGameNumber ? gamesData[activeGameNumber]?.color : roundColors[0];
-            (document.getElementById('drawn-prizes-title') as HTMLElement).style.color = roundColor;
         }
-
-        function handleAuctionSubmit() {
-            const itemName = (document.getElementById('auction-item-name') as HTMLInputElement).value;
-            const winnerName = (document.getElementById('auction-winner-name') as HTMLInputElement).value;
-            const currentBid = (document.getElementById('auction-item-current-bid') as HTMLInputElement).value;
         
-            if (!itemName.trim() || !winnerName.trim() || parseInt(currentBid, 10) <= 0) {
-                showAlert("Preencha o nome do item, o nome do arrematador e tenha um lance maior que zero.");
+        function drawRandomPrize() {
+            const minInput = document.getElementById('prize-draw-min') as HTMLInputElement;
+            const maxInput = document.getElementById('prize-draw-max') as HTMLInputElement;
+            const noRepeatCheckbox = DOMElements.noRepeatPrizeDrawCheckbox as HTMLInputElement;
+
+            const min = parseInt(minInput.value);
+            const max = parseInt(maxInput.value);
+
+            if (isNaN(min) || isNaN(max) || min > max) {
+                showAlert("Por favor, insira um intervalo de números válido.");
                 return;
             }
-        
-            if (!gamesData['Leilão']) gamesData['Leilão'] = { winners: [] };
-            const auctionData = {
-                id: Date.now(),
-                name: winnerName,
-                gameNumber: 'Leilão',
-                bingoType: 'Leilão',
-                itemName: itemName,
-                bid: currentBid,
+
+            let finalNumber;
+            if (noRepeatCheckbox.checked) {
+                const availableNumbers = Array.from({ length: max - min + 1 }, (_, i) => i + min)
+                    .filter(num => !drawnPrizeNumbers.includes(num));
+
+                if (availableNumbers.length === 0) {
+                    showAlert("Todos os números neste intervalo já foram sorteados!");
+                    return;
+                }
+                finalNumber = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+                drawnPrizeNumbers.push(finalNumber);
+            } else {
+                finalNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            const displayContainer = DOMElements.prizeDrawDisplayContainer;
+            const mainNumberDisplay = DOMElements.currentNumberEl;
+            const mainDisplayLabel = DOMElements.mainDisplayLabel;
+
+            mainNumberDisplay.style.visibility = 'hidden';
+            displayContainer.classList.remove('hidden');
+            displayContainer.innerHTML = '';
+
+            const prizeDisplay = document.createElement('div');
+            prizeDisplay.className = 'font-black flex items-center justify-center w-full h-full rounded-full text-white text-[10rem] sm:text-[15rem]';
+            prizeDisplay.style.backgroundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7'; // Cor da rodada ou roxo
+
+            displayContainer.appendChild(prizeDisplay);
+            mainDisplayLabel.textContent = "SORTEANDO BRINDE...";
+
+            let shuffleInterval: ReturnType<typeof setInterval>;
+            
+            const startShuffle = (speed: number) => {
+                clearInterval(shuffleInterval);
+                shuffleInterval = setInterval(() => {
+                    const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+                    prizeDisplay.textContent = randomNum.toString();
+                }, speed);
             };
-            gamesData['Leilão'].winners.push(auctionData);
-            
-            const gavelIcon = document.getElementById('gavel-icon') as HTMLElement;
-            gavelIcon.classList.remove('hidden');
-            gavelIcon.classList.add('animate-gavel-strike');
-            setTimeout(() => gavelIcon.classList.add('hidden'), 600);
-        
-            showCongratsModal(winnerName, `Arrematou ${itemName} por R$ ${currentBid},00!`);
-            renderAllWinners();
-            
-            // Limpa o formulário, exceto o nome do item para lances rápidos
-            (document.getElementById('auction-winner-name') as HTMLInputElement).value = '';
-            (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
-            updateAuctionBidDisplay(0);
-        
+
+            startShuffle(50); 
+            setTimeout(() => startShuffle(100), 2000); 
+            setTimeout(() => startShuffle(200), 3000); 
+            setTimeout(() => startShuffle(400), 4000); 
+
+            setTimeout(() => {
+                clearInterval(shuffleInterval);
+                prizeDisplay.textContent = finalNumber.toString();
+                prizeDisplay.classList.add('animate-custom-flash', 'pulse-glow-animation');
+                mainDisplayLabel.textContent = "CARTELA SORTEADA!";
+                
+                // Preenche automaticamente o número sorteado e foca no próximo campo
+                const numberInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
+                const nameInput = document.getElementById('prize-draw-name') as HTMLInputElement;
+                if (numberInput) {
+                    numberInput.value = finalNumber.toString();
+                }
+                if (nameInput) {
+                    nameInput.focus();
+                }
+
+                setTimeout(() => {
+                     prizeDisplay.classList.remove('pulse-glow-animation');
+                }, 4000);
+
+            }, 5000);
+
             debouncedSave();
         }
+// FIX: Added the missing `showRoundEditModal` function definition.
+function showRoundEditModal(gameNumber: string) {
+    const game = gamesData[gameNumber];
+    if (!game) {
+        console.error(`Attempted to edit non-existent round: ${gameNumber}`);
+        return;
+    }
+
+    DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
+
+    const titleEl = document.getElementById('round-edit-title') as HTMLElement;
+    const nameInput = document.getElementById('round-edit-name') as HTMLInputElement;
+    const prizesContainer = document.getElementById('round-edit-prizes-container') as HTMLElement;
+    const descriptionTextarea = document.getElementById('round-edit-description') as HTMLTextAreaElement;
+    const saveBtn = document.getElementById('save-round-edit-btn') as HTMLButtonElement;
+    const cancelBtn = document.getElementById('cancel-round-edit-btn') as HTMLButtonElement;
+
+    titleEl.textContent = `Editar ${game.name || `Rodada ${gameNumber}`}`;
+    nameInput.value = game.name;
+    descriptionTextarea.value = game.description || '';
+    prizesContainer.innerHTML = '';
+
+    Object.keys(game.prizes).forEach((prizeKey, index) => {
+        const prizeValue = game.prizes[prizeKey as keyof typeof game.prizes];
+        const prizeLabelKey = `prize${index + 1}Label` as keyof typeof appLabels;
+        const labelText = appLabels[prizeLabelKey] || `Prêmio ${index + 1}`;
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `
+            <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${labelText}</label>
+            <input type="text" id="round-edit-${prizeKey}" data-prize-key="${prizeKey}" value="${prizeValue}" class="w-full p-2 bg-gray-900 text-white rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500">
+        `;
+        prizesContainer.appendChild(wrapper);
+    });
+
+    DOMElements.roundEditModal.classList.remove('hidden');
+
+    saveBtn.onclick = () => {
+        game.name = nameInput.value;
+        game.description = descriptionTextarea.value;
         
-        // --- Inicialização e Event Listeners ---
-        function initEventListeners() {
+        prizesContainer.querySelectorAll<HTMLInputElement>('input[data-prize-key]').forEach(input => {
+            const key = input.dataset.prizeKey;
+            if (key && (key === 'prize1' || key === 'prize2' || key === 'prize3')) {
+                game.prizes[key] = input.value;
+            }
+        });
+
+        renderUIFromState();
+        
+        DOMElements.roundEditModal.classList.add('hidden');
+        debouncedSave();
+    };
+
+    cancelBtn.onclick = () => {
+        DOMElements.roundEditModal.classList.add('hidden');
+    };
+}
+        
+        function setupGlobalKeydownListener() {
+    // Attach listener to the window object for broader and more reliable event capturing.
+    window.addEventListener('keydown', (e) => {
+        const activeEl = document.activeElement as HTMLElement;
+        const isInputFocused = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable);
+        
+        // The winner modal has its own specific handler for Enter/Escape, so we block global shortcuts when it's open.
+        if (DOMElements.winnerModal && !DOMElements.winnerModal.classList.contains('hidden')) {
+            return;
+        }
+
+        // If any other modal is open, we also block global shortcuts to prevent actions from firing "behind" the modal.
+        const isOtherModalOpen = !!document.querySelector('.fixed.inset-0.z-50:not(.hidden):not(#verification-modal):not(#floating-number-modal):not(#sponsor-display-modal)');
+        if (isOtherModalOpen) {
+            return;
+        }
+
+        // Block shortcuts when typing in any text field.
+        if (isInputFocused) {
+            return;
+        }
+
+        // Build the shortcut string representation from the key event.
+        let shortcutString = '';
+        if (e.ctrlKey) shortcutString += 'Control+';
+        if (e.altKey) shortcutString += 'Alt+';
+        if (e.shiftKey) shortcutString += 'Shift+';
+        
+        let key = e.key;
+        if (key === ' ') {
+            key = 'Space';
+        } else if (key.length === 1) {
+            key = key.toUpperCase();
+        } else {
+            // Capitalize keys like 'Enter', 'Delete', etc., to match the config.
+            key = key.charAt(0).toUpperCase() + key.slice(1);
+        }
+        
+        // Avoid treating modifier keys themselves as part of the shortcut name.
+        if (['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
+            return; // Only a modifier key was pressed.
+        }
+        shortcutString += key;
+
+        // Find the action corresponding to the pressed shortcut.
+        const action = Object.keys(appConfig.shortcuts).find(
+            (k) => appConfig.shortcuts[k as keyof typeof appConfig.shortcuts] === shortcutString
+        );
+        
+        // If an action is found, prevent default browser behavior and execute the action.
+        if (action) {
+            e.preventDefault();
+            
+            switch (action) {
+                case 'autoDraw': handleAutoDraw(); break;
+                case 'verify': showVerificationPanel(); break;
+                case 'clearRound': confirmClearRound(); break;
+                case 'drawPrize': drawRandomPrize(); break;
+                case 'registerPrize': (document.getElementById('prize-draw-form') as HTMLFormElement)?.requestSubmit(); break;
+                case 'sellAuction': (DOMElements.auctionForm as HTMLFormElement)?.requestSubmit(); break;
+                case 'showInterval': showIntervalModal(); break;
+            }
+        }
+    });
+}
+        
+        // --- Handlers de Eventos ---
+
+        function setupEventListeners() {
             DOMElements.manualInputForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                handleManualSubmit();
+                const number = parseInt(DOMElements.numberInput.value);
+                if (!isNaN(number)) {
+                    showFloatingNumber(number);
+                } else {
+                    showError("Por favor, insira um número válido.");
+                }
             });
 
             DOMElements.addExtraGameBtn.addEventListener('click', addExtraGame);
+            document.getElementById('auto-draw-btn-top')!.addEventListener('click', handleAutoDraw);
+            document.getElementById('auto-draw-btn-bottom')!.addEventListener('click', handleAutoDraw);
+            document.getElementById('verify-btn-top')!.addEventListener('click', showVerificationPanel);
+            document.getElementById('verify-btn-bottom')!.addEventListener('click', showVerificationPanel);
 
-            const clearRoundBtns = [DOMElements.clearRoundBtnTop, DOMElements.clearRoundBtnBottom];
-            clearRoundBtns.forEach(btn => {
-                btn?.addEventListener('click', () => {
-                    if (!activeGameNumber) {
-                        showAlert("Nenhuma rodada ativa para limpar.");
-                        return;
-                    }
-                    DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
-                    DOMElements.clearRoundConfirmModal.classList.remove('hidden');
-                    document.getElementById('confirm-clear-round-btn')!.onclick = () => {
-                        startNewRound();
-                        DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                    };
-                    document.getElementById('cancel-clear-round-btn')!.onclick = () => {
-                        DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                    };
-                });
-            });
-            
             DOMElements.prizeDrawForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                registerPrizeWinner();
-            });
-
-            DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
-
-            document.getElementById('prize-draw-random-btn')!.addEventListener('click', handlePrizeDraw);
-            
-            document.getElementById('board-zoom-slider')?.addEventListener('input', (e) => {
-                const scale = parseInt((e.target as HTMLInputElement).value, 10);
-                appConfig.boardScale = scale;
-                applyBoardZoom(scale);
-            });
-            document.getElementById('board-zoom-slider')?.addEventListener('change', () => debouncedSave());
-            
-            document.getElementById('display-zoom-slider')?.addEventListener('input', (e) => {
-                const scale = parseInt((e.target as HTMLInputElement).value, 10);
-                appConfig.displayScale = scale;
-                applyDisplayZoom(scale);
-            });
-             document.getElementById('display-zoom-slider')?.addEventListener('change', () => debouncedSave());
-
-            DOMElements.shareBtn.addEventListener('click', showProofOptions);
-            DOMElements.endEventBtn.addEventListener('click', () => {
-                appConfig.isEventClosed = true;
+                const numberInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
+                const nameInput = document.getElementById('prize-draw-name') as HTMLInputElement;
+                const descriptionInput = document.getElementById('prize-draw-description') as HTMLInputElement;
+                
+                const number = numberInput.value;
+                if (!number) {
+                    showAlert("Por favor, insira o número da cartela do brinde.");
+                    return;
+                }
+                
+                if (!gamesData['Brindes']) gamesData['Brindes'] = { winners: [] };
+                
+                const winnerData = {
+                    id: Date.now(),
+                    name: nameInput.value || `Ganhador #${number}`,
+                    prize: descriptionInput.value || "Brinde",
+                    gameNumber: 'Brinde',
+                    bingoType: 'Sorteio',
+                    cartela: number
+                };
+                gamesData['Brindes'].winners.push(winnerData);
+                renderWinner(winnerData);
+                
+                numberInput.value = '';
+                nameInput.value = '';
+                descriptionInput.value = '';
+                
+                showCongratsModal(winnerData.name, winnerData.prize);
                 debouncedSave();
-                const allWinners = Object.values(gamesData).flatMap(g => (g as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
-                if (allWinners.length > 0) startFinalWinnerSlide(allWinners);
             });
 
+            DOMElements.gamesListEl.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const gameItem = target.closest('.game-item');
+                if (!gameItem) return;
+
+                const gameNumber = gameItem.getAttribute('data-game-number');
+                if (!gameNumber) return;
+
+                if (target.classList.contains('reopen-btn')) {
+                    const game = gamesData[gameNumber];
+                    if (game) {
+                        game.isComplete = false;
+                        updateGameItemUI(gameItem, false);
+                        debouncedSave();
+                    }
+                    return;
+                }
+                
+                if (gamesData[gameNumber].isComplete) {
+                     showAlert("Esta rodada já foi concluída. Você pode reabri-la se necessário.");
+                     return;
+                }
+
+                document.querySelectorAll('.game-item').forEach(el => el.classList.remove('active-round-highlight'));
+                document.querySelectorAll('.play-btn').forEach(btn => {
+                    btn.textContent = 'Jogar';
+                    btn.classList.remove('playing-btn');
+                });
+                
+                gameItem.classList.add('active-round-highlight');
+                const playBtn = gameItem.querySelector('.play-btn');
+                if (playBtn) {
+                    playBtn.textContent = 'Jogando...';
+                    playBtn.classList.add('playing-btn');
+                }
+                
+                loadRoundState(gameNumber);
+            });
+            
+            document.getElementById('prize-draw-random-btn')!.addEventListener('click', drawRandomPrize);
+            DOMElements.shareBtn.addEventListener('click', showProofOptionsModal);
+            DOMElements.endEventBtn.addEventListener('click', showFinalWinnersModal);
             DOMElements.resetEventBtn.addEventListener('click', () => {
                 DOMElements.resetConfirmModal.innerHTML = getModalTemplates().resetConfirm;
                 DOMElements.resetConfirmModal.classList.remove('hidden');
@@ -3485,100 +2809,681 @@ function showSettingsModal() {
                     localStorage.removeItem(LOCAL_STORAGE_KEY);
                     window.location.reload();
                 };
-                document.getElementById('cancel-reset-btn')!.onclick = () => {
-                    DOMElements.resetConfirmModal.classList.add('hidden');
-                };
+                document.getElementById('cancel-reset-btn')!.onclick = () => DOMElements.resetConfirmModal.classList.add('hidden');
             });
+            DOMElements.intervalBtn.addEventListener('click', showIntervalModal);
+            DOMElements.editMenuBtn.addEventListener('click', () => {
+                DOMElements.menuEditModal.innerHTML = getModalTemplates().menuEdit;
+                DOMElements.menuEditModal.classList.remove('hidden');
+                const textarea = document.getElementById('menu-textarea') as HTMLTextAreaElement;
+                textarea.value = menuItems.join('\n');
+                document.getElementById('save-menu-btn')!.onclick = () => {
+                    menuItems = textarea.value.split('\n').filter(item => item.trim() !== '');
+                    DOMElements.menuEditModal.classList.add('hidden');
+                    debouncedSave();
+                };
+                document.getElementById('cancel-menu-edit-btn')!.onclick = () => DOMElements.menuEditModal.classList.add('hidden');
+            });
+            DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
             
-            DOMElements.intervalBtn.addEventListener('click', showEventBreakModal);
-            DOMElements.editMenuBtn.addEventListener('click', showMenuEditModal);
+            // Sliders de Zoom
+            const boardZoomSlider = document.getElementById('board-zoom-slider') as HTMLInputElement;
+            const displayZoomSlider = document.getElementById('display-zoom-slider') as HTMLInputElement;
+            boardZoomSlider.addEventListener('input', (e) => {
+                const scale = parseInt((e.target as HTMLInputElement).value);
+                appConfig.boardScale = scale;
+                applyBoardZoom(scale);
+            });
+            boardZoomSlider.addEventListener('change', debouncedSave);
             
-            DOMElements.showDonationModalBtn.addEventListener('click', showDonationModal);
-            DOMElements.showChangelogBtn.addEventListener('click', showChangelogModal);
+            displayZoomSlider.addEventListener('input', (e) => {
+                const scale = parseInt((e.target as HTMLInputElement).value);
+                appConfig.displayScale = scale;
+                applyDisplayZoom(scale);
+            });
+             displayZoomSlider.addEventListener('change', debouncedSave);
+
+            DOMElements.clearRoundBtnTop.addEventListener('click', confirmClearRound);
+            DOMElements.clearRoundBtnBottom.addEventListener('click', confirmClearRound);
+
+            DOMElements.showDonationModalBtn.addEventListener('click', () => {
+                DOMElements.donationModal.innerHTML = getModalTemplates().donation;
+                (document.getElementById('pix-key-display') as HTMLElement).textContent = appConfig.pixKey;
+                document.getElementById('copy-pix-btn')!.addEventListener('click', () => {
+                    navigator.clipboard.writeText(appConfig.pixKey);
+                    (document.getElementById('copy-pix-btn') as HTMLElement).textContent = 'Copiado!';
+                    setTimeout(() => (document.getElementById('copy-pix-btn') as HTMLElement).textContent = appLabels.donationModalCopyButton, 2000);
+                });
+                document.getElementById('close-donation-btn')!.addEventListener('click', () => DOMElements.donationModal.classList.add('hidden'));
+                DOMElements.donationModal.classList.remove('hidden');
+            });
+
+             DOMElements.showChangelogBtn.addEventListener('click', () => {
+                DOMElements.changelogModal.innerHTML = getModalTemplates().changelog;
+                const contentEl = document.getElementById('version-history-content')!;
+                // Basic Markdown to HTML conversion
+                const htmlContent = versionHistory
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/- \*\*(.*?)\*\*:/g, '<h3 class="text-sky-400 font-bold mt-3 mb-1">$1</h3><p class="pl-4 border-l-2 border-gray-700">')
+                    .replace(/\n- /g, '</p><p class="pl-4 border-l-2 border-gray-700">')
+                    .replace(/<p class="pl-4 border-l-2 border-gray-700">$/, ''); // Remove trailing empty p
+
+                contentEl.innerHTML = htmlContent;
+                document.getElementById('close-changelog-btn')!.addEventListener('click', () => DOMElements.changelogModal.classList.add('hidden'));
+                DOMElements.changelogModal.classList.remove('hidden');
+            });
+
             DOMElements.showSettingsBtn.addEventListener('click', showSettingsModal);
 
-            DOMElements.auctionForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleAuctionSubmit();
-            });
-            
-            document.getElementById('add-50-bid')?.addEventListener('click', () => incrementAuctionBid(50));
-            document.getElementById('add-100-bid')?.addEventListener('click', () => incrementAuctionBid(100));
-            
-            document.getElementById('add-custom-bid-btn')?.addEventListener('click', () => {
+            document.getElementById('add-50-bid')!.addEventListener('click', () => incrementAuctionBid(50));
+            document.getElementById('add-100-bid')!.addEventListener('click', () => incrementAuctionBid(100));
+            document.getElementById('add-custom-bid-btn')!.addEventListener('click', () => {
                 const customInput = document.getElementById('custom-bid-input') as HTMLInputElement;
                 const value = parseInt(customInput.value, 10);
-                if (!isNaN(value) && value > 0) {
+                if (!isNaN(value)) {
                     incrementAuctionBid(value);
                     customInput.value = '';
                 }
             });
-            
-            document.getElementById('reset-auction-btn')?.addEventListener('click', () => {
-                (document.getElementById('auction-item-name') as HTMLInputElement).value = '';
-                (document.getElementById('auction-winner-name') as HTMLInputElement).value = '';
-                (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
-                (document.getElementById('custom-bid-input') as HTMLInputElement).value = '';
-                updateAuctionBidDisplay(0);
+
+            document.getElementById('reset-auction-btn')!.addEventListener('click', () => {
+                (DOMElements.auctionForm as HTMLFormElement).reset();
+                 updateAuctionBidDisplay(0);
+                 (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
             });
-            
-            document.getElementById('save-local-btn')?.addEventListener('click', saveStateToFile);
-            document.getElementById('load-local-input')?.addEventListener('change', loadStateFromFile);
 
-            const autoDrawBtns = [document.getElementById('auto-draw-btn-top'), document.getElementById('auto-draw-btn-bottom')];
-            autoDrawBtns.forEach(btn => btn?.addEventListener('click', handleAutoDraw));
+             DOMElements.auctionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const itemName = (document.getElementById('auction-item-name') as HTMLInputElement).value;
+                const winnerName = (document.getElementById('auction-winner-name') as HTMLInputElement).value;
+                const bid = (document.getElementById('auction-item-current-bid') as HTMLInputElement).value;
 
-            const verifyBtns = [document.getElementById('verify-btn-top'), document.getElementById('verify-btn-bottom')];
-            verifyBtns.forEach(btn => btn?.addEventListener('click', showVerificationPanel));
+                if (!itemName || !winnerName || !bid || parseInt(bid) <= 0) {
+                    showAlert("Preencha todos os campos do leilão (item, arrematador e lance).");
+                    return;
+                }
+                 if (!gamesData['Leilão']) gamesData['Leilão'] = { winners: [] };
+                
+                const winnerData = {
+                    id: Date.now(),
+                    name: winnerName,
+                    prize: `${itemName} (Leilão)`,
+                    gameNumber: 'Leilão',
+                    bingoType: 'Leilão',
+                    itemName: itemName,
+                    bid: bid
+                };
+                gamesData['Leilão'].winners.push(winnerData);
+                renderWinner(winnerData);
+                
+                showCongratsModal(winnerName, `${itemName} por R$ ${bid},00`);
 
-            window.addEventListener('keydown', handleKeydown);
-            
-            DOMElements.activeRoundPanel.addEventListener('click', () => {
-                 if (!activeGameNumber) return;
-                 const game = gamesData[activeGameNumber];
-                 if (!game) return;
+                (DOMElements.auctionForm as HTMLFormElement).reset();
+                updateAuctionBidDisplay(0);
+                (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
+                
+                const gavel = document.getElementById('gavel-icon')!;
+                gavel.classList.remove('hidden', 'animate-gavel-strike');
+                void gavel.offsetWidth;
+                gavel.classList.add('animate-gavel-strike');
 
-                 DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
-                 (document.getElementById('round-edit-title') as HTMLElement).textContent = `Editar Rodada ${activeGameNumber}`;
-                 
-                 const prizesContainer = document.getElementById('round-edit-prizes-container')!;
-                 prizesContainer.innerHTML = '';
-                 ['prize1', 'prize2', 'prize3'].forEach(prizeKey => {
-                     const labelKey = (prizeKey + 'Label') as keyof typeof appLabels;
-                     const labelText = appLabels[labelKey] || prizeKey;
-                     const value = game.prizes[prizeKey] || '';
-                     
-                     const prizeEl = document.createElement('div');
-                     prizeEl.innerHTML = `
-                        <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${labelText}</label>
-                        <input type="text" id="round-edit-${prizeKey}" value="${value}" class="w-full text-base font-bold p-2 border border-gray-600 bg-gray-900 text-white rounded-md focus:ring-sky-500 focus:border-sky-500">
-                     `;
-                     prizesContainer.appendChild(prizeEl);
-                 });
+                debouncedSave();
+            });
 
-                 (document.getElementById('round-edit-description') as HTMLTextAreaElement).value = game.description || '';
-                 
-                 DOMElements.roundEditModal.classList.remove('hidden');
+             document.getElementById('save-local-btn')!.addEventListener('click', saveStateToFile);
+             document.getElementById('load-local-input')!.addEventListener('change', loadStateFromFile);
 
-                 document.getElementById('save-round-edit-btn')!.onclick = () => {
-                     game.prizes.prize1 = (document.getElementById('round-edit-prize1') as HTMLInputElement).value;
-                     game.prizes.prize2 = (document.getElementById('round-edit-prize2') as HTMLInputElement).value;
-                     game.prizes.prize3 = (document.getElementById('round-edit-prize3') as HTMLInputElement).value;
-                     game.description = (document.getElementById('round-edit-description') as HTMLTextAreaElement).value;
-                     
-                     DOMElements.roundEditModal.classList.add('hidden');
-                     loadRoundState(activeGameNumber); // Recarrega o painel da rodada
-                     debouncedSave();
-                 };
-
-                 document.getElementById('cancel-round-edit-btn')!.onclick = () => {
-                     DOMElements.roundEditModal.classList.add('hidden');
-                 };
+             DOMElements.activeRoundPanel.addEventListener('click', () => {
+                if (activeGameNumber) {
+                    showRoundEditModal(activeGameNumber);
+                }
             });
         }
         
-        // --- Ponto de Entrada da Aplicação ---
+        function confirmClearRound() {
+            if (!activeGameNumber) {
+                showAlert("Nenhuma rodada ativa para limpar.");
+                return;
+            }
+            DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
+            DOMElements.clearRoundConfirmModal.classList.remove('hidden');
+            document.getElementById('confirm-clear-round-btn')!.onclick = () => {
+                startNewRound();
+                DOMElements.clearRoundConfirmModal.classList.add('hidden');
+            };
+            document.getElementById('cancel-clear-round-btn')!.onclick = () => DOMElements.clearRoundConfirmModal.classList.add('hidden');
+        }
+
+        function showProofOptionsModal() {
+            DOMElements.proofOptionsModal.innerHTML = getModalTemplates().proofOptions;
+            const listContainer = document.getElementById('proof-options-list')!;
+            listContainer.innerHTML = ''; 
+
+            const createCheckbox = (id: string, label: string, checked = true) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex items-center gap-3 bg-gray-700 p-3 rounded-lg';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `proof-${id}`;
+                checkbox.dataset.id = id;
+                checkbox.checked = checked;
+                checkbox.className = 'h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500';
+                const labelEl = document.createElement('label');
+                labelEl.htmlFor = `proof-${id}`;
+                labelEl.textContent = label;
+                labelEl.className = "text-slate-200 font-medium";
+                wrapper.appendChild(checkbox);
+                wrapper.appendChild(labelEl);
+                return wrapper;
+            };
+
+            const sortedGameKeys = Object.keys(gamesData)
+                .filter(key => !isNaN(parseInt(key)) && gamesData[key].winners?.length > 0)
+                .sort((a, b) => parseInt(a) - parseInt(b));
+            
+            sortedGameKeys.forEach(key => {
+                listContainer.appendChild(createCheckbox(`game-${key}`, gamesData[key].name || `Rodada ${key}`));
+            });
+
+            if (gamesData['Brindes']?.winners?.length > 0) {
+                listContainer.appendChild(createCheckbox('brindes', 'Brindes Sorteados'));
+            }
+            if (gamesData['Leilão']?.winners?.length > 0) {
+                listContainer.appendChild(createCheckbox('leilao', 'Itens do Leilão'));
+            }
+
+            DOMElements.proofOptionsModal.classList.remove('hidden');
+
+            document.getElementById('generate-selected-proof-btn')!.onclick = () => {
+                const selectedIds = Array.from(listContainer.querySelectorAll<HTMLInputElement>('input:checked')).map(cb => cb.dataset.id);
+                generateProof(selectedIds);
+                DOMElements.proofOptionsModal.classList.add('hidden');
+            };
+            document.getElementById('cancel-proof-btn')!.onclick = () => DOMElements.proofOptionsModal.classList.add('hidden');
+        }
+
+        function generateProof(selectedIds: (string | undefined)[]) {
+            const date = new Date().toLocaleString('pt-BR');
+            let content = `<html><head><title>Comprovante do Bingo - ${date}</title><style>body{font-family: Arial, sans-serif; margin: 20px; line-height: 1.6;} h1, h2 {color: #333;} h2 {border-bottom: 1px solid #ccc; padding-bottom: 5px;} .winner-block {margin-bottom: 20px;} .numbers {font-family: monospace; word-wrap: break-word;}</style></head><body>`;
+            content += `<h1>Comprovante do Bingo Show</h1><p>Gerado em: ${date}</p>`;
+
+            selectedIds.forEach(id => {
+                if (!id) return;
+                if (id.startsWith('game-')) {
+                    const gameNumber = id.replace('game-', '');
+                    const game = gamesData[gameNumber];
+                    if (game && game.winners.length > 0) {
+                        content += `<h2>${game.name || `Rodada ${gameNumber}`}</h2>`;
+                        game.winners.forEach((winner: any) => {
+                            content += `<div class="winner-block"><strong>Ganhador:</strong> ${winner.name}<br/><strong>Prêmio:</strong> ${winner.prize}<br/><strong>Números Sorteados na Rodada:</strong><p class="numbers">${winner.numbers.join(', ')}</p></div>`;
+                        });
+                    }
+                } else if (id === 'brindes' && gamesData['Brindes']?.winners.length > 0) {
+                    content += `<h2>Brindes Sorteados</h2>`;
+                    gamesData['Brindes'].winners.forEach((winner: any) => {
+                        content += `<div class="winner-block"><strong>Ganhador:</strong> ${winner.name}<br/><strong>Prêmio:</strong> ${winner.prize}<br/><strong>Nº da Cartela:</strong> ${winner.cartela}</div>`;
+                    });
+                } else if (id === 'leilao' && gamesData['Leilão']?.winners.length > 0) {
+                    content += `<h2>Leilão</h2>`;
+                    gamesData['Leilão'].winners.forEach((winner: any) => {
+                         content += `<div class="winner-block"><strong>Arrematador:</strong> ${winner.name}<br/><strong>Item:</strong> ${winner.itemName}<br/><strong>Lance:</strong> R$ ${winner.bid},00</div>`;
+                    });
+                }
+            });
+
+            content += '</body></html>';
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
+
+        function showFinalWinnersModal() {
+            appConfig.isEventClosed = true;
+            debouncedSave();
+
+            DOMElements.finalWinnersModal.innerHTML = getModalTemplates().finalWinners;
+            DOMElements.finalWinnersModal.classList.remove('hidden');
+            
+            const winnerDisplay = document.getElementById('current-winner-card')!;
+            const allWinners = Object.values(gamesData).flatMap(g => g.winners || []).sort((a,b) => a.id - b.id);
+            let winnerIndex = 0;
+
+            const updateWinnerDisplay = () => {
+                if (allWinners.length === 0) {
+                    winnerDisplay.innerHTML = `<h3 class="text-3xl font-bold text-white">Nenhum vencedor registrado.</h3>`;
+                    winnerDisplay.classList.add('opacity-100', 'scale-100');
+                    return;
+                }
+                const winner = allWinners[winnerIndex];
+                const game = gamesData[winner.gameNumber];
+                const prizeType = winner.bingoType === 'Sorteio' ? winner.prize : `${appLabels[winner.bingoType + 'Label' as keyof typeof appLabels]} (${winner.prize})`;
+                
+                winnerDisplay.classList.remove('opacity-100', 'scale-100');
+                winnerDisplay.classList.add('opacity-0', 'scale-90');
+
+                setTimeout(() => {
+                    winnerDisplay.innerHTML = `<p class="text-xl font-bold text-sky-400 mb-2">${game?.name || winner.gameNumber}</p>
+                                           <h3 class="text-5xl font-black text-white">${winner.name}</h3>
+                                           <p class="text-3xl font-bold text-amber-300 mt-2">${prizeType}</p>`;
+                    winnerDisplay.classList.remove('opacity-0', 'scale-90');
+                    winnerDisplay.classList.add('opacity-100', 'scale-100');
+                    winnerIndex = (winnerIndex + 1) % allWinners.length;
+                }, 500);
+            };
+
+            updateWinnerDisplay();
+            winnerDisplayTimeout = setInterval(updateWinnerDisplay, winnerDisplayDuration);
+            
+            // Lógica para exibir patrocinadores no final
+            const sponsorsListEl = document.getElementById('final-sponsors-list')!;
+            const allSponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.image && s.name);
+            if(appConfig.globalSponsor.image && appConfig.globalSponsor.name) {
+                allSponsors.push(appConfig.globalSponsor);
+            }
+            if(allSponsors.length > 0) {
+                allSponsors.forEach(sponsor => {
+                    const sponsorEl = document.createElement('div');
+                    sponsorEl.className = 'flex flex-col items-center justify-center p-2 bg-gray-700 rounded-lg';
+                    sponsorEl.innerHTML = `<img src="${sponsor.image}" alt="${sponsor.name}" class="h-16 object-contain rounded"><p class="text-xs mt-1 text-slate-300">${sponsor.name}</p>`;
+                    sponsorsListEl.appendChild(sponsorEl);
+                });
+            } else {
+                sponsorsListEl.innerHTML = `<p class="text-slate-400">Nenhum patrocinador cadastrado.</p>`;
+            }
+
+            document.getElementById('generate-proof-final-btn')!.addEventListener('click', () => {
+                 const allIds = Object.keys(gamesData).map(key => isNaN(parseInt(key)) ? key.toLowerCase() : `game-${key}`);
+                 generateProof(allIds);
+            });
+            document.getElementById('donation-final-btn')!.addEventListener('click', () => {
+                 DOMElements.showDonationModalBtn.click();
+            });
+            document.getElementById('close-final-modal-btn')!.addEventListener('click', () => {
+                 DOMElements.finalWinnersModal.classList.add('hidden');
+                 clearInterval(winnerDisplayTimeout);
+            });
+            
+             const startFinalConfetti = () => {
+                if (typeof confetti !== 'function') return;
+                const count = 200;
+                const defaults = { origin: { y: 0.7 } };
+                function fire(particleRatio: number, opts: any) {
+                    confetti({
+                        ...defaults,
+                        ...opts,
+                        particleCount: Math.floor(count * particleRatio)
+                    });
+                }
+                fire(0.25, { spread: 26, startVelocity: 55 });
+                fire(0.2, { spread: 60 });
+                fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+                fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+                fire(0.1, { spread: 120, startVelocity: 45 });
+            };
+            startFinalConfetti();
+            finalConfettiInterval = setInterval(startFinalConfetti, 3000);
+        }
+
+        function showWinnerEditModal(winnerId: number) {
+            let gameKey: string | null = null;
+            let winnerIndex = -1;
+
+            for (const key in gamesData) {
+                const index = gamesData[key].winners.findIndex((w: any) => w.id === winnerId);
+                if (index !== -1) {
+                    gameKey = key;
+                    winnerIndex = index;
+                    break;
+                }
+            }
+
+            if (!gameKey) return;
+            const winner = gamesData[gameKey].winners[winnerIndex];
+
+            DOMElements.winnerEditModal.innerHTML = getModalTemplates().winnerEdit;
+            const nameInput = document.getElementById('edit-winner-name') as HTMLInputElement;
+            const prizeInput = document.getElementById('edit-winner-prize') as HTMLInputElement;
+            nameInput.value = winner.name;
+            prizeInput.value = winner.prize;
+            
+            DOMElements.winnerEditModal.classList.remove('hidden');
+
+            document.getElementById('save-winner-changes-btn')!.onclick = () => {
+                gamesData[gameKey].winners[winnerIndex].name = nameInput.value;
+                gamesData[gameKey].winners[winnerIndex].prize = prizeInput.value;
+                renderAllWinners();
+                DOMElements.winnerEditModal.classList.add('hidden');
+                debouncedSave();
+            };
+            
+             document.getElementById('remove-winner-btn')!.onclick = () => {
+                DOMElements.deleteConfirmModal.innerHTML = getModalTemplates().deleteConfirm;
+                (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o vencedor "${winner.name}"?`;
+                (document.getElementById('confirm-delete-btn') as HTMLElement).textContent = "Remover Vencedor";
+                DOMElements.deleteConfirmModal.classList.remove('hidden');
+
+                document.getElementById('confirm-delete-btn')!.onclick = () => {
+                    gamesData[gameKey].winners.splice(winnerIndex, 1);
+                    renderAllWinners();
+                    DOMElements.deleteConfirmModal.classList.add('hidden');
+                    DOMElements.winnerEditModal.classList.add('hidden');
+                    debouncedSave();
+                };
+                 document.getElementById('cancel-delete-btn')!.onclick = () => DOMElements.deleteConfirmModal.classList.add('hidden');
+            };
+
+            document.getElementById('cancel-winner-edit-btn')!.onclick = () => DOMElements.winnerEditModal.classList.add('hidden');
+        }
+
+        function showDrawnPrizesModal() {
+            DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
+            const listEl = document.getElementById('drawn-prizes-list')!;
+            const titleEl = document.getElementById('drawn-prizes-title')!;
+            const subtitleEl = document.getElementById('drawn-prizes-subtitle')!;
+            listEl.innerHTML = '';
+            
+            const roundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) || '#a855f7';
+            titleEl.style.color = roundColor;
+            subtitleEl.textContent = `Rodada Ativa: ${activeGameNumber ? (gamesData[activeGameNumber].name || `Rodada ${activeGameNumber}`) : 'Nenhuma'}`;
+            
+            if (drawnPrizeNumbers.length > 0) {
+                 const sortedNumbers = [...drawnPrizeNumbers].sort((a, b) => a - b);
+                 const lastDrawn = sortedNumbers[sortedNumbers.length -1];
+                 
+                 sortedNumbers.forEach(num => {
+                    const numberEl = document.createElement('div');
+                    numberEl.className = 'w-16 h-16 flex items-center justify-center text-2xl font-bold rounded-full bg-gray-700 text-white cursor-pointer hover:bg-red-600 transition-colors';
+                    numberEl.textContent = num.toString();
+                    numberEl.title = 'Clique para remover este número';
+
+                    if (num === lastDrawn) {
+                        numberEl.classList.add('animate-pulse');
+                        numberEl.style.backgroundColor = roundColor;
+                        numberEl.style.transform = 'scale(1.1)';
+                    }
+                    
+                    numberEl.addEventListener('click', () => {
+                        const index = drawnPrizeNumbers.indexOf(num);
+                        if (index > -1) {
+                            drawnPrizeNumbers.splice(index, 1);
+                            numberEl.remove();
+                            debouncedSave();
+                        }
+                    });
+                    listEl.appendChild(numberEl);
+                 });
+            } else {
+                listEl.innerHTML = `<p class="text-slate-400">Nenhum brinde sorteado ainda.</p>`;
+            }
+
+            document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
+                DOMElements.drawnPrizesModal.classList.add('hidden');
+            });
+            DOMElements.drawnPrizesModal.classList.remove('hidden');
+        }
+
+        function showSettingsModal() {
+            DOMElements.settingsModal.innerHTML = getModalTemplates().settings;
+            DOMElements.settingsModal.classList.remove('hidden');
+            
+            // Lógica dos Tabs
+            const tabs = ['appearance', 'sponsors', 'labels', 'shortcuts'];
+            tabs.forEach(tabId => {
+                document.getElementById(`tab-${tabId}`)!.addEventListener('click', () => {
+                    tabs.forEach(id => {
+                        document.getElementById(`tab-content-${id}`)!.classList.add('hidden');
+                        const tabBtn = document.getElementById(`tab-${id}`)!;
+                        tabBtn.classList.remove('border-sky-500', 'text-sky-400');
+                        tabBtn.classList.add('border-transparent', 'text-gray-400');
+                    });
+                    document.getElementById(`tab-content-${tabId}`)!.classList.remove('hidden');
+                    const activeTabBtn = document.getElementById(`tab-${tabId}`)!;
+                    activeTabBtn.classList.add('border-sky-500', 'text-sky-400');
+                    activeTabBtn.classList.remove('border-transparent', 'text-gray-400');
+                });
+            });
+
+            // Tab Aparência
+            const logoUpload = document.getElementById('custom-logo-upload') as HTMLInputElement;
+            const logoPreview = document.getElementById('custom-logo-preview') as HTMLImageElement;
+            const removeLogoBtn = document.getElementById('remove-custom-logo-btn')!;
+            logoPreview.src = appConfig.customLogoBase64 || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+            logoUpload.addEventListener('change', async (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (file) {
+                    const base64 = await fileToBase64(file);
+                    appConfig.customLogoBase64 = base64;
+                    logoPreview.src = base64;
+                    renderCustomLogo();
+                }
+            });
+            removeLogoBtn.addEventListener('click', () => {
+                appConfig.customLogoBase64 = '';
+                logoPreview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                renderCustomLogo();
+            });
+
+            const bingoTitleSelect = document.getElementById('bingo-title-select') as HTMLSelectElement;
+            bingoTitleSelect.value = appConfig.bingoTitle;
+            bingoTitleSelect.addEventListener('change', (e) => {
+                const newValue = (e.target as HTMLSelectElement).value;
+                appConfig.bingoTitle = newValue;
+                const newLetters = newValue === 'AJUDE' ? DYNAMIC_LETTERS_AJUDE : DYNAMIC_LETTERS;
+                DYNAMIC_LETTERS.forEach((l, i) => BINGO_CONFIG[l] = BINGO_CONFIG[newLetters[i]]);
+                renderMasterBoard();
+                loadRoundState(activeGameNumber); 
+            });
+
+            const boardColorPicker = document.getElementById('board-color-picker') as HTMLInputElement;
+            boardColorPicker.value = appConfig.boardColor === 'default' ? '#374151' : appConfig.boardColor;
+            boardColorPicker.addEventListener('input', (e) => {
+                appConfig.boardColor = (e.target as HTMLInputElement).value;
+                renderMasterBoard();
+                loadRoundState(activeGameNumber);
+            });
+            document.getElementById('reset-board-color-btn')!.addEventListener('click', () => {
+                appConfig.boardColor = 'default';
+                boardColorPicker.value = '#374151';
+                renderMasterBoard();
+                loadRoundState(activeGameNumber);
+            });
+
+             const textColorPicker = document.getElementById('drawn-text-color-picker') as HTMLInputElement;
+            const strokeColorPicker = document.getElementById('drawn-stroke-color-picker') as HTMLInputElement;
+            const strokeWidthSlider = document.getElementById('drawn-stroke-width-slider') as HTMLInputElement;
+            const strokeWidthValue = document.getElementById('drawn-stroke-width-value') as HTMLElement;
+
+            textColorPicker.value = appConfig.drawnTextColor;
+            strokeColorPicker.value = appConfig.drawnTextStrokeColor;
+            strokeWidthSlider.value = appConfig.drawnTextStrokeWidth.toString();
+            strokeWidthValue.textContent = appConfig.drawnTextStrokeWidth.toString();
+
+            textColorPicker.addEventListener('input', (e) => { appConfig.drawnTextColor = (e.target as HTMLInputElement).value; announceNumber(1); });
+            strokeColorPicker.addEventListener('input', (e) => { appConfig.drawnTextStrokeColor = (e.target as HTMLInputElement).value; announceNumber(1); });
+            strokeWidthSlider.addEventListener('input', (e) => {
+                const width = parseInt((e.target as HTMLInputElement).value);
+                appConfig.drawnTextStrokeWidth = width;
+                strokeWidthValue.textContent = width.toString();
+                announceNumber(1);
+            });
+            if(activeGameNumber) cancelAnnouncedNumber(1);
+            else if(gamesData['1']) gamesData['1'].calledNumbers = [];
+
+
+             const modalAutocloseCheckbox = document.getElementById('enable-modal-autoclose') as HTMLInputElement;
+            const modalAutocloseTimer = document.getElementById('modal-autoclose-timer') as HTMLInputElement;
+            const modalAutocloseValue = document.getElementById('modal-autoclose-value') as HTMLElement;
+
+            modalAutocloseCheckbox.checked = appConfig.enableModalAutoclose;
+            modalAutocloseTimer.value = appConfig.modalAutocloseSeconds.toString();
+            modalAutocloseValue.textContent = appConfig.modalAutocloseSeconds.toString();
+
+            modalAutocloseCheckbox.addEventListener('change', (e) => {
+                appConfig.enableModalAutoclose = (e.target as HTMLInputElement).checked;
+            });
+            modalAutocloseTimer.addEventListener('input', (e) => {
+                const seconds = parseInt((e.target as HTMLInputElement).value);
+                appConfig.modalAutocloseSeconds = seconds;
+                modalAutocloseValue.textContent = seconds.toString();
+            });
+
+            // Tab Patrocinadores
+            const enableSponsorsCheckbox = document.getElementById('enable-sponsors-by-number-checkbox') as HTMLInputElement;
+            enableSponsorsCheckbox.checked = appConfig.enableSponsorsByNumber;
+            enableSponsorsCheckbox.addEventListener('change', (e) => {
+                appConfig.enableSponsorsByNumber = (e.target as HTMLInputElement).checked;
+                renderMasterBoard();
+                loadRoundState(activeGameNumber);
+            });
+            
+            const globalSponsorNameInput = document.getElementById('global-sponsor-name') as HTMLInputElement;
+            const globalSponsorUpload = document.getElementById('global-sponsor-upload') as HTMLInputElement;
+            const globalSponsorPreview = document.getElementById('global-sponsor-preview') as HTMLImageElement;
+            const removeGlobalSponsorBtn = document.getElementById('remove-global-sponsor-btn') as HTMLButtonElement;
+
+            if (appConfig.globalSponsor) {
+                globalSponsorNameInput.value = appConfig.globalSponsor.name || '';
+                globalSponsorPreview.src = appConfig.globalSponsor.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            }
+
+            globalSponsorNameInput.addEventListener('change', (e) => {
+                appConfig.globalSponsor.name = (e.target as HTMLInputElement).value;
+            });
+
+            globalSponsorUpload.addEventListener('change', async (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (file) {
+                    const base64 = await fileToBase64(file);
+                    appConfig.globalSponsor.image = base64;
+                    globalSponsorPreview.src = base64;
+                }
+            });
+
+            removeGlobalSponsorBtn.addEventListener('click', () => {
+                appConfig.globalSponsor = { name: '', image: '' };
+                globalSponsorNameInput.value = '';
+                globalSponsorPreview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                globalSponsorUpload.value = '';
+                deleteSponsorImage('global');
+            });
+            
+            const sponsorsContainer = document.getElementById('sponsors-by-number-container')!;
+            sponsorsContainer.innerHTML = ''; 
+            for (let i = 1; i <= 75; i++) {
+                const currentNumber = i; // FIX: Capture the loop variable `i` to prevent closure issues.
+                const sponsor = appConfig.sponsorsByNumber[currentNumber];
+                const wrapper = document.createElement('div');
+                wrapper.className = 'grid grid-cols-12 gap-2 items-center text-sm';
+                
+                const numberLabel = document.createElement('label');
+                numberLabel.className = 'col-span-1 font-bold text-slate-300';
+                numberLabel.textContent = `${currentNumber}:`;
+                
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.placeholder = 'Nome do Patrocinador';
+                nameInput.className = 'col-span-5 bg-gray-900 text-white p-2 rounded-lg';
+                nameInput.value = sponsor?.name || '';
+                nameInput.addEventListener('change', (e) => {
+                    if (!appConfig.sponsorsByNumber[currentNumber]) appConfig.sponsorsByNumber[currentNumber] = { name: '', image: '' };
+                    appConfig.sponsorsByNumber[currentNumber].name = (e.target as HTMLInputElement).value;
+                });
+
+                const imageUpload = document.createElement('input');
+                imageUpload.type = 'file';
+                imageUpload.accept = 'image/*';
+                imageUpload.className = 'col-span-5 text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100';
+                imageUpload.addEventListener('change', async (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                        const base64 = await fileToBase64(file);
+                        if (!appConfig.sponsorsByNumber[currentNumber]) {
+                            appConfig.sponsorsByNumber[currentNumber] = { name: '', image: '' };
+                        }
+                        appConfig.sponsorsByNumber[currentNumber].image = base64;
+                        await saveSponsorImage(currentNumber.toString(), base64); // FIX: Persist the image to IndexedDB
+                        renderMasterBoard();
+                        loadRoundState(activeGameNumber);
+                    }
+                });
+
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '🗑️';
+                removeBtn.title = `Remover patrocinador do número ${currentNumber}`;
+                removeBtn.className = 'col-span-1 text-lg hover:text-red-500 transition-colors flex items-center justify-center';
+                removeBtn.addEventListener('click', () => {
+                    if (appConfig.sponsorsByNumber[currentNumber]) {
+                        delete appConfig.sponsorsByNumber[currentNumber];
+                        nameInput.value = '';
+                        imageUpload.value = '';
+                        deleteSponsorImage(currentNumber.toString());
+                        renderMasterBoard();
+                        loadRoundState(activeGameNumber);
+                    }
+                });
+                
+                wrapper.appendChild(numberLabel);
+                wrapper.appendChild(nameInput);
+                wrapper.appendChild(imageUpload);
+                wrapper.appendChild(removeBtn);
+                
+                sponsorsContainer.appendChild(wrapper);
+            }
+
+            // Tab Rótulos
+            populateSettingsLabelsTab();
+            ['prize1Label', 'prize2Label', 'prize3Label'].forEach(key => {
+                const input = document.getElementById(`label-${key}`) as HTMLInputElement;
+                if (input) {
+                    input.value = appLabels[key as keyof typeof appLabels];
+                    input.addEventListener('change', e => {
+                        appLabels[key as keyof typeof appLabels] = (e.target as HTMLInputElement).value;
+                        renderUIFromState();
+                        applyLabels();
+                        debouncedSave();
+                    });
+                }
+            });
+
+            // Tab Atalhos
+            populateSettingsShortcutsTab();
+
+            // Botões de Ação do Modal
+            document.getElementById('generate-test-data-btn')!.addEventListener('click', generateTestData);
+            document.getElementById('close-settings-btn')!.addEventListener('click', () => {
+                DOMElements.settingsModal.classList.add('hidden');
+                debouncedSave(); 
+            });
+        }
+
+        // --- Inicialização ---
+
+        /**
+         * Configura ouvintes de eventos para a funcionalidade de impressão.
+         * Atualiza dinamicamente as informações do rodapé de impressão antes de imprimir.
+         */
+        function setupPrintListeners() {
+            window.addEventListener('beforeprint', () => {
+                const printVersionEl = document.getElementById('print-version');
+                const printDateTimeEl = document.getElementById('print-datetime');
+        
+                if (printVersionEl) {
+                    printVersionEl.textContent = currentVersion;
+                }
+                if (printDateTimeEl) {
+                    printDateTimeEl.textContent = new Date().toLocaleString('pt-BR');
+                }
+            });
+        }
+
+        /**
+         * Ponto de entrada principal do aplicativo.
+         * Garante que o DOM esteja totalmente carregado antes de inicializar o estado e os eventos.
+         */
         document.addEventListener('DOMContentLoaded', () => {
             loadInitialState();
-            initEventListeners();
+            setupEventListeners();
+            setupGlobalKeydownListener();
+            setupPrintListeners();
         });

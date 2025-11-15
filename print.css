@@ -1,0 +1,143 @@
+/* print.css - Estilos para Impressão do Bingo Show */
+
+@media print {
+    /* Esconde elementos da interface que não são necessários na impressão */
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 10pt;
+    }
+
+    header,
+    footer,
+    aside,
+    #controls-panel-left,
+    #prize-draw-section,
+    #auction-form,
+    #shortcuts-legend,
+    .modal,
+    button,
+    input,
+    label[for="load-local-input"],
+    #confetti-canvas,
+    .lg\:col-span-1, /* Esconde as sidebars */
+    div[class*="modal"] {
+        display: none !important;
+    }
+
+    /* Ajusta o layout principal para ocupar a página toda */
+    main {
+        display: block !important;
+        grid-template-columns: 1fr !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .lg\:col-span-3 {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    section {
+        box-shadow: none !important;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        padding: 15px !important;
+        page-break-inside: avoid;
+    }
+    
+    h2, h3 {
+        color: #000 !important;
+    }
+
+    /* Garante que a lista de vencedores seja exibida completamente */
+    #winners-container {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .winner-card {
+        background-color: #f3f4f6 !important; /* light gray */
+        color: #000 !important;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+    .winner-card h4 {
+      color: #000 !important;
+    }
+    .winner-card p {
+      color: #333 !important;
+    }
+
+    /* Otimiza o painel de números para impressão */
+    #bingo-board-wrapper {
+        transform: scale(1) !important;
+    }
+    #bingo-board {
+        gap: 4px !important;
+    }
+    .bingo-cell {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 14px !important;
+        border: 1px solid #ccc;
+        color: #000 !important;
+        background-color: #fff !important;
+    }
+    .bingo-cell.scale-125 { /* Números sorteados */
+        background-color: #e5e7eb !important; /* gray-200 */
+        font-weight: bold;
+    }
+
+    /* Painel de Rodada Ativa */
+    #active-round-panel {
+        background-color: #f9fafb !important;
+        color: #000 !important;
+        border: 1px solid #ccc;
+    }
+     #active-round-panel p, #active-round-panel span {
+        color: #000 !important;
+     }
+
+    /* Rodapé de Impressão */
+    #print-footer {
+        display: block !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 10px 20px;
+        border-top: 1px solid #ccc;
+        background-color: #fff;
+        font-size: 8pt;
+    }
+
+    #print-footer .content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    #print-footer .info p {
+        margin: 0;
+    }
+
+    #print-footer .qr-code {
+        text-align: center;
+    }
+
+    #print-footer .qr-code img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    #print-footer .qr-code p {
+        margin: 0;
+        font-size: 7pt;
+    }
+
+    /* Evita que o conteúdo seja cortado pelo rodapé fixo */
+    @page {
+        margin-bottom: 100px; /* Espaço para o rodapé */
+    }
+}
