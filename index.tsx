@@ -2134,9 +2134,18 @@ function applyDisplayZoom(scale: number) {
              const prize2Btn = document.getElementById('confirm-prize2-btn') as HTMLButtonElement;
              const prize3Btn = document.getElementById('confirm-prize3-btn') as HTMLButtonElement;
              
-             if (!game.prizes.prize1) prize1Btn.disabled = true;
-             if (!game.prizes.prize2) prize2Btn.disabled = true;
-             if (!game.prizes.prize3) prize3Btn.disabled = true;
+             const hasPrize2Winner = game.winners?.some((w: any) => w.bingoType === 'prize2');
+
+            // Se a Cartela Cheia (prêmio 2) já foi ganha, a rodada terminou. Desabilita outros prêmios.
+            if (hasPrize2Winner) {
+                prize1Btn.disabled = true;
+                prize2Btn.disabled = true;
+                prize3Btn.disabled = true;
+            } else {
+                if (!game.prizes.prize1) prize1Btn.disabled = true;
+                if (!game.prizes.prize2) prize2Btn.disabled = true;
+                if (!game.prizes.prize3) prize3Btn.disabled = true;
+            }
         }
 
         function handlePrizeConfirmation(bingoType: 'prize1' | 'prize2' | 'prize3') {
@@ -3319,7 +3328,7 @@ function showSettingsModal() {
             const winnerName = winnerNameInput.value;
             const bid = bidInput.value;
         
-            if (!itemName || !winnerName || !bid || parseInt(bid) <= 0) {
+            if (!itemName || !winnerName || !bid) {
                 showAlert("Preencha todos os campos do leilão (item, arrematador e lance) para registrar a venda.");
                 return;
             }
@@ -3347,7 +3356,10 @@ function showSettingsModal() {
             debouncedSave();
         
             setTimeout(() => {
-                (DOMElements.auctionForm as HTMLFormElement).reset();
+                const form = DOMElements.auctionForm as HTMLFormElement;
+                (form.elements.namedItem('auction-item-name') as HTMLInputElement).value = '';
+                (form.elements.namedItem('auction-winner-name') as HTMLInputElement).value = '';
+                (form.elements.namedItem('auction-item-current-bid') as HTMLInputElement).value = '0';
                 updateAuctionBidDisplay(0);
                 gavelIcon.classList.add('hidden');
             }, 1500);
@@ -3480,13 +3492,16 @@ function showSettingsModal() {
             document.getElementById('add-custom-bid-btn')!.addEventListener('click', () => {
                 const customBidInput = document.getElementById('custom-bid-input') as HTMLInputElement;
                 const amount = parseInt(customBidInput.value, 10);
-                if (!isNaN(amount) && amount > 0) {
+                if (!isNaN(amount)) {
                     incrementAuctionBid(amount);
                     customBidInput.value = '';
                 }
             });
             document.getElementById('reset-auction-btn')!.addEventListener('click', () => {
-                (DOMElements.auctionForm as HTMLFormElement).reset();
+                const form = DOMElements.auctionForm as HTMLFormElement;
+                (form.elements.namedItem('auction-item-name') as HTMLInputElement).value = '';
+                (form.elements.namedItem('auction-winner-name') as HTMLInputElement).value = '';
+                (form.elements.namedItem('auction-item-current-bid') as HTMLInputElement).value = '0';
                 updateAuctionBidDisplay(0);
             });
         
@@ -3566,4 +3581,3 @@ function showSettingsModal() {
         }
         
         main();
-        
