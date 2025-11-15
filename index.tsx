@@ -3230,15 +3230,33 @@ function showRoundEditModal(gameNumber: string) {
             
             // Lógica para exibir patrocinadores no final
             const sponsorsListEl = document.getElementById('final-sponsors-list')!;
-            const allSponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.image && s.name);
-            if(appConfig.globalSponsor.image && appConfig.globalSponsor.name) {
-                allSponsors.push(appConfig.globalSponsor);
+            const sponsorMap = new Map<string, {name: string, image?: string}>();
+            // Adiciona patrocinadores individuais, garantindo unicidade pelo nome
+            Object.values(appConfig.sponsorsByNumber)
+                .filter(s => s && s.name)
+                .forEach(s => {
+                    if (!sponsorMap.has(s.name)) {
+                        sponsorMap.set(s.name, {name: s.name, image: s.image });
+                    }
+                });
+
+            // Adiciona o patrocinador global se ele tiver nome e não estiver já na lista
+            if (appConfig.globalSponsor && appConfig.globalSponsor.name && !sponsorMap.has(appConfig.globalSponsor.name)) {
+                sponsorMap.set(appConfig.globalSponsor.name, appConfig.globalSponsor);
             }
+
+            const allSponsors = Array.from(sponsorMap.values());
+
             if(allSponsors.length > 0) {
+                sponsorsListEl.innerHTML = ''; // Limpa o container
                 allSponsors.forEach(sponsor => {
                     const sponsorEl = document.createElement('div');
-                    sponsorEl.className = 'flex flex-col items-center justify-center p-2 bg-gray-700 rounded-lg';
-                    sponsorEl.innerHTML = `<img src="${sponsor.image}" alt="${sponsor.name}" class="h-16 object-contain rounded"><p class="text-xs mt-1 text-slate-300">${sponsor.name}</p>`;
+                    sponsorEl.className = 'flex flex-col items-center justify-center p-2 bg-gray-700 rounded-lg w-28 text-center';
+                    let imageHtml = '';
+                    if (sponsor.image) {
+                        imageHtml = `<img src="${sponsor.image}" alt="${sponsor.name}" class="h-16 object-contain rounded mb-1">`;
+                    }
+                    sponsorEl.innerHTML = `${imageHtml}<p class="text-xs mt-1 text-slate-300 w-full truncate" title="${sponsor.name}">${sponsor.name}</p>`;
                     sponsorsListEl.appendChild(sponsorEl);
                 });
             } else {
@@ -3255,12 +3273,13 @@ function showRoundEditModal(gameNumber: string) {
             document.getElementById('close-final-modal-btn')!.addEventListener('click', () => {
                  DOMElements.finalWinnersModal.classList.add('hidden');
                  clearInterval(winnerDisplayTimeout);
+                 if (finalConfettiInterval) clearInterval(finalConfettiInterval);
             });
             
              const startFinalConfetti = () => {
                 if (typeof confetti !== 'function') return;
                 const count = 200;
-                const defaults = { origin: { y: 0.7 } };
+                const defaults = { origin: { y: 0.7 }, zIndex: 1000 };
                 function fire(particleRatio: number, opts: any) {
                     confetti({
                         ...defaults,
