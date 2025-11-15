@@ -1,5 +1,4 @@
 
-
         // FIX: Added declaration for the 'confetti' library function to resolve "Cannot find name 'confetti'" errors.
         declare var confetti: any;
         
@@ -3004,37 +3003,192 @@ function showRoundEditModal(gameNumber: string) {
 
         function generateProof(selectedIds: (string | undefined)[]) {
             const date = new Date().toLocaleString('pt-BR');
-            let content = `<html><head><title>Comprovante do Bingo - ${date}</title><style>body{font-family: Arial, sans-serif; margin: 20px; line-height: 1.6;} h1, h2 {color: #333;} h2 {border-bottom: 1px solid #ccc; padding-bottom: 5px;} .winner-block {margin-bottom: 20px;} .numbers {font-family: monospace; word-wrap: break-word;}</style></head><body>`;
-            content += `<h1>Comprovante do Bingo Show</h1><p>Gerado em: ${date}</p>`;
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://bingoshow.netlify.app`;
+            const logoSrc = appConfig.customLogoBase64;
+
+            const styles = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Slab:wght@700&display=swap');
+                    :root {
+                        --primary-color: #1e3a8a; /* Cor mais escura para impressão */
+                        --secondary-color: #333333;
+                        --text-color: #111111;
+                        --light-gray: #f0f0f0;
+                        --border-color: #cccccc;
+                    }
+                    body {
+                        font-family: 'Roboto', sans-serif;
+                        margin: 0;
+                        padding: 2cm;
+                        background-color: #ffffff;
+                        color: var(--text-color);
+                        line-height: 1.6;
+                        font-size: 11pt;
+                    }
+                    .report-container { max-width: 18cm; margin: auto; }
+                    .report-header { text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 15px; margin-bottom: 25px; }
+                    .report-header h1 { margin: 0; font-size: 26pt; color: var(--primary-color); font-family: 'Roboto Slab', serif; }
+                    .report-header p { margin: 5px 0 0; font-size: 10pt; color: #555; }
+                    .print-button-container { text-align: center; margin-bottom: 20px; }
+                    .print-button { padding: 10px 20px; font-size: 12pt; cursor: pointer; background-color: var(--primary-color); color: white; border: none; border-radius: 5px; transition: background-color 0.2s; }
+                    .print-button:hover { background-color: #1c3276; }
+                    .section { margin-bottom: 30px; page-break-inside: avoid; }
+                    .section h2 { font-size: 18pt; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; font-family: 'Roboto Slab', serif; }
+                    .winner-block { margin-bottom: 20px; padding-left: 15px; border-left: 3px solid var(--light-gray); }
+                    .winner-block p { margin: 4px 0; }
+                    .winner-block strong { color: var(--secondary-color); font-weight: 700; }
+                    .numbers-list-container h3 { font-size: 12pt; margin-top: 15px; margin-bottom: 10px; font-style: italic; font-weight: normal; color: #444; }
+                    .numbers-list {
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 10pt;
+                        column-count: 6;
+                        column-gap: 20px;
+                        background-color: var(--light-gray);
+                        border: 1px solid var(--border-color);
+                        padding: 15px;
+                        border-radius: 5px;
+                    }
+                    .numbers-list span { display: inline-block; width: 2.5em; text-align: right; }
+                    .report-footer {
+                        text-align: center;
+                        margin-top: 40px;
+                        padding-top: 20px;
+                        border-top: 2px solid var(--secondary-color);
+                        page-break-before: auto;
+                    }
+                    .footer-content {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        gap: 20px;
+                    }
+                    .footer-logo img {
+                        max-height: 60px;
+                        object-fit: contain;
+                    }
+                    .footer-info {
+                        font-size: 9pt;
+                        color: #555;
+                    }
+                    .footer-info p {
+                        margin: 0;
+                    }
+                    .footer-qr {
+                        text-align: center;
+                    }
+                    .footer-qr img {
+                        width: 80px;
+                        height: 80px;
+                        display: block;
+                        margin: 0 auto 5px;
+                    }
+                    .footer-qr p {
+                        font-size: 8pt;
+                        color: #555;
+                        margin: 0;
+                    }
+                    @media print {
+                        body { padding: 0; }
+                        .print-button-container { display: none; }
+                        @page { margin: 2cm; }
+                    }
+                </style>
+            `;
+        
+            let bodyContent = `<div class="report-container">`;
+            bodyContent += `<header class="report-header"><h1>Comprovante do Evento Bingo Show</h1><p>Relatório gerado em: ${date}</p></header>`;
+            bodyContent += `<div class="print-button-container"><button class="print-button" onclick="window.print()">🖨️ Imprimir Relatório</button></div>`;
 
             selectedIds.forEach(id => {
                 if (!id) return;
+        
                 if (id.startsWith('game-')) {
                     const gameNumber = id.replace('game-', '');
                     const game = gamesData[gameNumber];
                     if (game && game.winners.length > 0) {
-                        content += `<h2>${game.name || `Rodada ${gameNumber}`}</h2>`;
+                        bodyContent += `<section class="section"><h2>${game.name || `Rodada ${gameNumber}`}</h2>`;
                         game.winners.forEach((winner: any) => {
-                            content += `<div class="winner-block"><strong>Ganhador:</strong> ${winner.name}<br/><strong>Prêmio:</strong> ${winner.prize}<br/><strong>Números Sorteados na Rodada:</strong><p class="numbers">${winner.numbers.join(', ')}</p></div>`;
+                            bodyContent += `<div class="winner-block">
+                                              <p><strong>Ganhador:</strong> ${winner.name}</p>
+                                              <p><strong>Prêmio:</strong> ${winner.prize}</p>
+                                          </div>`;
+                            if (winner.numbers && winner.numbers.length > 0) {
+                                bodyContent += `<div class="numbers-list-container">
+                                                    <h3>Números Sorteados na Rodada (${winner.numbers.length}):</h3>
+                                                    <div class="numbers-list">${winner.numbers.map((n: number) => `<span>${n}</span>`).join('')}</div>
+                                                </div>`;
+                            }
                         });
+                        bodyContent += `</section>`;
                     }
                 } else if (id === 'brindes' && gamesData['Brindes']?.winners.length > 0) {
-                    content += `<h2>Brindes Sorteados</h2>`;
+                    bodyContent += `<section class="section"><h2>Brindes Sorteados</h2>`;
                     gamesData['Brindes'].winners.forEach((winner: any) => {
-                        content += `<div class="winner-block"><strong>Ganhador:</strong> ${winner.name}<br/><strong>Prêmio:</strong> ${winner.prize}<br/><strong>Nº da Cartela:</strong> ${winner.cartela}</div>`;
+                        bodyContent += `<div class="winner-block">
+                                          <p><strong>Ganhador:</strong> ${winner.name}</p>
+                                          <p><strong>Prêmio:</strong> ${winner.prize}</p>
+                                          <p><strong>Nº da Cartela:</strong> ${winner.cartela}</p>
+                                      </div>`;
                     });
+                    bodyContent += `</section>`;
                 } else if (id === 'leilao' && gamesData['Leilão']?.winners.length > 0) {
-                    content += `<h2>Leilão</h2>`;
+                    bodyContent += `<section class="section"><h2>Leilão</h2>`;
                     gamesData['Leilão'].winners.forEach((winner: any) => {
-                         content += `<div class="winner-block"><strong>Arrematador:</strong> ${winner.name}<br/><strong>Item:</strong> ${winner.itemName}<br/><strong>Lance:</strong> R$ ${winner.bid},00</div>`;
+                        bodyContent += `<div class="winner-block">
+                                          <p><strong>Arrematador:</strong> ${winner.name}</p>
+                                          <p><strong>Item:</strong> ${winner.itemName}</p>
+                                          <p><strong>Lance:</strong> R$ ${winner.bid},00</p>
+                                      </div>`;
                     });
+                    bodyContent += `</section>`;
                 }
             });
-
-            content += '</body></html>';
-            const blob = new Blob([content], { type: 'text/html' });
+        
+            bodyContent += `
+                <footer class="report-footer">
+                    <div class="footer-content">
+                        <div class="footer-logo">
+                            <img src="${logoSrc}" alt="Logo do Programa">
+                        </div>
+                        <div class="footer-info">
+                            <p><strong>Bingo Show</strong></p>
+                            <p>Versão ${currentVersion}</p>
+                            <p>bingoshow.netlify.app</p>
+                        </div>
+                        <div class="footer-qr">
+                            <img src="${qrCodeUrl}" alt="QR Code para o App">
+                            <p>Acesse o App</p>
+                        </div>
+                    </div>
+                </footer>
+            `;
+            bodyContent += `</div>`;
+        
+            const fullHtml = `
+                <!DOCTYPE html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Comprovante do Bingo - ${date}</title>
+                    ${styles}
+                </head>
+                <body>
+                    ${bodyContent}
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        }
+                    </script>
+                </body>
+                </html>
+            `;
+        
+            const blob = new Blob([fullHtml], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            const proofWindow = window.open(url, '_blank');
+            if (!proofWindow) {
+                showAlert("O bloqueador de pop-ups impediu a abertura do comprovante. Por favor, habilite pop-ups para este site.");
+            }
         }
 
         function showFinalWinnersModal() {
