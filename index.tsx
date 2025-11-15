@@ -81,7 +81,7 @@
             drawnTextStrokeColor: '#000000',
             drawnTextStrokeWidth: 2,
             isEventClosed: false,
-            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ29sZEdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkQ3MDA7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZGQTUwMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgICA8L2xpbmVhckdyYWRpZW50PgogICAgICAgIDxmaWx0ZXIgaWQ9Imdsb3ciPgogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPgogICAgICAgICAgICA8ZmVNZXJnZT4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPgogICAgICAgICAgICA8L2ZlTWVyZ2U+CiAgICAgICAgPC9maWx0ZXI+CiAgICA8L2RlZnM+CiAgICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzExMTgyNyIgcng9IjUwIiAvPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjQ1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI2dvbGRHcmFkaWVudCkiIGxldHRlci1zcGFjaW5nPSIyIj4KICAgICAgICAgICAgQklOR08KICAgICAgICA8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iNTAlIiB5PSI2NSUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQתYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2MCIgZm9udC1zZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iI0ZGQTUwMCIgc3Ryb2tlLXdpZHRoPSI0IiBsZXR0ZXItc3BhY2luZz0iNSI+CiAgICAgICAgICAgIFNIT1cKICAgICAgICA8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg==',
+            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4NCiAgICA8ZGVmcz4NCiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4NCiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkRGODg7IiAvPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkM3MDA7IiAvPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRjVCMzAwOyIgLz4NCiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPg0KICAgICAgICAgICAgPGZlTWVyZ2U+DQogICAgICAgICAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJjb2xvcmVkQmx1ciIvPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPg0KICAgICAgICAgICAgPC9mZU1lcmdlPg0KICAgICAgICA8L2ZpbHRlcj4NCiAgICA8L2RlZnM+DQogICAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9IiMxMTE4MjciIHJ4PSI1MCIgLz4NCiAgICA8ZyBmaWx0ZXI9InVybCgjZ2xvdykiPg0KICAgICAgICA8cGF0aCBkPSJNMjU2LDEwMS40bDM1LjgsMTA5LjloMTE1LjZsLTkzLjUsNjcuOWwzNS44LDEwOS45TDI1NiwzMjEuMmwtOTMuNSw2Ny45bDM1LjgtMTA5LjlsLTkzLjUtNjcuOWgxMTUuNkwyNTYsMTAxLjR6IiBmaWxsPSJ1cmwoI2dvbGRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNCIvPg0KICAgICAgICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE2MCIgc3Ryb2tlPSIjRkZDNzAwIiBzdHJva2Utd2lkdGg9IjgiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuNiIvPg0KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjQ1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOTAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjZ29sZEdyYWRpZW50KSIgbGV0dGVyLXNwYWNpbmc9IjIiPg0KICAgICAgICAgICAgQklOR08NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjY1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjRjVCMzAwIiBzdHJva2Utd2lkdGg9IjQiIGxldHRlci1zcGFjaW5nPSI1Ij4NCiAgICAgICAgICAgIFNIT1cNCiAgICAgICAgPC90ZXh0Pg0KICAgIDwvZz4NCjwvc3ZnPg==',
             enableSponsorsByNumber: false,
             enableModalAutoclose: true,
             modalAutocloseSeconds: 5,
@@ -210,6 +210,7 @@
             settingsLogoRemoveButton: "Remover Logo",
             settingsGlobalSponsorTitle: "Patrocinador Global",
             settingsGlobalSponsorDescription: "Este patrocinador será exibido para qualquer número sorteado que não tenha um patrocinador individual cadastrado.",
+            removeGlobalSponsorButton: "Remover Patrocinador Global",
             settingsSponsorsByNumberTitle: "Patrocinadores por Número",
             settingsSponsorsByNumberEnable: "Habilitar exibição de patrocinador ao sortear número",
             settingsSponsorsByNumberDescription: "Cadastre um nome e uma imagem para cada número. Eles aparecerão em um modal especial durante o sorteio.",
@@ -712,6 +713,7 @@ function populateSettingsShortcutsTab() {
                                        </div>
                                    </div>
                                </div>
+                               <button id="remove-global-sponsor-btn" class="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-sm" data-label-key="removeGlobalSponsorButton">${appLabels.removeGlobalSponsorButton}</button>
                            </div>
                            <h3 class="text-xl font-bold text-slate-300">${appLabels.settingsSponsorsByNumberTitle}</h3>
                            <div class="flex items-center gap-3 bg-gray-700 p-3 rounded-lg">
@@ -1025,6 +1027,17 @@ function applyDisplayZoom(scale: number) {
             });
         }
 
+        async function deleteSponsorImage(id: string) {
+            const db = await openDb();
+            return new Promise<void>((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject("Failed to delete image from IndexedDB.");
+            });
+        }
+
         async function loadSponsorImages() {
             try {
                 const db = await openDb();
@@ -1052,8 +1065,11 @@ function applyDisplayZoom(scale: number) {
             }
         }
 
-        function saveStateToFile() {
+        async function saveStateToFile() {
             try {
+                // Garante que o estado mais recente seja salvo no navegador antes de exportar.
+                await saveStateToLocalStorage();
+        
                 const appState = getAppState();
                 const stateString = JSON.stringify(appState, null, 2); 
                 const blob = new Blob([stateString], { type: 'application/json' });
@@ -2662,6 +2678,70 @@ function showChangelogModal() {
     });
 }
 
+function confirmDeleteSponsor(num: string) {
+    const modal = DOMElements.deleteConfirmModal;
+    modal.innerHTML = getModalTemplates().deleteConfirm;
+    (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o patrocinador do número ${num}?`;
+    (document.getElementById('confirm-delete-btn') as HTMLElement).textContent = "Remover Patrocinador";
+    
+    modal.classList.add('z-[60]'); // Garante que o modal de confirmação fique sobre o de configurações
+    modal.classList.remove('hidden');
+
+    document.getElementById('confirm-delete-btn')!.onclick = async () => {
+        delete appConfig.sponsorsByNumber[num as any];
+        await deleteSponsorImage(num);
+
+        const sponsorItem = document.getElementById(`sponsor-item-${num}`);
+        if (sponsorItem) {
+            (sponsorItem.querySelector(`input[data-field="name"]`) as HTMLInputElement).value = '';
+            (sponsorItem.querySelector(`#sponsor-preview-${num}`) as HTMLImageElement).src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            (sponsorItem.querySelector(`#sponsor-status-${num}`) as HTMLElement).textContent = 'Vazio';
+            (sponsorItem as HTMLDetailsElement).open = false;
+        }
+        
+        renderMasterBoard();
+        
+        modal.classList.add('hidden');
+        modal.classList.remove('z-[60]');
+        debouncedSave();
+    };
+    
+    document.getElementById('cancel-delete-btn')!.onclick = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('z-[60]');
+    };
+}
+
+function confirmDeleteGlobalSponsor() {
+    const modal = DOMElements.deleteConfirmModal;
+    modal.innerHTML = getModalTemplates().deleteConfirm;
+    (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o patrocinador global?`;
+    (document.getElementById('confirm-delete-btn') as HTMLElement).textContent = "Remover Patrocinador";
+
+    modal.classList.add('z-[60]');
+    modal.classList.remove('hidden');
+
+    document.getElementById('confirm-delete-btn')!.onclick = async () => {
+        appConfig.globalSponsor = { name: '', image: '' };
+        await deleteSponsorImage('global');
+
+        const nameInput = document.getElementById('global-sponsor-name') as HTMLInputElement;
+        const previewImg = document.getElementById('global-sponsor-preview') as HTMLImageElement;
+        if (nameInput) nameInput.value = '';
+        if (previewImg) previewImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        
+        modal.classList.add('hidden');
+        modal.classList.remove('z-[60]');
+        debouncedSave();
+    };
+    
+    document.getElementById('cancel-delete-btn')!.onclick = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('z-[60]');
+    };
+}
+
+
 function populateSettingsSponsorsTab() {
     const container = document.getElementById('sponsors-by-number-container')!;
     const enableCheckbox = document.getElementById('enable-sponsors-by-number-checkbox') as HTMLInputElement;
@@ -2704,6 +2784,7 @@ function populateSettingsSponsorsTab() {
         
         const wrapper = document.createElement('details');
         wrapper.className = 'bg-gray-900 rounded-lg p-2 sponsor-item';
+        wrapper.id = `sponsor-item-${i}`;
         
         const summary = document.createElement('summary');
         summary.className = 'font-bold text-slate-300 cursor-pointer flex justify-between items-center';
@@ -2713,14 +2794,15 @@ function populateSettingsSponsorsTab() {
         formContent.className = 'mt-2 p-2 border-t border-gray-700 space-y-2';
 
         formContent.innerHTML = `
-            <div>
-                <label class="text-sm font-medium text-slate-400">${appLabels.settingsSponsorNameLabel}</label>
-                <input type="text" value="${sponsor.name}" class="mt-1 w-full text-sm p-1 bg-gray-800 text-white rounded" data-number="${i}" data-field="name">
+            <div class="flex justify-between items-center">
+                 <label class="text-sm font-medium text-slate-400">${appLabels.settingsSponsorNameLabel}</label>
+                 <button class="delete-sponsor-btn text-xs bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-2 rounded-lg" data-number="${i}">Remover</button>
             </div>
+            <input type="text" value="${sponsor.name}" class="mt-1 w-full text-sm p-1 bg-gray-800 text-white rounded" data-number="${i}" data-field="name">
             <div>
                  <label class="text-sm font-medium text-slate-400">${appLabels.settingsSponsorImageLabel}</label>
                 <input type="file" accept="image/*" class="mt-1 block w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" data-number="${i}" data-field="image-upload">
-                <img src="${sponsor.image}" class="mt-1 h-16 w-16 object-cover rounded bg-gray-700" id="sponsor-preview-${i}" />
+                <img src="${sponsor.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" class="mt-1 h-16 w-16 object-cover rounded bg-gray-700" id="sponsor-preview-${i}" />
             </div>
         `;
 
@@ -2731,6 +2813,12 @@ function populateSettingsSponsorsTab() {
         const nameInput = wrapper.querySelector('input[data-field="name"]') as HTMLInputElement;
         const fileInput = wrapper.querySelector('input[data-field="image-upload"]') as HTMLInputElement;
         const previewImg = wrapper.querySelector(`#sponsor-preview-${i}`) as HTMLImageElement;
+        const deleteBtn = wrapper.querySelector('.delete-sponsor-btn') as HTMLElement;
+
+        deleteBtn.addEventListener('click', (e) => {
+            const num = (e.currentTarget as HTMLElement).dataset.number!;
+            confirmDeleteSponsor(num);
+        });
 
         nameInput.addEventListener('change', e => {
             const num = (e.target as HTMLElement).dataset.number!;
@@ -2790,7 +2878,7 @@ function showSettingsModal() {
         }
     });
     document.getElementById('remove-custom-logo-btn')!.addEventListener('click', () => {
-        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ29sZEdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkQ3MDA7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZGQTUwMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgICA8L2xpbmVhckdyYWRpZW50PgogICAgICAgIDxmaWx0ZXIgaWQ9Imdsb3ciPgogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPgogICAgICAgICAgICA8ZmVNZXJnZT4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPgogICAgICAgICAgICA8L2ZlTWVyZ2U+CiAgICAgICAgPC9maWx0ZXI+CiAgICA8L2RlZnM+CiAgICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzExMTgyNyIgcng9IjUwIiAvPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjQ1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI2dvbGRHcmFkaWVudCkiIGxldHRlci1zcGFjaW5nPSIyIj4KICAgICAgICAgICAgQklOR08KICAgICAgICA8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iNTAlIiB5PSI2NSUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQתYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2MCIgZm9udC1zZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iI0ZGQTUwMCIgc3Ryb2tlLXdpZHRoPSI0IiBsZXR0ZXItc3BhY2luZz0iNSI+CiAgICAgICAgICAgIFNIT1cKICAgICAgICA8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg==';
+        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4NCiAgICA8ZGVmcz4NCiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4NCiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkRGODg7IiAvPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkM3MDA7IiAvPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRjVCMzAwOyIgLz4NCiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPg0KICAgICAgICAgICAgPGZlTWVyZ2U+DQogICAgICAgICAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJjb2xvcmVkQmx1ciIvPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPg0KICAgICAgICAgICAgPC9mZU1lcmdlPg0KICAgICAgICA8L2ZpbHRlcj4NCiAgICA8L2RlZnM+DQogICAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9IiMxMTE4MjciIHJ4PSI1MCIgLz4NCiAgICA8ZyBmaWx0ZXI9InVybCgjZ2xvdykiPg0KICAgICAgICA8cGF0aCBkPSJNMjU2LDEwMS40bDM1LjgsMTA5LjloMTE1LjZsLTkzLjUsNjcuOWwzNS44LDEwOS45TDI1NiwzMjEuMmwtOTMuNSw2Ny45bDM1LjgtMTA5LjlsLTkzLjUtNjcuOWgxMTUuNkwyNTYsMTAxLjR6IiBmaWxsPSJ1cmwoI2dvbGRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNCIvPg0KICAgICAgICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE2MCIgc3Ryb2tlPSIjRkZDNzAwIiBzdHJva2Utd2lkdGg9IjgiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuNiIvPg0KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjQ1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOTAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjZ29sZEdyYWRpZW50KSIgbGV0dGVyLXNwYWNpbmc9IjIiPg0KICAgICAgICAgICAgQklOR08NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjY1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjRjVCMzAwIiBzdHJva2Utd2lkdGg9IjQiIGxldHRlci1zcGFjaW5nPSI1Ij4NCiAgICAgICAgICAgIFNIT1cNCiAgICAgICAgPC90ZXh0Pg0KICAgIDwvZz4NCjwvc3ZnPg==';
         customLogoPreview.src = appConfig.customLogoBase64;
         renderCustomLogo();
         debouncedSave();
@@ -2868,6 +2956,7 @@ function showSettingsModal() {
     populateSettingsLabelsTab();
     populateSettingsShortcutsTab();
     
+    document.getElementById('remove-global-sponsor-btn')!.addEventListener('click', confirmDeleteGlobalSponsor);
     document.getElementById('generate-test-data-btn')!.addEventListener('click', generateTestData);
     document.getElementById('close-settings-btn')!.addEventListener('click', () => {
         DOMElements.settingsModal.classList.add('hidden');
@@ -3493,5 +3582,3 @@ function showSettingsModal() {
             loadInitialState();
             initEventListeners();
         });
-        
-    
