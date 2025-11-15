@@ -1,5 +1,5 @@
 {
-  "name": "Bingo Cloud (Show de Prêmios) original",
-  "description": "An interactive prize show and bingo application with features for managing rounds, drawing numbers, tracking winners, and customizing the game experience.",
+  "name": "Bingo Show",
+  "description": "An interactive bingo and prize show application designed for local, offline events. Manage rounds, draw numbers, track winners, and customize the game experience.",
   "requestFramePermissions": []
 }

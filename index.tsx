@@ -1,25 +1,10 @@
 
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
         // FIX: Added declaration for the 'confetti' library function to resolve "Cannot find name 'confetti'" errors.
         declare var confetti: any;
-        declare global {
-            interface Window {
-                VITE_API_KEY: string | undefined;
-                VITE_AUTH_DOMAIN: string | undefined;
-                VITE_PROJECT_ID: string | undefined;
-                VITE_STORAGE_BUCKET: string | undefined;
-                VITE_MESSAGING_SENDER_ID: string | undefined;
-                VITE_APP_ID: string | undefined;
-            }
-        }
-
+        
         // --- Variáveis de Estado ---
         let floatingNumberTimeout: ReturnType<typeof setTimeout> | null = null;
-        let currentVersion = "6.8"; // Salvar e Carregar Localmente
+        let currentVersion = "7.0"; // Foco 100% Local
         
         // Mapeamento de letras dinâmico
         let DYNAMIC_LETTERS = ['B', 'I', 'N', 'G', 'O'];
@@ -48,7 +33,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let drawnPrizeNumbers: number[] = [];
         let winnerDisplayTimeout: any; 
         const winnerDisplayDuration = 5000;
-        let versionHistory = `**v6.7.0 (Atual)**
+        let versionHistory = `**v7.0.0 (Atual)**
+- **REMARCA E FOCO LOCAL:** O programa foi renomeado para "Bingo Show". Toda a funcionalidade online e de sincronização com a nuvem (Firebase) foi removida. O aplicativo agora opera em um modo 100% local, salvando todos os dados (incluindo imagens de patrocinadores) diretamente no navegador para máxima confiabilidade e simplicidade em eventos presenciais.
+- **NOVO LOGOTIPO:** O aplicativo agora apresenta um novo logotipo para refletir a marca "Bingo Show".
+- **PATROCINADOR GLOBAL:** Adicionada uma nova seção nas configurações para cadastrar um "Patrocinador Global". Uma única imagem e nome podem ser definidos para aparecer em todos os números que não possuam um patrocinador individual, garantindo que a tela de sorteio sempre exiba um apoio.
+- **INTERFACE SIMPLIFICADA:** Removidos os indicadores de status de conexão e a tela de seleção de modo (Online/Local), tornando a inicialização do programa mais direta.
+- **MELHORIA NO BACKUP:** A função "Salvar no Computador" agora é o método principal de backup, garantindo que 100% dos dados, incluindo todas as imagens de patrocinadores (individuais e global), sejam salvas no arquivo .json.
+
+**v6.8.0**
 - **REFORMULAÇÃO DA INTERFACE DE INTERVALO:** A tela de intervalo foi redesenhada para projetores, exibindo em tela cheia o cardápio e os patrocinadores (ou vencedores) em um ciclo contínuo e com letras grandes, com uma animação constante de confetes ao fundo.
 - **FLUXO DE VENCEDOR UNIFICADO:** O modal de parabéns e o de registro de nome foram unificados em uma única tela. O modal se fecha automaticamente após 20 segundos ou ao pressionar Enter (para salvar) ou Esc.
 - **GESTÃO DE RODADAS APRIMORADA:** Rodadas extras agora são adicionadas no topo da lista com uma animação "fade-in". Rodadas concluídas agora podem ser reabertas com um clique, facilitando correções.
@@ -69,34 +61,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 - **GESTÃO DE RODADAS:** Adicionado um ícone de lixeira (🗑️) em cada rodada, permitindo sua exclusão mediante confirmação.
 - **CORES DINÂMICAS E CONSISTENTES:** O número sorteado no painel principal agora é pintado com a cor exata da rodada ativa. O cabeçalho do modal de "Brindes Sorteados" também adota a cor da rodada.
 - **FEEDBACK VISUAL APRIMORADO:** O botão da rodada ativa agora fica verde e exibe o texto "Jogando...", facilitando a identificação.
-- **CONTROLE DE MODAIS:** Adicionada uma nova seção nas configurações para desativar o fechamento automático dos modais de sorteio ou ajustar seu tempo de exibição (de 3 a 15 segundos).
+- **CONTROLE DE MODAIS:** Adicionada uma nova seção nas configurações para desativar o fechamento automático dos modais de sorteio ou ajustar seu tempo de exibição (de 3 a 15 segundos).`;
 
-**v6.3.0**
-- **CORREÇÃO DE ERRO CRÍTICO:** Implementadas verificações de segurança para prevenir o erro "Cannot read properties of undefined (reading 'calledNumbers')", garantindo estabilidade ao manusear rodadas.
-- **PAINEL DE RODADA ATIVA INTERATIVO:** O painel da rodada ativa agora exibe o texto deslizando horizontalmente e é clicável, abrindo um modal para edição rápida dos prêmios da rodada.
-- **ANIMAÇÃO DE DESTAQUE:** A rodada selecionada agora possui uma animação de brilho pulsante para melhor identificação.
-- **MAIOR VISIBILIDADE:** O tamanho da logomarca principal e da imagem do patrocinador no modal de sorteio foram aumentados significativamente.
-
-**v6.2.0**
-- **ZOOM APRIMORADO EM MODAIS:** A lógica de zoom nos modais de sorteio e de patrocinador foi refeita. Agora, o círculo de exibição (largura e altura) e o número crescem juntos, proporcionando uma experiência visual mais coesa e impactante.
-- **UPLOAD DE PATROCINADORES SIMPLIFICADO:** Assim como na logomarca, o cadastro de imagens de patrocinadores agora é feito via seletor de arquivo com pré-visualização instantânea, eliminando a necessidade de colar códigos Base64.
-- **IDENTIDADE VISUAL DINÂmica:** O nome do programa foi ajustado para "Bingo Cloud (Show de Prêmios)", mudando para "Ajude Cloud (Show de Prêmios)" conforme a configuração do grito de vitória.
-
-**v6.1.0**
-- **VERIFICADOR REDONDO:** Os números no painel de verificação agora são exibidos em círculos para um visual mais moderno.
-- **INDICADOR DE PATROCINADOR:** Números com patrocinadores são visualmente indicados no painel principal com um ponto dourado.
-- **UPLOAD DE LOGO:** Substituído o campo de texto Base64 por um seletor de arquivo de imagem com pré-visualização.
-- **ZOOM EM MODAIS:** Adicionados controles de zoom para os modais de sorteio de número e de patrocinador, com persistência.
-- **NOME DINÂMICO:** O sistema agora se chama "Bingo Cloud" ou "Ajude Cloud", dependendo da configuração do grito de vitória.
-- **DATA E VERSÃO:** A versão foi atualizada e a data de "última atualização" foi fixada para refletir a data da nova versão.
-
-**v6.0.0**
-- **PATROCINADOR POR NÚMERO:** Nova funcionalidade permite associar um patrocinador (nome e imagem) a cada número do bingo. Ao sortear, um modal especial exibe o número e o patrocinador lado a lado.
-- **REFORMULAÇÃO TOTAL DO ZOOM:** A lógica de zoom do Painel de Números e do modal de Verificação foi refeita para ajustar o tamanho dos números individualmente, eliminando quebras de layout e melhorando a visibilidade.
-- **NOVOS ATALHOS DE TECLADO:** Adicionados atalhos para: Sortear Brinde (CTRL+B), Registrar Brinde (CTRL+S), Vender Leilão (CTRL+L) e Abrir Intervalo (CTRL+I).
-- **DATA DE ATUALIZAÇÃO ESTÁTICA:** A data no rodapé agora reflete a data de desenvolvimento da versão, não a de carregamento da página.`;
-
-        // --- Configurações Globais da Aplicação (Persistidas no Firebase ou LocalStorage) ---
+        // --- Configurações Globais da Aplicação (Persistidas no LocalStorage) ---
         let appConfig = {
             // FIXOS
             pixKey: '1e8e4af0-4d23-440c-9f3d-b4e527f65911',
@@ -114,11 +81,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             drawnTextStrokeColor: '#000000',
             drawnTextStrokeWidth: 2,
             isEventClosed: false,
-            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY2xvdWRHcmFkaWVudCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzOGJkZjgiLz4gPCEtLSBza3ktNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3ZGQzZmMiLz4gPCEtLSBza3ktMzAwIC0tPgogICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJiYWxsR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+IDwhLS0gYW1iZXItNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYmJmMjQiLz4gPCEtLSBhbWJlci00MDAgLS0+CiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4KICAgICAgICA8ZmlsdGVyIGlkPSJnbG93IiB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMjAwJSIgaGVpZ2h0PSIyMDAlIj4KICAgICAgICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgPGZlTWVyZ2U+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49ImNvbG9yZWRCbHVyIi8+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4KICAgICAgICAgICAgPC9mZU1lcmdlPgogICAgICAgIDwvZmlsdGVyPgogICAgPC9kZWZzPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8cGF0aCBmaWxsPSJ1cmwoI2Nsb3VkR3JhZGllbnQpIiBkPSJNMzQwLjcgODUuM2MtMTYuNC0zMy44LTUwLjgtNTYuMi05MC43LTU2LjItNDYuMSAwLTg1LjMgMzEuOC05Ny4zIDc0LjUtNDcuNSA4LjctODIuNCA1Mi04Mi40IDEwMS45IDAgNTcuMyA0Ni40IDEwMy43IDEwMy43IDEwMy43aDE3NS4yYzQ5LjMgMCA4OS4xLTM5LjggODkuMS04OS4xIDAtNDYuMS0zNS4zLTg0LTgwLjktODguNnoiIG9wYWNpdHk9IjAuOCIvPgogICAgICAgIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI4MCIgcj0iMTIwIiBmaWxsPSJ1cmwoI2JhbGxHcmFkaWVudCkiLz4KICAgICAgICA8dGV4dCB4PSIyNTYiIHk9IjMzMCIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYwIiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjYTE1YzA3IiBzdHJva2Utd2lkdGg9IjUiPkI8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg==',
+            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ29sZEdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkQ3MDA7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZGQTUwMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgICA8L2xpbmVhckdyYWRpZW50PgogICAgICAgIDxmaWx0ZXIgaWQ9Imdsb3ciPgogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPgogICAgICAgICAgICA8ZmVNZXJnZT4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPgogICAgICAgICAgICA8L2ZlTWVyZ2U+CiAgICAgICAgPC9maWx0ZXI+CiAgICA8L2RlZnM+CiAgICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzExMTgyNyIgcng9IjUwIiAvPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjQ1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI2dvbGRHcmFkaWVudCkiIGxldHRlci1zcGFjaW5nPSIyIj4KICAgICAgICAgICAgQklOR08KICAgICAgICA8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iNTAlIiB5PSI2NSUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQתYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2MCIgZm9udC1zZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iI0ZGQTUwMCIgc3Ryb2tlLXdpZHRoPSI0IiBsZXR0ZXItc3BhY2luZz0iNSI+CiAgICAgICAgICAgIFNIT1cKICAgICAgICA8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg==',
             enableSponsorsByNumber: false,
             enableModalAutoclose: true,
             modalAutocloseSeconds: 5,
             sponsorsByNumber: {} as Record<number, {name: string, image: string}>,
+            globalSponsor: { name: '', image: '' },
             shortcuts: {
                 autoDraw: 'Control+Enter',
                 verify: 'Control+Space',
@@ -240,6 +208,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             settingsLogoTitle: "Logo do Evento",
             settingsLogoDescription: "Selecione uma imagem do seu computador (PNG, JPG). A imagem será redimensionada para caber no espaço.",
             settingsLogoRemoveButton: "Remover Logo",
+            settingsGlobalSponsorTitle: "Patrocinador Global",
+            settingsGlobalSponsorDescription: "Este patrocinador será exibido para qualquer número sorteado que não tenha um patrocinador individual cadastrado.",
             settingsSponsorsByNumberTitle: "Patrocinadores por Número",
             settingsSponsorsByNumberEnable: "Habilitar exibição de patrocinador ao sortear número",
             settingsSponsorsByNumberDescription: "Cadastre um nome e uma imagem para cada número. Eles aparecerão em um modal especial durante o sorteio.",
@@ -247,7 +217,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             settingsSponsorNameLabel: "Nome do Patrocinador",
             settingsSponsorImageLabel: "Imagem do Patrocinador",
             settingsBingoTitleLabel: "Título do Grito de Vitória",
-            settingsBingoTitleDescription: "Mude o 'BINGO!' para 'AJUDE!'. Isso também altera o nome do programa.",
+            settingsBingoTitleDescription: "Mude o 'BINGO!' para 'AJUDE!'. Isso também altera as letras no painel.",
             settingsBoardColorLabel: "Cor de Fundo da Cartela",
             settingsBoardColorDescription: "Cor base dos números não sorteados.",
             settingsBoardColorResetButton: "Limpar Cor",
@@ -263,18 +233,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         };
 
 
-        // --- Firebase Vars ---
-        let db, auth, userId, dbRef;
-        let firebaseReady = false;
-        let isLocalMode = false;
-        const LOCAL_STORAGE_KEY = 'bingoCloudState';
-        const MODE_STORAGE_KEY = 'bingoCloudMode';
+        // --- Variáveis Locais ---
+        const LOCAL_STORAGE_KEY = 'bingoShowState';
 
         // --- Seletores de Elementos ---
         const DOMElements = {
             mainTitle: document.getElementById('main-title'),
-            connectionIndicator: document.getElementById('connection-indicator'),
-            connectionStatusText: document.getElementById('connection-status-text'),
             version: document.getElementById('version'),
             lastUpdated: document.getElementById('last-updated'),
             clearRoundBtnTop: document.getElementById('clear-round-btn-top'),
@@ -732,6 +696,23 @@ function populateSettingsShortcutsTab() {
                         </div>
 
                         <div id="tab-content-sponsors" class="hidden space-y-4 text-left">
+                            <div class="border-b border-gray-700 pb-6 mb-6">
+                               <h3 class="text-xl font-bold text-slate-300 mb-2" data-label-key="settingsGlobalSponsorTitle">${appLabels.settingsGlobalSponsorTitle}</h3>
+                               <p class="text-sm text-slate-400 mb-4" data-label-key="settingsGlobalSponsorDescription">${appLabels.settingsGlobalSponsorDescription}</p>
+                               <div class="flex items-center gap-4">
+                                   <img id="global-sponsor-preview" src="" alt="Pré-visualização do Patrocinador Global" class="w-24 h-24 bg-gray-900 rounded-lg object-contain border border-gray-600">
+                                   <div class="flex-grow space-y-2">
+                                       <div>
+                                           <label for="global-sponsor-name" class="block text-sm font-medium text-slate-300 mb-1">Nome do Patrocinador Global</label>
+                                           <input type="text" id="global-sponsor-name" class="block w-full text-sm p-2 bg-gray-900 text-white rounded-lg">
+                                       </div>
+                                       <div>
+                                            <label for="global-sponsor-upload" class="block text-sm font-medium text-slate-300 mb-1">Imagem do Patrocinador Global</label>
+                                           <input type="file" id="global-sponsor-upload" accept="image/*" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
                            <h3 class="text-xl font-bold text-slate-300">${appLabels.settingsSponsorsByNumberTitle}</h3>
                            <div class="flex items-center gap-3 bg-gray-700 p-3 rounded-lg">
                                 <input type="checkbox" id="enable-sponsors-by-number-checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
@@ -791,21 +772,6 @@ function populateSettingsShortcutsTab() {
                 appConfig,
                 appLabels,
             };
-        
-            // Se estiver no modo online, remove as imagens dos patrocinadores para não sobrecarregar o Firestore.
-            if (!isLocalMode) {
-                const configCopy = JSON.parse(JSON.stringify(appConfig));
-                if (configCopy.sponsorsByNumber) {
-                    for (const num in configCopy.sponsorsByNumber) {
-                        if (configCopy.sponsorsByNumber[num].image) {
-                            // Mantém o nome, mas remove a imagem base64
-                            delete configCopy.sponsorsByNumber[num].image;
-                        }
-                    }
-                }
-                state.appConfig = configCopy;
-            }
-        
             return state;
         }
 
@@ -825,11 +791,7 @@ function populateSettingsShortcutsTab() {
         const debouncedSave = () => {
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
-                if (isLocalMode) {
-                    saveStateToLocalStorage();
-                } else {
-                    saveStateToFirestore();
-                }
+                saveStateToLocalStorage();
             }, 1000); 
         };
         
@@ -875,7 +837,7 @@ function populateSettingsShortcutsTab() {
             activeGameNumber = '3';
             gamesData[3].calledNumbers = gamesData[3].calledNumbers.slice(0, 10);
 
-            const savePromise = isLocalMode ? saveStateToLocalStorage() : saveStateToFirestore();
+            const savePromise = saveStateToLocalStorage();
             savePromise.then(() => {
                 showAlert("Dados de teste gerados com sucesso! O aplicativo será recarregado com o novo histórico.");
                 DOMElements.settingsModal.classList.add('hidden');
@@ -1014,13 +976,11 @@ function applyDisplayZoom(scale: number) {
         }
 
         function updateProgramTitle() {
-            const prefix = appConfig.bingoTitle === 'AJUDE' ? 'Ajude Cloud' : 'Bingo Cloud';
-            document.title = `${prefix} (Show de Prêmios)`;
+            document.title = "Bingo Show";
         }
 
         function renderAppName() {
-            const prefix = appConfig.bingoTitle === 'AJUDE' ? 'Ajude' : 'Bingo';
-            const mainTitle = `${prefix} Cloud <span class="text-slate-400 font-normal text-2xl sm:text-3xl">(Show de Prêmios)</span>`;
+            const mainTitle = `Bingo Show`;
             DOMElements.mainTitle.innerHTML = `${mainTitle}<span id="subtitle-version" class="block text-xl sm:text-2xl text-slate-300 font-normal"></span>`;
         }
         
@@ -1029,11 +989,11 @@ function applyDisplayZoom(scale: number) {
             if (document.getElementById('version')) document.getElementById('version')!.innerText = currentVersion;
             const subtitle = document.getElementById('subtitle-version');
             if (subtitle) subtitle.innerText = `Versão ${currentVersion}`;
-            if (DOMElements.lastUpdated) DOMElements.lastUpdated.innerText = `Última atualização do programa: ${now}`;
+            if (DOMElements.lastUpdated) DOMElements.lastUpdated.innerText = `Salvo localmente às: ${now}`;
         }
         
         // --- Funções de Salvamento ---
-        const DB_NAME = 'BingoCloudDB';
+        const DB_NAME = 'BingoShowDB';
         const STORE_NAME = 'sponsorImages';
         let dbPromise: Promise<IDBDatabase>;
 
@@ -1076,7 +1036,10 @@ function applyDisplayZoom(scale: number) {
                     request.onsuccess = () => {
                         const images = request.result;
                         images.forEach(item => {
-                            if (appConfig.sponsorsByNumber[item.id]) {
+                            if (item.id === 'global' && appConfig.globalSponsor) {
+                                appConfig.globalSponsor.image = item.image;
+                            }
+                            else if (appConfig.sponsorsByNumber[item.id]) {
                                 appConfig.sponsorsByNumber[item.id].image = item.image;
                             }
                         });
@@ -1099,7 +1062,7 @@ function applyDisplayZoom(scale: number) {
                 const a = document.createElement('a');
                 a.href = url;
                 const date = new Date().toISOString().slice(0, 10); 
-                a.download = `bingo-cloud-backup-${date}.json`;
+                a.download = `bingo-show-backup-${date}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -1130,7 +1093,7 @@ function applyDisplayZoom(scale: number) {
                     const loadedState = JSON.parse(result);
                     
                     if (!loadedState.gamesData || !loadedState.appConfig) {
-                         throw new Error("O arquivo selecionado não parece ser um backup válido do Bingo Cloud.");
+                         throw new Error("O arquivo selecionado não parece ser um backup válido do Bingo Show.");
                     }
         
                     loadAppState(loadedState);
@@ -1160,8 +1123,9 @@ function applyDisplayZoom(scale: number) {
                 const appState = getAppState();
                 const stateToStore = JSON.parse(JSON.stringify(appState));
         
-                if (isLocalMode && stateToStore.appConfig && stateToStore.appConfig.sponsorsByNumber) {
-                    const imageSavePromises: Promise<void>[] = [];
+                // Lidar com imagens de patrocinadores individuais e global
+                const imageSavePromises: Promise<void>[] = [];
+                if (stateToStore.appConfig && stateToStore.appConfig.sponsorsByNumber) {
                     for (const num in stateToStore.appConfig.sponsorsByNumber) {
                         const sponsor = stateToStore.appConfig.sponsorsByNumber[num];
                         if (sponsor.image && sponsor.image.startsWith('data:image')) {
@@ -1169,15 +1133,19 @@ function applyDisplayZoom(scale: number) {
                             delete sponsor.image;
                         }
                     }
-                    await Promise.all(imageSavePromises);
                 }
-        
+                if (stateToStore.appConfig && stateToStore.appConfig.globalSponsor) {
+                    const globalSponsor = stateToStore.appConfig.globalSponsor;
+                    if (globalSponsor.image && globalSponsor.image.startsWith('data:image')) {
+                         imageSavePromises.push(saveSponsorImage('global', globalSponsor.image));
+                         delete globalSponsor.image;
+                    }
+                }
+                
+                await Promise.all(imageSavePromises);
+                
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToStore));
-        
-                if (isLocalMode) {
-                    const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    DOMElements.connectionStatusText.innerHTML = `<strong>Modo Local</strong> (Salvo às ${time})`;
-                }
+                renderUpdateInfo();
             } catch (error) {
                 console.error("Falha ao salvar estado no localStorage:", error);
             }
@@ -1198,59 +1166,12 @@ function applyDisplayZoom(scale: number) {
                 return false;
             }
         }
-
-        async function saveStateToFirestore() {
-            if (!firebaseReady || !dbRef || isLocalMode) return;
-            
-            appConfig.tutorialVideoLink = 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ'; 
-            appConfig.paypalLink = 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW';
-            appConfig.pixKey = '1e8e4af0-4d23-440c-9f3d-b4e527f65911';
-            
-            const appState = getAppState();
-            try {
-                await setDoc(dbRef, appState);
-                const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                DOMElements.connectionStatusText.textContent = `Modo Online (Salvo às ${time})`;
-                renderUpdateInfo(); 
-
-                if (areAllGamesComplete() && !appConfig.isEventClosed) { 
-                    const allWinners = Object.values(gamesData).flatMap(game => (game as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
-                    if (allWinners.length > 0) {
-                        appConfig.isEventClosed = true;
-                        await saveStateToFirestore();
-                        setTimeout(() => startFinalWinnerSlide(allWinners), 1500); 
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao salvar dados no Firestore: ", error);
-                showAlert("Não foi possível salvar os dados. Verifique a conexão.");
-            }
-        }
-
+        
         async function loadInitialState() {
             let stateLoaded = false;
             let forceSave = false;
         
-            if (isLocalMode) {
-                stateLoaded = await loadStateFromLocalStorage();
-            } else {
-                try {
-                    const docSnap = await getDoc(dbRef);
-                    if (docSnap.exists()) {
-                        const appState = docSnap.data();
-                        loadAppState(appState);
-                        if (appState.versionText && appState.versionText !== currentVersion) {
-                            console.log(`[UPGRADE] Versão local (${currentVersion}) forçada sobre a versão salva (${appState.versionText}).`);
-                            forceSave = true;
-                        }
-                        stateLoaded = true;
-                    }
-                } catch (error) {
-                    console.error("Erro ao carregar dados do Firestore: ", error);
-                    showAlert("Não foi possível carregar os dados salvos. Verificando dados locais.");
-                    stateLoaded = await loadStateFromLocalStorage();
-                }
-            }
+            stateLoaded = await loadStateFromLocalStorage();
         
             if (!stateLoaded || Object.keys(gamesData).length === 0) {
                 console.log("Nenhum estado salvo encontrado. Inicializando com dados padrão.");
@@ -1404,10 +1325,15 @@ function applyDisplayZoom(scale: number) {
                 return;
             }
 
-            const sponsor = appConfig.sponsorsByNumber[number];
-            if (appConfig.enableSponsorsByNumber && sponsor && sponsor.image) {
-                showSponsorDisplayModal(number, sponsor);
-            } else {
+            const individualSponsor = appConfig.sponsorsByNumber[number];
+            const globalSponsor = appConfig.globalSponsor;
+
+            if (appConfig.enableSponsorsByNumber && individualSponsor && individualSponsor.image) {
+                showSponsorDisplayModal(number, individualSponsor);
+            } else if (appConfig.enableSponsorsByNumber && globalSponsor && globalSponsor.image) {
+                showSponsorDisplayModal(number, globalSponsor);
+            }
+            else {
                 showClassicFloatingNumberModal(number);
             }
         }
@@ -2158,7 +2084,7 @@ function applyDisplayZoom(scale: number) {
             triggerBingoWinConfetti();
 
             DOMElements.winnerModal.innerHTML = getModalTemplates().winner;
-            (document.getElementById('winner-title-display') as HTMLElement).textContent = (appConfig.bingoTitle || 'BINGO') + '!';
+            (document.getElementById('winner-title-display') as HTMLElement).textContent = appLabels.congratsModalTitle;
             (document.getElementById('game-text-winner') as HTMLElement).textContent = `Rodada ${activeGameNumber}`;
             let prizeLabelKey = 'prize1Label';
             if (bingoType === 'prize2') prizeLabelKey = 'prize2Label';
@@ -2256,7 +2182,6 @@ function applyDisplayZoom(scale: number) {
 
             DOMElements.winnerModal.classList.add('hidden');
             renderAllWinners();
-            showCongratsModal(`${winnerName}`, `${prizeLabel}: ${winnerData.prize}`);
             debouncedSave();
         }
 
@@ -2322,7 +2247,7 @@ function generateProof(selectedOptions: { [key: string]: boolean }) {
         <body class="bg-gray-100 text-gray-800 font-sans p-8">
             <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
                 <header class="text-center border-b pb-4 mb-8">
-                    <h1 class="text-4xl font-bold">${appConfig.bingoTitle === 'AJUDE' ? 'Ajude Cloud' : 'Bingo Cloud'} - Prova do Evento</h1>
+                    <h1 class="text-4xl font-bold">Bingo Show - Prova do Evento</h1>
                     <p class="text-gray-600">Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
                 </header>
                 <main>`;
@@ -2387,7 +2312,7 @@ function generateProof(selectedOptions: { [key: string]: boolean }) {
     proofContent += `
                 </main>
                  <footer class="text-center mt-8 pt-4 border-t">
-                    <p class="text-sm text-gray-500">Bingo Cloud - ${currentVersion}</p>
+                    <p class="text-sm text-gray-500">Bingo Show - ${currentVersion}</p>
                 </footer>
             </div>
              <div class="no-print max-w-4xl mx-auto text-center mt-4">
@@ -2646,8 +2571,15 @@ function startFinalWinnerSlide(allWinners: any[]) {
     
     const sponsorsContainer = document.getElementById('final-sponsors-list')!;
     const allSponsors = Object.values(appConfig.sponsorsByNumber).filter(s => s.name || s.image);
-    if (allSponsors.length > 0) {
-        allSponsors.forEach(sponsor => {
+    if (appConfig.globalSponsor && (appConfig.globalSponsor.name || appConfig.globalSponsor.image)) {
+        allSponsors.unshift(appConfig.globalSponsor);
+    }
+    const uniqueSponsors = Array.from(new Map(allSponsors.map(item => [item.name, item])).values());
+
+
+    if (uniqueSponsors.length > 0) {
+        uniqueSponsors.forEach(sponsor => {
+            if (!sponsor.name && !sponsor.image) return;
             const sponsorEl = document.createElement('div');
             sponsorEl.className = 'flex items-center gap-2 bg-gray-800 p-2 rounded';
             if (sponsor.image) {
@@ -2734,6 +2666,31 @@ function populateSettingsSponsorsTab() {
     const container = document.getElementById('sponsors-by-number-container')!;
     const enableCheckbox = document.getElementById('enable-sponsors-by-number-checkbox') as HTMLInputElement;
 
+    // Global Sponsor Elements
+    const globalSponsorPreview = document.getElementById('global-sponsor-preview') as HTMLImageElement;
+    const globalSponsorNameInput = document.getElementById('global-sponsor-name') as HTMLInputElement;
+    const globalSponsorUpload = document.getElementById('global-sponsor-upload') as HTMLInputElement;
+    
+    if (appConfig.globalSponsor.image) globalSponsorPreview.src = appConfig.globalSponsor.image;
+    if (appConfig.globalSponsor.name) globalSponsorNameInput.value = appConfig.globalSponsor.name;
+    
+    globalSponsorNameInput.addEventListener('change', e => {
+        appConfig.globalSponsor.name = (e.target as HTMLInputElement).value;
+        debouncedSave();
+    });
+
+    globalSponsorUpload.addEventListener('change', async e => {
+        const file = (e.target as HTMLInputElement).files![0];
+        if (file) {
+            const base64 = await fileToBase64(file);
+            appConfig.globalSponsor.image = base64;
+            globalSponsorPreview.src = base64;
+            debouncedSave();
+        }
+    });
+
+
+    // Individual Sponsors
     enableCheckbox.checked = appConfig.enableSponsorsByNumber;
     enableCheckbox.addEventListener('change', e => {
         appConfig.enableSponsorsByNumber = (e.target as HTMLInputElement).checked;
@@ -2833,7 +2790,7 @@ function showSettingsModal() {
         }
     });
     document.getElementById('remove-custom-logo-btn')!.addEventListener('click', () => {
-        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY2xvdWRHcmFkaWVudCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzOGJkZjgiLz4gPCEtLSBza3ktNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3ZGQzZmMiLz4gPCEtLSBza3ktMzAwIC0tPgogICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJiYWxsR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+IDwhLS0gYW1iZXItNTAwIC0tPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYmJmMjQiLz4gPCEtLSBhbWJlci00MDAgLS0+CiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4KICAgICAgICA8ZmlsdGVyIGlkPSJnbG93IiB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMjAwJSIgaGVpZ2h0PSIyMDAlIj4KICAgICAgICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgPGZlTWVyZ2U+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49ImNvbG9yZWRCbHVyIi8+CiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4KICAgICAgICAgICAgPC9mZU1lcmdlPgogICAgICAgIDwvZmlsdGVyPgogICAgPC9kZWZzPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8cGF0aCBmaWxsPSJ1cmwoI2Nsb3VkR3JhZGllbnQpIiBkPSJNMzQwLjcgODUuM2MtMTYuNC0zMy44LTUwLjgtNTYuMi05MC43LTU2LjItNDYuMSAwLTg1LjMgMzEuOC05Ny4zIDc0LjUtNDcuNSA4LjctODIuNCA1Mi04Mi40IDEwMS45IDAgNTcuMyA0Ni40IDEwMy43IDEwMy43IDEwMy43aDE3NS4yYzQ5LjMgMCA4OS4xLTM5LjggODkuMS04OS4xIDAtNDYuMS0zNS4zLTg0LTgwLjktODguNnoiIG9wYWNpdHk9IjAuOCIvPgogICAgICAgIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI4MCIgcj0iMTIwIiBmaWxsPSJ1cmwoI2JhbGxHcmFkaWVudCkiLz4KICAgICAgICA8dGV4dCB4PSIyNTYiIHk9IjMzMCIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYwIiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjYTE1YzA3IiBzdHJva2Utd2lkdGg9IjUiPkI8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg=='; // Default logo
+        appConfig.customLogoBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ29sZEdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkQ3MDA7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZGQTUwMDtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgICA8L2xpbmVhckdyYWRpZW50PgogICAgICAgIDxmaWx0ZXIgaWQ9Imdsb3ciPgogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPgogICAgICAgICAgICA8ZmVNZXJnZT4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPgogICAgICAgICAgICA8L2ZlTWVyZ2U+CiAgICAgICAgPC9maWx0ZXI+CiAgICA8L2RlZnM+CiAgICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzExMTgyNyIgcng9IjUwIiAvPgogICAgPGcgZmlsdGVyPSJ1cmwoI2dsb3cpIj4KICAgICAgICA8dGV4dCB4PSI1MCUiIHk9IjQ1JSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI2dvbGRHcmFkaWVudCkiIGxldHRlci1zcGFjaW5nPSIyIj4KICAgICAgICAgICAgQklOR08KICAgICAgICA8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iNTAlIiB5PSI2NSUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQתYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2MCIgZm9udC1zZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iI0ZGQTUwMCIgc3Ryb2tlLXdpZHRoPSI0IiBsZXR0ZXItc3BhY2luZz0iNSI+CiAgICAgICAgICAgIFNIT1cKICAgICAgICA8L3RleHQ+CiAgICA8L2c+Cjwvc3ZnPg==';
         customLogoPreview.src = appConfig.customLogoBase64;
         renderCustomLogo();
         debouncedSave();
@@ -3143,7 +3100,7 @@ function showSettingsModal() {
                 const animationEnd = Date.now() + duration;
                 const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1001 };
         
-                function randomInRange(min:number, max:number) {
+                function randomInRange(min: number, max: number) {
                     return Math.random() * (max - min) + min;
                 }
         
@@ -3152,11 +3109,13 @@ function showSettingsModal() {
                         clearInterval(breakConfettiInterval);
                         return;
                     }
-                    let timeLeft = animationEnd - Date.now();
-                    if (timeLeft <= 0 && DOMElements.eventBreakModal.classList.contains('hidden')) {
-                         return clearInterval(breakConfettiInterval);
+                    const timeLeft = animationEnd - Date.now();
+        
+                    if (timeLeft <= 0) {
+                        return clearInterval(breakConfettiInterval);
                     }
-                    let particleCount = 50 * (Math.max(timeLeft, 5000) / duration);
+                    
+                    const particleCount = 50 * (timeLeft / duration);
                     confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
                     confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
                 }, 350);
@@ -3171,73 +3130,23 @@ function showSettingsModal() {
             });
         }
         
-        function resetEvent() {
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            if (!isLocalMode && dbRef) {
-                deleteDoc(dbRef).then(() => {
-                    window.location.reload();
-                }).catch(err => {
-                    console.error("Failed to delete cloud data, reloading anyway.", err);
-                    window.location.reload();
-                });
-            } else {
-                window.location.reload();
-            }
-        }
-        
-        function handlePrizeDrawSubmit(e: Event) {
-            e.preventDefault();
-            const ticketInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
-            const nameInput = document.getElementById('prize-draw-name') as HTMLInputElement;
-            const descInput = document.getElementById('prize-draw-description') as HTMLInputElement;
-        
-            const ticketNumber = ticketInput.value;
-            if (!ticketNumber) {
-                showAlert("O número da cartela é obrigatório para registrar um brinde.");
-                return;
-            }
-        
-            if (!gamesData['Brindes']) {
-                gamesData['Brindes'] = { winners: [] };
-            }
-            gamesData['Brindes'].winners.push({
-                id: Date.now(),
-                name: nameInput.value || `Ganhador #${ticketNumber}`,
-                prize: descInput.value || 'Brinde',
-                gameNumber: 'Brinde',
-                bingoType: 'Sorteio',
-                cartela: ticketNumber
-            });
-        
-            if (DOMElements.noRepeatPrizeDrawCheckbox.checked) {
-                drawnPrizeNumbers.push(parseInt(ticketNumber, 10));
-            }
-        
-            renderAllWinners();
-            showCongratsModal(nameInput.value || `Ganhador #${ticketNumber}`, descInput.value || 'Brinde', true, ticketNumber);
-            debouncedSave();
-            
-            ticketInput.value = '';
-            nameInput.value = '';
-            descInput.value = '';
-        }
-        
-        function handleRandomPrizeDraw() {
+        // --- Sorteio de Brindes e Leilão ---
+        function handlePrizeDraw() {
             const min = parseInt((document.getElementById('prize-draw-min') as HTMLInputElement).value, 10);
             const max = parseInt((document.getElementById('prize-draw-max') as HTMLInputElement).value, 10);
-            
-            if (isNaN(min) || isNaN(max) || min >= max) {
-                showAlert("Por favor, insira um intervalo válido para o sorteio.");
+        
+            if (isNaN(min) || isNaN(max) || min < 1 || max <= min) {
+                showAlert("Por favor, insira um intervalo de números válido para o sorteio de brindes.");
                 return;
             }
         
+            const noRepeat = DOMElements.noRepeatPrizeDrawCheckbox.checked;
             let availableNumbers = [];
+        
             for (let i = min; i <= max; i++) {
-                availableNumbers.push(i);
-            }
-            
-            if (DOMElements.noRepeatPrizeDrawCheckbox.checked) {
-                availableNumbers = availableNumbers.filter(n => !drawnPrizeNumbers.includes(n));
+                if (!noRepeat || !drawnPrizeNumbers.includes(i)) {
+                    availableNumbers.push(i);
+                }
             }
         
             if (availableNumbers.length === 0) {
@@ -3246,338 +3155,343 @@ function showSettingsModal() {
             }
         
             const drawnNumber = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
-        
-            const displayContainer = DOMElements.prizeDrawDisplayContainer as HTMLElement;
-            displayContainer.classList.remove('hidden');
-            (DOMElements.currentNumberEl as HTMLElement).style.visibility = 'hidden';
-            DOMElements.mainDisplayLabel.textContent = "Cartela Sorteada";
             
-            const roundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
-            displayContainer.innerHTML = `<div id="prize-draw-display" class="font-black text-white flex justify-center items-center rounded-2xl w-full max-w-lg h-64 text-[150px] transition-all duration-300" style="background-color: ${roundColor};"></div>`;
-            const displayEl = document.getElementById('prize-draw-display') as HTMLElement;
+            const displayContainer = DOMElements.prizeDrawDisplayContainer as HTMLElement;
+            displayContainer.innerHTML = '';
+            displayContainer.classList.remove('hidden');
+            DOMElements.mainDisplayLabel.textContent = 'Cartela Sorteada!';
+            
+            const roundColor = activeGameNumber ? gamesData[activeGameNumber]?.color : roundColors[0];
+            
+            const numberDisplay = document.createElement('div');
+            numberDisplay.className = 'prize-draw-number-display text-9xl font-black text-white p-6 rounded-full w-80 h-80 flex items-center justify-center';
+            numberDisplay.style.backgroundColor = roundColor;
+            numberDisplay.style.textShadow = '0 0 20px rgba(0,0,0,0.5)';
+            displayContainer.appendChild(numberDisplay);
         
-            let iterations = 0;
-            const interval = setInterval(() => {
-                displayEl.textContent = Math.floor(Math.random() * (max - min + 1) + min).toString();
-                iterations++;
-                if (iterations > 20) {
-                    clearInterval(interval);
-                    displayEl.textContent = drawnNumber.toString();
-                    displayEl.classList.add('pulse-glow-animation');
-                    (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value = drawnNumber.toString();
+            let start = 0;
+            const end = drawnNumber;
+            const duration = 1500;
+            const frameDuration = 1000 / 60;
+            const totalFrames = Math.round(duration / frameDuration);
+            let frame = 0;
+        
+            const animateCount = () => {
+                frame++;
+                const progress = frame / totalFrames;
+                const currentNum = Math.round(end * (1 - Math.pow(1 - progress, 3))); // Easing function
+                numberDisplay.textContent = currentNum.toString();
+        
+                if (frame < totalFrames) {
+                    requestAnimationFrame(animateCount);
+                } else {
+                    numberDisplay.textContent = end.toString();
+                    numberDisplay.classList.add('pulse-glow-animation');
+                    (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value = end.toString();
+                    if (noRepeat) {
+                        drawnPrizeNumbers.push(end);
+                        debouncedSave();
+                    }
                 }
-            }, 100);
-        }
+            };
         
+            requestAnimationFrame(animateCount);
+        }
+
+        function registerPrizeWinner() {
+            const cartela = (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value;
+            const name = (document.getElementById('prize-draw-name') as HTMLInputElement).value;
+            const prize = (document.getElementById('prize-draw-description') as HTMLInputElement).value;
+
+            if (!cartela.trim()) {
+                showAlert("O número da cartela é obrigatório para registrar um brinde.");
+                return;
+            }
+            
+            if (!gamesData['Brindes']) gamesData['Brindes'] = { winners: [] };
+            const winnerData = {
+                id: Date.now(),
+                name: name || `Ganhador #${cartela}`,
+                prize: prize || "Brinde",
+                gameNumber: 'Brinde',
+                bingoType: 'Sorteio',
+                cartela: cartela,
+            };
+            gamesData['Brindes'].winners.push(winnerData);
+            
+            showCongratsModal(winnerData.name, winnerData.prize, true, winnerData.cartela);
+            renderAllWinners();
+            debouncedSave();
+
+            (document.getElementById('prize-draw-number-manual') as HTMLInputElement).value = '';
+            (document.getElementById('prize-draw-name') as HTMLInputElement).value = '';
+            (document.getElementById('prize-draw-description') as HTMLInputElement).value = '';
+            
+            DOMElements.prizeDrawDisplayContainer.classList.add('hidden');
+            (DOMElements.currentNumberEl as HTMLElement).style.visibility = activeGameNumber ? 'visible' : 'hidden';
+            DOMElements.mainDisplayLabel.textContent = appLabels.announcedNumberLabel;
+        }
+
         function showDrawnPrizesModal() {
             DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
             const listContainer = document.getElementById('drawn-prizes-list')!;
             const subtitleEl = document.getElementById('drawn-prizes-subtitle')!;
             listContainer.innerHTML = '';
-            
-            const roundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
-            (document.getElementById('drawn-prizes-title') as HTMLElement).style.color = roundColor;
-            
-            const drawnPrizes = gamesData['Brindes']?.winners || [];
-            subtitleEl.textContent = `Total de ${drawnPrizes.length} brindes registrados.`;
-            
-            if (drawnPrizes.length > 0) {
-                drawnPrizes.slice().reverse().forEach((winner: any) => {
-                    const prizeEl = document.createElement('div');
-                    prizeEl.className = 'bg-gray-700 p-2 rounded-lg text-sm text-left';
-                    const isLast = drawnPrizeNumbers.length > 0 && winner.cartela == drawnPrizeNumbers[drawnPrizeNumbers.length - 1];
-                    if (isLast) {
-                        prizeEl.classList.add('border-2', 'border-amber-400');
+
+            const allPrizeWinners = gamesData['Brindes']?.winners || [];
+            subtitleEl.textContent = `Total de ${allPrizeWinners.length} brindes registrados.`;
+
+            if (allPrizeWinners.length > 0) {
+                allPrizeWinners.slice().reverse().forEach((winner: any, index: number) => {
+                    const winnerEl = document.createElement('div');
+                    winnerEl.className = `bg-gray-800 p-3 rounded-lg text-left w-full max-w-sm transition-all duration-300`;
+                     if (index === 0) {
+                        winnerEl.classList.add('animate-custom-flash', 'border-2', 'border-yellow-400');
                     }
-        
-                    prizeEl.innerHTML = `
+                    winnerEl.innerHTML = `
                         <div class="flex justify-between items-start">
-                            <div>
-                                <span class="font-bold text-lg text-white">Cartela #${winner.cartela}</span>
-                                <p class="text-slate-300">${winner.name}</p>
-                                <p class="text-xs text-yellow-400">${winner.prize}</p>
-                            </div>
-                            <button class="text-red-500 hover:text-red-400 font-bold" data-id="${winner.id}">X</button>
+                             <div>
+                                <p class="font-bold text-white text-lg">${winner.name}</p>
+                                <p class="text-sm text-yellow-400">${winner.prize}</p>
+                                <p class="text-xs text-slate-400">Cartela: ${winner.cartela}</p>
+                             </div>
+                             <button data-winner-id="${winner.id}" class="delete-prize-btn text-red-500 hover:text-red-400 text-xl font-bold p-1">✖</button>
                         </div>
                     `;
-                    prizeEl.querySelector('button')?.addEventListener('click', () => {
-                        gamesData['Brindes'].winners = gamesData['Brindes'].winners.filter((w: any) => w.id !== winner.id);
-                        drawnPrizeNumbers = drawnPrizeNumbers.filter(n => n.toString() !== winner.cartela);
-                        debouncedSave();
-                        showDrawnPrizesModal(); // Refresh the modal
-                    });
-                    listContainer.appendChild(prizeEl);
+                    listContainer.appendChild(winnerEl);
                 });
             } else {
-                listContainer.textContent = "Nenhum brinde registrado ainda.";
+                listContainer.textContent = 'Nenhum brinde foi registrado ainda.';
             }
-        
+
             DOMElements.drawnPrizesModal.classList.remove('hidden');
+
             document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
                 DOMElements.drawnPrizesModal.classList.add('hidden');
             });
+            
+            document.querySelectorAll('.delete-prize-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const winnerId = parseInt((e.currentTarget as HTMLElement).dataset.winnerId!, 10);
+                    gamesData['Brindes'].winners = gamesData['Brindes'].winners.filter((w:any) => w.id !== winnerId);
+                    
+                    // Também remove o número da cartela da lista de "já sorteados" para que possa ser sorteado novamente
+                    const winnerToRemove = allPrizeWinners.find((w:any) => w.id === winnerId);
+                    if (winnerToRemove && winnerToRemove.cartela) {
+                        const cartelaNum = parseInt(winnerToRemove.cartela, 10);
+                        if (!isNaN(cartelaNum)) {
+                            drawnPrizeNumbers = drawnPrizeNumbers.filter(n => n !== cartelaNum);
+                        }
+                    }
+                    
+                    debouncedSave();
+                    showDrawnPrizesModal(); // Recarrega o modal para refletir a exclusão
+                });
+            });
+            
+             const roundColor = activeGameNumber ? gamesData[activeGameNumber]?.color : roundColors[0];
+            (document.getElementById('drawn-prizes-title') as HTMLElement).style.color = roundColor;
         }
+
+        function handleAuctionSubmit() {
+            const itemName = (document.getElementById('auction-item-name') as HTMLInputElement).value;
+            const winnerName = (document.getElementById('auction-winner-name') as HTMLInputElement).value;
+            const currentBid = (document.getElementById('auction-item-current-bid') as HTMLInputElement).value;
         
-        function handleAuctionSubmit(e: Event) {
-            e.preventDefault();
-            const itemNameInput = document.getElementById('auction-item-name') as HTMLInputElement;
-            const winnerNameInput = document.getElementById('auction-winner-name') as HTMLInputElement;
-            const bidInput = document.getElementById('auction-item-current-bid') as HTMLInputElement;
-        
-            const itemName = itemNameInput.value;
-            const winnerName = winnerNameInput.value;
-            const bid = bidInput.value;
-        
-            if (!itemName || !winnerName || !bid) {
-                showAlert("Preencha todos os campos do leilão (item, arrematador e lance) para registrar a venda.");
+            if (!itemName.trim() || !winnerName.trim() || parseInt(currentBid, 10) <= 0) {
+                showAlert("Preencha o nome do item, o nome do arrematador e tenha um lance maior que zero.");
                 return;
             }
         
-            if (!gamesData['Leilão']) {
-                gamesData['Leilão'] = { winners: [] };
-            }
-            gamesData['Leilão'].winners.push({
+            if (!gamesData['Leilão']) gamesData['Leilão'] = { winners: [] };
+            const auctionData = {
                 id: Date.now(),
                 name: winnerName,
-                prize: `Leilão: ${itemName} (R$ ${bid})`,
                 gameNumber: 'Leilão',
                 bingoType: 'Leilão',
                 itemName: itemName,
-                bid: bid
-            });
-        
-            const gavelIcon = document.getElementById('gavel-icon')!;
-            gavelIcon.classList.remove('hidden', 'animate-gavel-strike');
-            void gavelIcon.offsetWidth; 
+                bid: currentBid,
+            };
+            gamesData['Leilão'].winners.push(auctionData);
+            
+            const gavelIcon = document.getElementById('gavel-icon') as HTMLElement;
+            gavelIcon.classList.remove('hidden');
             gavelIcon.classList.add('animate-gavel-strike');
+            setTimeout(() => gavelIcon.classList.add('hidden'), 600);
         
+            showCongratsModal(winnerName, `Arrematou ${itemName} por R$ ${currentBid},00!`);
             renderAllWinners();
-            showCongratsModal(winnerName, `Arrematou "${itemName}" por R$ ${bid}`);
+            
+            // Limpa o formulário, exceto o nome do item para lances rápidos
+            (document.getElementById('auction-winner-name') as HTMLInputElement).value = '';
+            (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
+            updateAuctionBidDisplay(0);
+        
             debouncedSave();
-        
-            setTimeout(() => {
-                const form = DOMElements.auctionForm as HTMLFormElement;
-                (form.elements.namedItem('auction-item-name') as HTMLInputElement).value = '';
-                (form.elements.namedItem('auction-winner-name') as HTMLInputElement).value = '';
-                (form.elements.namedItem('auction-item-current-bid') as HTMLInputElement).value = '0';
-                updateAuctionBidDisplay(0);
-                gavelIcon.classList.add('hidden');
-            }, 1500);
         }
         
-        function showRoundEditModal(gameNumber: string) {
-            DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
-            const game = gamesData[gameNumber];
-            if (!game) return;
-        
-            const titleEl = document.getElementById('round-edit-title')!;
-            const prizesContainer = document.getElementById('round-edit-prizes-container')!;
-            const descriptionTextarea = document.getElementById('round-edit-description') as HTMLTextAreaElement;
-        
-            titleEl.textContent = `Editar Rodada ${gameNumber}`;
-            descriptionTextarea.value = game.description || '';
-            prizesContainer.innerHTML = '';
-        
-            Object.keys(game.prizes).forEach((prizeKey, index) => {
-                const prizeLabelKey = `prize${index + 1}Label` as keyof typeof appLabels;
-                const prizeWrapper = document.createElement('div');
-                prizeWrapper.innerHTML = `
-                    <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${appLabels[prizeLabelKey]}</label>
-                    <input type="text" id="round-edit-${prizeKey}" value="${game.prizes[prizeKey as keyof typeof game.prizes]}" class="w-full text-base font-bold p-2 border-2 border-gray-600 bg-gray-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
-                `;
-                prizesContainer.appendChild(prizeWrapper);
-            });
-        
-            DOMElements.roundEditModal.classList.remove('hidden');
-        
-            document.getElementById('save-round-edit-btn')!.addEventListener('click', () => {
-                Object.keys(game.prizes).forEach(prizeKey => {
-                    const input = document.getElementById(`round-edit-${prizeKey}`) as HTMLInputElement;
-                    game.prizes[prizeKey as keyof typeof game.prizes] = input.value;
-                });
-                game.description = descriptionTextarea.value;
-                
-                DOMElements.roundEditModal.classList.add('hidden');
-                renderUIFromState();
-                debouncedSave();
-            });
-        
-            document.getElementById('cancel-round-edit-btn')!.addEventListener('click', () => {
-                DOMElements.roundEditModal.classList.add('hidden');
-            });
-        }
-        
-        // --- Event Listeners ---
-        function setupEventListeners() {
-            DOMElements.showSettingsBtn.addEventListener('click', showSettingsModal);
-            DOMElements.showChangelogBtn.addEventListener('click', showChangelogModal);
-            DOMElements.showDonationModalBtn.addEventListener('click', showDonationModal);
-            document.getElementById('show-tutorial-btn')!.addEventListener('click', () => {
-                if (appConfig.tutorialVideoLink) window.open(appConfig.tutorialVideoLink, '_blank');
-            });
-        
-            document.getElementById('save-local-btn')!.addEventListener('click', saveStateToFile);
-            document.getElementById('load-local-input')!.addEventListener('change', loadStateFromFile);
-        
+        // --- Inicialização e Event Listeners ---
+        function initEventListeners() {
             DOMElements.manualInputForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 handleManualSubmit();
             });
-        
-            const confirmClearRound = () => {
-                DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
-                DOMElements.clearRoundConfirmModal.classList.remove('hidden');
-                document.getElementById('confirm-clear-round-btn')!.addEventListener('click', () => {
-                    startNewRound();
-                    DOMElements.clearRoundConfirmModal.classList.add('hidden');
+
+            DOMElements.addExtraGameBtn.addEventListener('click', addExtraGame);
+
+            const clearRoundBtns = [DOMElements.clearRoundBtnTop, DOMElements.clearRoundBtnBottom];
+            clearRoundBtns.forEach(btn => {
+                btn?.addEventListener('click', () => {
+                    if (!activeGameNumber) {
+                        showAlert("Nenhuma rodada ativa para limpar.");
+                        return;
+                    }
+                    DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
+                    DOMElements.clearRoundConfirmModal.classList.remove('hidden');
+                    document.getElementById('confirm-clear-round-btn')!.onclick = () => {
+                        startNewRound();
+                        DOMElements.clearRoundConfirmModal.classList.add('hidden');
+                    };
+                    document.getElementById('cancel-clear-round-btn')!.onclick = () => {
+                        DOMElements.clearRoundConfirmModal.classList.add('hidden');
+                    };
                 });
-                document.getElementById('cancel-clear-round-btn')!.addEventListener('click', () => {
-                    DOMElements.clearRoundConfirmModal.classList.add('hidden');
-                });
-            };
-            DOMElements.clearRoundBtnTop.addEventListener('click', confirmClearRound);
-            DOMElements.clearRoundBtnBottom.addEventListener('click', confirmClearRound);
-        
-            document.getElementById('auto-draw-btn-top')!.addEventListener('click', handleAutoDraw);
-            document.getElementById('auto-draw-btn-bottom')!.addEventListener('click', handleAutoDraw);
-            document.getElementById('verify-btn-top')!.addEventListener('click', showVerificationPanel);
-            document.getElementById('verify-btn-bottom')!.addEventListener('click', showVerificationPanel);
+            });
             
-            const boardZoomSlider = document.getElementById('board-zoom-slider') as HTMLInputElement;
-            const displayZoomSlider = document.getElementById('display-zoom-slider') as HTMLInputElement;
-            boardZoomSlider.addEventListener('input', (e) => {
-                appConfig.boardScale = parseInt((e.target as HTMLInputElement).value, 10);
-                applyBoardZoom(appConfig.boardScale);
+            DOMElements.prizeDrawForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                registerPrizeWinner();
             });
-            boardZoomSlider.addEventListener('change', debouncedSave);
-            displayZoomSlider.addEventListener('input', (e) => {
-                appConfig.displayScale = parseInt((e.target as HTMLInputElement).value, 10);
-                applyDisplayZoom(appConfig.displayScale);
+
+            DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
+
+            document.getElementById('prize-draw-random-btn')!.addEventListener('click', handlePrizeDraw);
+            
+            document.getElementById('board-zoom-slider')?.addEventListener('input', (e) => {
+                const scale = parseInt((e.target as HTMLInputElement).value, 10);
+                appConfig.boardScale = scale;
+                applyBoardZoom(scale);
             });
-            displayZoomSlider.addEventListener('change', debouncedSave);
-        
-            DOMElements.intervalBtn.addEventListener('click', showEventBreakModal);
-            DOMElements.editMenuBtn.addEventListener('click', showMenuEditModal);
+            document.getElementById('board-zoom-slider')?.addEventListener('change', () => debouncedSave());
+            
+            document.getElementById('display-zoom-slider')?.addEventListener('input', (e) => {
+                const scale = parseInt((e.target as HTMLInputElement).value, 10);
+                appConfig.displayScale = scale;
+                applyDisplayZoom(scale);
+            });
+             document.getElementById('display-zoom-slider')?.addEventListener('change', () => debouncedSave());
+
             DOMElements.shareBtn.addEventListener('click', showProofOptions);
+            DOMElements.endEventBtn.addEventListener('click', () => {
+                appConfig.isEventClosed = true;
+                debouncedSave();
+                const allWinners = Object.values(gamesData).flatMap(g => (g as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
+                if (allWinners.length > 0) startFinalWinnerSlide(allWinners);
+            });
+
             DOMElements.resetEventBtn.addEventListener('click', () => {
                 DOMElements.resetConfirmModal.innerHTML = getModalTemplates().resetConfirm;
                 DOMElements.resetConfirmModal.classList.remove('hidden');
-                document.getElementById('confirm-reset-btn')!.addEventListener('click', () => {
+                document.getElementById('confirm-reset-btn')!.onclick = () => {
+                    localStorage.removeItem(LOCAL_STORAGE_KEY);
+                    window.location.reload();
+                };
+                document.getElementById('cancel-reset-btn')!.onclick = () => {
                     DOMElements.resetConfirmModal.classList.add('hidden');
-                    resetEvent();
-                });
-                document.getElementById('cancel-reset-btn')!.addEventListener('click', () => DOMElements.resetConfirmModal.classList.add('hidden'));
+                };
             });
-            DOMElements.endEventBtn.addEventListener('click', () => {
-                const allWinners = Object.values(gamesData).flatMap(game => (game as any).winners || []).filter(w => w.bingoType !== 'Sorteio').reverse();
-                if (allWinners.length > 0) {
-                    startFinalWinnerSlide(allWinners);
-                } else {
-                    showAlert("Nenhum vencedor de rodada para exibir.");
-                }
-            });
-        
-            DOMElements.addExtraGameBtn.addEventListener('click', addExtraGame);
-            DOMElements.activeRoundPanel.addEventListener('click', () => {
-                if (activeGameNumber) showRoundEditModal(activeGameNumber);
-            });
-        
-            DOMElements.prizeDrawForm.addEventListener('submit', handlePrizeDrawSubmit);
-            document.getElementById('prize-draw-random-btn')!.addEventListener('click', handleRandomPrizeDraw);
-            DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
             
-            DOMElements.auctionForm.addEventListener('submit', handleAuctionSubmit);
-            document.getElementById('add-50-bid')!.addEventListener('click', () => incrementAuctionBid(50));
-            document.getElementById('add-100-bid')!.addEventListener('click', () => incrementAuctionBid(100));
-            document.getElementById('add-custom-bid-btn')!.addEventListener('click', () => {
-                const customBidInput = document.getElementById('custom-bid-input') as HTMLInputElement;
-                const amount = parseInt(customBidInput.value, 10);
-                if (!isNaN(amount)) {
-                    incrementAuctionBid(amount);
-                    customBidInput.value = '';
+            DOMElements.intervalBtn.addEventListener('click', showEventBreakModal);
+            DOMElements.editMenuBtn.addEventListener('click', showMenuEditModal);
+            
+            DOMElements.showDonationModalBtn.addEventListener('click', showDonationModal);
+            DOMElements.showChangelogBtn.addEventListener('click', showChangelogModal);
+            DOMElements.showSettingsBtn.addEventListener('click', showSettingsModal);
+
+            DOMElements.auctionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleAuctionSubmit();
+            });
+            
+            document.getElementById('add-50-bid')?.addEventListener('click', () => incrementAuctionBid(50));
+            document.getElementById('add-100-bid')?.addEventListener('click', () => incrementAuctionBid(100));
+            
+            document.getElementById('add-custom-bid-btn')?.addEventListener('click', () => {
+                const customInput = document.getElementById('custom-bid-input') as HTMLInputElement;
+                const value = parseInt(customInput.value, 10);
+                if (!isNaN(value) && value > 0) {
+                    incrementAuctionBid(value);
+                    customInput.value = '';
                 }
             });
-            document.getElementById('reset-auction-btn')!.addEventListener('click', () => {
-                const form = DOMElements.auctionForm as HTMLFormElement;
-                (form.elements.namedItem('auction-item-name') as HTMLInputElement).value = '';
-                (form.elements.namedItem('auction-winner-name') as HTMLInputElement).value = '';
-                (form.elements.namedItem('auction-item-current-bid') as HTMLInputElement).value = '0';
+            
+            document.getElementById('reset-auction-btn')?.addEventListener('click', () => {
+                (document.getElementById('auction-item-name') as HTMLInputElement).value = '';
+                (document.getElementById('auction-winner-name') as HTMLInputElement).value = '';
+                (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
+                (document.getElementById('custom-bid-input') as HTMLInputElement).value = '';
                 updateAuctionBidDisplay(0);
             });
-        
+            
+            document.getElementById('save-local-btn')?.addEventListener('click', saveStateToFile);
+            document.getElementById('load-local-input')?.addEventListener('change', loadStateFromFile);
+
+            const autoDrawBtns = [document.getElementById('auto-draw-btn-top'), document.getElementById('auto-draw-btn-bottom')];
+            autoDrawBtns.forEach(btn => btn?.addEventListener('click', handleAutoDraw));
+
+            const verifyBtns = [document.getElementById('verify-btn-top'), document.getElementById('verify-btn-bottom')];
+            verifyBtns.forEach(btn => btn?.addEventListener('click', showVerificationPanel));
+
             window.addEventListener('keydown', handleKeydown);
+            
+            DOMElements.activeRoundPanel.addEventListener('click', () => {
+                 if (!activeGameNumber) return;
+                 const game = gamesData[activeGameNumber];
+                 if (!game) return;
+
+                 DOMElements.roundEditModal.innerHTML = getModalTemplates().roundEdit;
+                 (document.getElementById('round-edit-title') as HTMLElement).textContent = `Editar Rodada ${activeGameNumber}`;
+                 
+                 const prizesContainer = document.getElementById('round-edit-prizes-container')!;
+                 prizesContainer.innerHTML = '';
+                 ['prize1', 'prize2', 'prize3'].forEach(prizeKey => {
+                     const labelKey = (prizeKey + 'Label') as keyof typeof appLabels;
+                     const labelText = appLabels[labelKey] || prizeKey;
+                     const value = game.prizes[prizeKey] || '';
+                     
+                     const prizeEl = document.createElement('div');
+                     prizeEl.innerHTML = `
+                        <label for="round-edit-${prizeKey}" class="block text-sm font-medium text-slate-400 mb-1">${labelText}</label>
+                        <input type="text" id="round-edit-${prizeKey}" value="${value}" class="w-full text-base font-bold p-2 border border-gray-600 bg-gray-900 text-white rounded-md focus:ring-sky-500 focus:border-sky-500">
+                     `;
+                     prizesContainer.appendChild(prizeEl);
+                 });
+
+                 (document.getElementById('round-edit-description') as HTMLTextAreaElement).value = game.description || '';
+                 
+                 DOMElements.roundEditModal.classList.remove('hidden');
+
+                 document.getElementById('save-round-edit-btn')!.onclick = () => {
+                     game.prizes.prize1 = (document.getElementById('round-edit-prize1') as HTMLInputElement).value;
+                     game.prizes.prize2 = (document.getElementById('round-edit-prize2') as HTMLInputElement).value;
+                     game.prizes.prize3 = (document.getElementById('round-edit-prize3') as HTMLInputElement).value;
+                     game.description = (document.getElementById('round-edit-description') as HTMLTextAreaElement).value;
+                     
+                     DOMElements.roundEditModal.classList.add('hidden');
+                     loadRoundState(activeGameNumber); // Recarrega o painel da rodada
+                     debouncedSave();
+                 };
+
+                 document.getElementById('cancel-round-edit-btn')!.onclick = () => {
+                     DOMElements.roundEditModal.classList.add('hidden');
+                 };
+            });
         }
         
-        // --- Firebase & App Initialization ---
-        function initializeFirebase() {
-            const firebaseConfig = {
-                apiKey: window.VITE_API_KEY,
-                authDomain: window.VITE_AUTH_DOMAIN,
-                projectId: window.VITE_PROJECT_ID,
-                storageBucket: window.VITE_STORAGE_BUCKET,
-                messagingSenderId: window.VITE_MESSAGING_SENDER_ID,
-                appId: window.VITE_APP_ID,
-            };
-            if (Object.values(firebaseConfig).every(v => v)) {
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    signInAnonymously(auth).catch(error => console.error("Anonymous sign-in failed:", error));
-                    return true;
-                } catch (error) {
-                    console.error("Firebase initialization failed:", error);
-                    return false;
-                }
-            }
-            return false;
-        }
+        // --- Ponto de Entrada da Aplicação ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInitialState();
+            initEventListeners();
+        });
         
-        async function main() {
-            setupEventListeners();
-        
-            const firebaseAvailable = initializeFirebase();
-            let preferredMode = localStorage.getItem(MODE_STORAGE_KEY);
-        
-            const handleModeSelection = (mode: 'local' | 'online') => {
-                isLocalMode = mode === 'local';
-                localStorage.setItem(MODE_STORAGE_KEY, mode);
-                document.getElementById('mode-selection-modal')!.classList.add('hidden');
-                
-                if (isLocalMode) {
-                    DOMElements.connectionIndicator.classList.remove('bg-blue-500');
-                    DOMElements.connectionIndicator.classList.add('bg-yellow-500');
-                    loadInitialState();
-                } else {
-                     onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            dbRef = doc(db, 'bingoEvents', userId);
-                            firebaseReady = true;
-                            DOMElements.connectionIndicator.classList.remove('bg-blue-500');
-                            DOMElements.connectionIndicator.classList.add('bg-green-500');
-                            loadInitialState();
-                        }
-                    });
-                }
-            };
-        
-            if (preferredMode) {
-                if (preferredMode === 'online' && !firebaseAvailable) {
-                    console.warn("Firebase not configured. Forcing local mode.");
-                    preferredMode = 'local';
-                }
-                handleModeSelection(preferredMode as 'local' | 'online');
-            } else {
-                if (!firebaseAvailable) {
-                    handleModeSelection('local');
-                } else {
-                    const modeModal = document.getElementById('mode-selection-modal')!;
-                    modeModal.classList.remove('hidden');
-                    document.getElementById('select-online-mode-btn')!.onclick = () => handleModeSelection('online');
-                    document.getElementById('select-local-mode-btn')!.onclick = () => handleModeSelection('local');
-                }
-            }
-        }
-        
-        main();
+    

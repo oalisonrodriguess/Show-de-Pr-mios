@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Cloud (Show de Prêmios)</title>
+    <title>Bingo Show</title>
     <!-- Carrega o Tailwind CSS para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Carrega a fonte Inter do Google Fonts -->
@@ -18,11 +18,11 @@
         @keyframes logo-float-glow {
           0%, 100% {
             transform: translateY(0) scale(1);
-            filter: drop-shadow(0 0 5px #38bdf8);
+            filter: drop-shadow(0 0 5px #f59e0b);
           }
           50% {
             transform: translateY(-10px) scale(1.05);
-            filter: drop-shadow(0 0 15px #7dd3fc) drop-shadow(0 0 25px #0ea5e9);
+            filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 25px #f59e0b);
           }
         }
         .logo-animation {
@@ -300,7 +300,7 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <meta name="description" content="An interactive prize show and bingo application.">
+    <meta name="description" content="An interactive bingo and prize show application designed for local, offline events. Manage rounds, draw numbers, track winners, and customize the game experience.">
     <canvas id="confetti-canvas"></canvas>
     
     <div class="flex flex-col min-h-screen">
@@ -311,15 +311,8 @@
                     <!-- O logo customizado será inserido aqui, ou o SVG padrão será mostrado -->
                 </div>
                 
-                <div id="main-title" class="text-2xl sm:text-3xl font-black text-sky-400 leading-tight focus:outline-none focus:ring-2 ring-sky-500 rounded-lg px-2">
+                <div id="main-title" class="text-2xl sm:text-3xl font-black text-amber-400 leading-tight focus:outline-none focus:ring-2 ring-amber-500 rounded-lg px-2">
                     <!-- Será preenchido pelo JS -->
-                </div>
-                 <div class="flex items-center gap-4 mt-2">
-                    <div id="connection-indicator" title="Status da Conexão" class="flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-white text-xs font-bold transition-all duration-500 bg-blue-500">
-                        <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                        <span id="connection-status-text">Conectando...</span>
-                    </div>
-                    <button id="change-mode-btn" title="Trocar modo de salvamento (Online/Local)" class="hidden text-xs bg-slate-600 hover:bg-slate-500 rounded-full px-3 py-1">Trocar Modo</button>
                 </div>
             </div>
         </header>
@@ -557,34 +550,11 @@
                 Desenvolvido inteiramente com a Inteligência Artificial Gemini 2.5 PRO da Google, este projeto demonstra como é possível criar soluções pastorais inovadoras com criatividade e ferramentas de baixo custo ou gratuitas, mesmo sem conhecimentos prévios em programação.
             </p>
             <p class="mt-2">
-                Versão <span id="version">6.8</span> - <span id="last-updated">Última atualização do programa: carregando...</span>
+                Versão <span id="version">7.0</span> - <span id="last-updated">Última atualização do programa: carregando...</span>
             </p>
         </footer>
     </div>
     
-    <!-- MODAL DE SELEÇÃO DE MODO -->
-    <div id="mode-selection-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-[100] hidden">
-        <div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-4xl w-full text-center">
-            <h2 class="text-3xl font-black text-amber-400 mb-4">Bem-vindo ao Bingo Cloud!</h2>
-            <p class="text-slate-300 text-lg mb-8">Como você prefere salvar os dados do seu evento?</p>
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Card Modo Online -->
-                <div class="bg-gray-700 p-6 rounded-xl border-2 border-sky-500 flex flex-col">
-                    <h3 class="text-2xl font-bold text-sky-400 mb-3">☁️ Jogar Online</h3>
-                    <p class="text-slate-400 text-sm flex-grow">Sincroniza seus dados na nuvem (exceto imagens de patrocinadores). Ideal para acessar de múltiplos dispositivos.</p>
-                    <button id="select-online-mode-btn" class="mt-6 w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-full text-lg">Selecionar Online</button>
-                </div>
-                <!-- Card Modo Local -->
-                <div class="bg-gray-700 p-6 rounded-xl border-2 border-yellow-500 flex flex-col">
-                    <h3 class="text-2xl font-bold text-yellow-400 mb-3">💻 Jogar Local</h3>
-                    <p class="text-slate-400 text-sm flex-grow">Salva todos os dados, incluindo imagens de patrocinadores, diretamente no seu navegador. Ideal para uso em um único computador e para ter backups completos.</p>
-                    <button id="select-local-mode-btn" class="mt-6 w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-full text-lg">Selecionar Local</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
     <!-- MODAIS (INICIALMENTE OCULTOS) -->
     <div id="verification-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
     <div id="floating-number-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden"></div>
@@ -609,16 +579,6 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <script>
-        // Injeta as variáveis de ambiente do Firebase no escopo global. 
-        // Se não forem definidas, a aplicação entrará em modo local.
-        window.VITE_API_KEY = "AIzaSyC5YqzA9D6pcKpHakDSSW9e2jw-gbsVPME";
-        window.VITE_AUTH_DOMAIN = "bingo-cloud-6fb2a.firebaseapp.com";
-        window.VITE_PROJECT_ID = "bingo-cloud-6fb2a";
-        window.VITE_STORAGE_BUCKET = "bingo-cloud-6fb2a.firebasestorage.app";
-        window.VITE_MESSAGING_SENDER_ID = "1062292343344";
-        window.VITE_APP_ID = "1:1062292343344:web:67c65869ab06be5457fbf5";
-    </script>
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>
