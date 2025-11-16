@@ -1639,11 +1639,21 @@ function applyDisplayZoom(scale: number) {
                 skipBtn.style.display = 'none';
                 closeBtn.style.display = 'block';
 
-                closeBtn.onclick = () => {
+                let autoCloseTimeout: ReturnType<typeof setTimeout>;
+
+                const closeModalAction = () => {
+                    clearTimeout(autoCloseTimeout); // Evita que o timer dispare se o botão for clicado
+                    if (DOMElements.spinningWheelModal.classList.contains('hidden')) return; // Previne dupla execução
+
                     DOMElements.spinningWheelModal.classList.add('hidden');
                     document.querySelectorAll('[data-label-key="autoDrawButton"]').forEach(btn => (btn as HTMLButtonElement).disabled = false);
                      showFloatingNumber(drawnNumber);
                 };
+
+                closeBtn.onclick = closeModalAction;
+
+                // Adiciona o timer para fechamento automático após 3 segundos
+                autoCloseTimeout = setTimeout(closeModalAction, 3000);
             };
             
             const randomIndex = Math.floor(Math.random() * availableNumbers.length);
@@ -2398,6 +2408,7 @@ function applyDisplayZoom(scale: number) {
         function showIntervalModal() {
             DOMElements.eventBreakModal.innerHTML = getModalTemplates().eventBreak;
             DOMElements.eventBreakModal.classList.remove('hidden');
+            DOMElements.confettiCanvas.style.zIndex = '51'; // Trazer para a frente do modal de intervalo
             
             const leftContentEl = document.getElementById('break-left-content')!;
             const rightContentEl = document.getElementById('break-right-content')!;
@@ -2454,14 +2465,28 @@ function applyDisplayZoom(scale: number) {
             intervalContentInterval = setInterval(updateContent, 6000);
             intervalClockInterval = setInterval(updateClock, 1000);
             
-            const startConfetti = () => confetti({ particleCount: 5, startVelocity: 10, spread: 360, origin: { x: Math.random(), y: Math.random() - 0.2 }, zIndex: 0 });
-            breakConfettiInterval = setInterval(startConfetti, 500);
+            const startConfetti = () => {
+                // Efeito de chuva
+                const particleCount = 2;
+                confetti({
+                    particleCount,
+                    angle: 270,
+                    spread: 55,
+                    origin: { x: Math.random(), y: 0 },
+                    startVelocity: 15 + (Math.random() * 20),
+                    gravity: 0.7,
+                    ticks: 300,
+                    zIndex: 51, // Garante que esteja na frente
+                });
+            };
+            breakConfettiInterval = setInterval(startConfetti, 150);
 
             document.getElementById('close-break-modal-btn')!.addEventListener('click', () => {
                 DOMElements.eventBreakModal.classList.add('hidden');
                 clearInterval(intervalContentInterval);
                 clearInterval(intervalClockInterval);
                 clearInterval(breakConfettiInterval);
+                DOMElements.confettiCanvas.style.zIndex = '50'; // Reseta o zIndex
             });
         }
         
