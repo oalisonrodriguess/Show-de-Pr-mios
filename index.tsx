@@ -610,7 +610,26 @@ function populateSettingsShortcutsTab() {
                 proofOptions: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"><h2 class="text-3xl font-bold text-white mb-6">${appLabels.proofOptionsModalTitle}</h2><p class="text-slate-400 mb-4">${appLabels.proofOptionsModalDescription}</p><div id="proof-options-list" class="space-y-2 max-h-60 overflow-y-auto"></div><div class="flex justify-end gap-4 mt-6"><button id="cancel-proof-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-full">${appLabels.modalCancelButton}</button><button id="generate-selected-proof-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full">${appLabels.proofOptionsModalGenerateButton}</button></div></div>`,
                 spinningWheel: `<div class="w-full h-full max-w-3xl max-h-[40rem] relative flex items-center justify-center"><div id="bingo-cage" class="w-full h-full absolute spinning-cage"><div id="number-cyclone" class="absolute w-full h-full transform-gpu"></div><div class="absolute w-full h-full border-8 border-gray-500 rounded-full" style="transform: rotateY(0deg) translateZ(0px);"></div><div class="absolute w-full h-full border-8 border-gray-500 rounded-full" style="transform: rotateY(30deg) translateZ(0px);"></div><div class="absolute w-full h-full border-8 border-gray-500 rounded-full" style="transform: rotateY(60deg) translateZ(0px);"></div><div class="absolute w-full h-full border-8 border-gray-500 rounded-full" style="transform: rotateY(90deg) translateZ(0px);"></div><div class="absolute w-full h-full border-8 border-gray-500 rounded-full" style="transform: rotateY(120deg) translateZ(0px);"></div><div class="absolute w-full h-full border-8 border-gray-500 rounded-full" style="transform: rotateY(150deg) translateZ(0px);"></div></div><div id="drawn-ball-container" class="z-10 opacity-0"></div></div><div class="absolute bottom-10 flex gap-4"><button id="skip-animation-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-full text-lg">${appLabels.spinningWheelSkipButton}</button><button id="close-drawn-btn" class="hidden bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-full text-lg">${appLabels.modalBackButton}</button></div>`,
                 resetConfirm: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center"><h2 class="text-2xl font-bold text-red-500 mb-4">${appLabels.resetConfirmModalTitle}</h2><p class="text-slate-300 text-lg mb-8">${appLabels.resetConfirmModalMessage}</p><div class="flex justify-center gap-4"><button id="cancel-reset-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-full text-lg">${appLabels.modalCancelButton}</button><button id="confirm-reset-btn" class="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-6 rounded-full text-lg">${appLabels.resetConfirmModalConfirmButton}</button></div></div>`,
-                drawnPrizes: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-3xl w-full text-center"><h2 id="drawn-prizes-title" class="text-3xl font-bold text-white">${appLabels.drawnPrizesModalTitle}</h2><p id="drawn-prizes-subtitle" class="text-xl font-bold text-yellow-400 mb-6"></p><div id="drawn-prizes-list" class="bg-gray-900 rounded-lg p-4 max-h-96 overflow-y-auto flex flex-wrap gap-3 justify-center mb-6"></div><button id="close-drawn-prizes-btn" class="mt-8 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-full text-lg">${appLabels.modalCloseButton}</button></div>`,
+                drawnPrizes: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-2xl w-full text-center flex flex-col h-[70vh]">
+                                <h2 id="drawn-prizes-title" class="text-3xl font-bold text-white flex-shrink-0">${appLabels.drawnPrizesModalTitle}</h2>
+                                <p id="drawn-prizes-subtitle" class="text-xl font-bold text-amber-400 mb-4 flex-shrink-0"></p>
+                                
+                                <div class="mb-6 flex-shrink-0">
+                                    <h3 class="text-lg font-semibold text-sky-400 mb-2">Última Cartela Sorteada</h3>
+                                    <div id="last-drawn-prize-display" class="flex justify-center items-center">
+                                        <!-- O último número sorteado será inserido aqui -->
+                                    </div>
+                                </div>
+
+                                <div class="flex-grow flex flex-col min-h-0">
+                                    <h3 class="text-lg font-semibold text-slate-300 mb-2 flex-shrink-0">Histórico de Sorteios</h3>
+                                    <div id="drawn-prizes-history-list" class="bg-gray-900 rounded-lg p-4 flex-grow overflow-y-auto flex flex-wrap gap-3 justify-center content-start">
+                                        <!-- O histórico de números será inserido aqui -->
+                                    </div>
+                                </div>
+                                
+                                <button id="close-drawn-prizes-btn" class="mt-6 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-full text-lg flex-shrink-0">${appLabels.modalCloseButton}</button>
+                             </div>`,
                 donation: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center"><h2 class="text-3xl font-black text-amber-400 mb-6">${appLabels.donationModalTitle}</h2><p class="text-slate-300 mb-4">${appLabels.donationModalDescription}</p><div class="space-y-6 text-left"><div class="text-center border-b border-gray-700 pb-6"><p class="text-lg font-bold text-white mb-4">${appLabels.donationModalPaypalLabel}</p><div class="flex justify-center"><form action="https://www.paypal.com/donate" method="post" target="_top"><input type="hidden" name="hosted_button_id" value="FLVDNY994MNQS" /><input type="image" src="https://www.paypalobjects.com/pt_BR/BR/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Faça doações com o botão do PayPal" /></form></div></div><div class="pt-6"><p class="text-lg font-bold text-white mb-2">${appLabels.donationModalPixLabel}</p><div class="flex flex-col items-center"><div id="pix-key-display" contenteditable="false" class="bg-gray-700 text-white p-3 rounded-lg text-center text-sm font-mono select-all cursor-text max-w-full overflow-hidden whitespace-nowrap overflow-ellipsis"></div><button id="copy-pix-btn" class="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all">${appLabels.donationModalCopyButton}</button></div></div></div><button id="close-donation-btn" class="mt-8 bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-full text-lg">${appLabels.modalCloseButton}</button></div>`,
                 finalWinners: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-5xl w-full text-center h-[95vh] flex flex-col justify-between">
                                 <h2 id="end-title" class="text-5xl font-black text-yellow-400 mb-4 flex-shrink-0">${appLabels.finalWinnersModalTitle}</h2>
@@ -949,7 +968,6 @@ function applyBoardZoom(scale: number) {
     if (zoomValueEl) {
         zoomValueEl.textContent = `${scale}%`;
     }
-    renderMasterBoard(); 
 }
 
 function applyDisplayZoom(scale: number) {
@@ -1837,20 +1855,19 @@ function applyDisplayZoom(scale: number) {
         function renderMasterBoard() {
             DOMElements.bingoBoardEl.innerHTML = '';
             const currentLetters = appConfig.bingoTitle === 'AJUDE' ? DYNAMIC_LETTERS_AJUDE : DYNAMIC_LETTERS;
-            const scale = appConfig.boardScale / 100;
-            const baseSize = 80; // 5rem
-            const baseFontSize = 48; // 3rem
-            const newSize = baseSize * scale;
-            const newFontSize = baseFontSize * scale;
+            
+            // Otimização: Tamanhos fixos, o zoom é controlado pelo 'transform: scale' no wrapper.
+            // Isso previne o "double-scaling" e melhora a performance.
+            const headerSizeClass = 'text-6xl'; 
+            const cellSizeClass = 'w-20 h-20 text-5xl'; 
 
             currentLetters.forEach(letter => {
                 const columnWrapper = document.createElement('div');
                 columnWrapper.className = 'col-span-2 flex flex-col items-center';
                 
                 const headerEl = document.createElement('div');
-                headerEl.className = 'font-black text-sky-400 mb-4';
+                headerEl.className = `font-black text-sky-400 mb-4 ${headerSizeClass}`;
                 headerEl.textContent = letter;
-                headerEl.style.fontSize = `${newFontSize * 1.2}px`;
                 columnWrapper.appendChild(headerEl);
 
                 const numbersGrid = document.createElement('div');
@@ -1864,7 +1881,7 @@ function applyDisplayZoom(scale: number) {
                     cell.id = `master-cell-${i}`;
                     cell.textContent = i.toString();
                     
-                    let cellClasses = 'bingo-cell flex items-center justify-center font-black rounded-full transition-all duration-300';
+                    let cellClasses = `bingo-cell flex items-center justify-center font-black rounded-full transition-all duration-300 ${cellSizeClass}`;
                     if (appConfig.boardColor !== 'default') {
                         cell.style.backgroundColor = appConfig.boardColor;
                         cellClasses += isLightColor(appConfig.boardColor) ? ' text-gray-900' : ' text-white';
@@ -1872,9 +1889,6 @@ function applyDisplayZoom(scale: number) {
                         cellClasses += ' bg-gray-700 text-slate-300';
                     }
                     cell.className = cellClasses;
-                    cell.style.width = `${newSize}px`;
-                    cell.style.height = `${newSize}px`;
-                    cell.style.fontSize = `${newFontSize}px`;
                     
                     if (appConfig.enableSponsorsByNumber && appConfig.sponsorsByNumber[i] && appConfig.sponsorsByNumber[i].image) {
                          cell.classList.add('has-sponsor');
@@ -1905,7 +1919,7 @@ function applyDisplayZoom(scale: number) {
                     cell.classList.remove('scale-125', 'text-gray-900', 'text-slate-200', 'text-white');
                     cell.style.backgroundColor = '';
                     cell.style.transform = '';
-                    cell.className = 'bingo-cell flex items-center justify-center font-black rounded-full transition-all duration-300';
+                    cell.className = 'bingo-cell flex items-center justify-center font-black rounded-full transition-all duration-300 w-20 h-20 text-5xl';
 
                     if (applyCustomColor && activeRoundColor) {
                         cell.style.backgroundColor = hexToRgba(activeRoundColor, 0.25)!; 
@@ -1926,12 +1940,11 @@ function applyDisplayZoom(scale: number) {
         function updateMasterBoardCell(number: number) {
             const cell = document.getElementById(`master-cell-${number}`) as HTMLElement;
             if (cell) {
-                cell.classList.remove('bg-gray-700', 'text-slate-300', 'text-gray-900', 'text-white');
+                cell.classList.remove('bg-gray-700', 'text-slate-300', 'text-gray-900', 'text-white', 'text-slate-200');
                 cell.style.backgroundColor = ''; 
                 const activeRoundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#16a34a'; 
                 cell.style.backgroundColor = activeRoundColor;
                 cell.classList.add(isLightColor(activeRoundColor) ? 'text-gray-900' : 'text-white', 'scale-125');
-                cell.style.transform = `scale(${(appConfig.boardScale / 100) * 1.1})`;
             }
         }
         
@@ -2518,6 +2531,33 @@ function applyDisplayZoom(scale: number) {
             }
         }
         
+        function updateLastPrizesDisplay() {
+            DOMElements.lastNumbersDisplay.innerHTML = ''; // Limpa números anteriores (bingo ou brinde)
+            if (drawnPrizeNumbers.length === 0) return;
+        
+            const activeRoundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7'; // Roxo como fallback
+        
+            const lastThree = drawnPrizeNumbers.slice(-3).reverse();
+            lastThree.forEach((num: number) => {
+                const prizeEl = document.createElement('div');
+                prizeEl.className = 'text-white font-bold rounded-lg w-28 h-16 flex flex-col items-center justify-center text-3xl shadow-md p-1';
+                prizeEl.style.backgroundColor = activeRoundColor;
+                
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'text-xs';
+                labelSpan.textContent = 'Cartela';
+        
+                const numberSpan = document.createElement('span');
+                numberSpan.className = 'text-2xl leading-none';
+                numberSpan.textContent = num.toString();
+        
+                prizeEl.appendChild(labelSpan);
+                prizeEl.appendChild(numberSpan);
+        
+                DOMElements.lastNumbersDisplay.appendChild(prizeEl);
+            });
+        }
+
         function drawRandomPrize() {
             const minInput = document.getElementById('prize-draw-min') as HTMLInputElement;
             const maxInput = document.getElementById('prize-draw-max') as HTMLInputElement;
@@ -2581,6 +2621,7 @@ function applyDisplayZoom(scale: number) {
                 prizeDisplay.textContent = finalNumber.toString();
                 prizeDisplay.classList.add('animate-custom-flash', 'pulse-glow-animation');
                 mainDisplayLabel.textContent = "CARTELA SORTEADA!";
+                updateLastPrizesDisplay();
                 
                 // Preenche automaticamente o número sorteado e foca no próximo campo
                 const numberInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
@@ -3368,43 +3409,62 @@ function showRoundEditModal(gameNumber: string) {
 
         function showDrawnPrizesModal() {
             DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
-            const listEl = document.getElementById('drawn-prizes-list')!;
+            const lastDrawnEl = document.getElementById('last-drawn-prize-display')!;
+            const historyListEl = document.getElementById('drawn-prizes-history-list')!;
             const titleEl = document.getElementById('drawn-prizes-title')!;
             const subtitleEl = document.getElementById('drawn-prizes-subtitle')!;
-            listEl.innerHTML = '';
+            
+            lastDrawnEl.innerHTML = '';
+            historyListEl.innerHTML = '';
             
             const roundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) || '#a855f7';
             titleEl.style.color = roundColor;
             subtitleEl.textContent = `Rodada Ativa: ${activeGameNumber ? (gamesData[activeGameNumber].name || `Rodada ${activeGameNumber}`) : 'Nenhuma'}`;
-            
-            if (drawnPrizeNumbers.length > 0) {
-                 const sortedNumbers = [...drawnPrizeNumbers].sort((a, b) => a - b);
-                 const lastDrawn = sortedNumbers[sortedNumbers.length -1];
-                 
-                 sortedNumbers.forEach(num => {
-                    const numberEl = document.createElement('div');
-                    numberEl.className = 'w-16 h-16 flex items-center justify-center text-2xl font-bold rounded-full bg-gray-700 text-white cursor-pointer hover:bg-red-600 transition-colors';
-                    numberEl.textContent = num.toString();
-                    numberEl.title = 'Clique para remover este número';
 
-                    if (num === lastDrawn) {
-                        numberEl.classList.add('animate-pulse');
-                        numberEl.style.backgroundColor = roundColor;
-                        numberEl.style.transform = 'scale(1.1)';
+            if (drawnPrizeNumbers.length > 0) {
+                const lastDrawn = drawnPrizeNumbers[drawnPrizeNumbers.length - 1];
+                const historyNumbers = drawnPrizeNumbers.slice(0, -1).sort((a, b) => a - b);
+
+                // Display Last Drawn Number
+                const lastNumberEl = document.createElement('div');
+                lastNumberEl.className = 'w-24 h-24 flex items-center justify-center text-5xl font-bold rounded-full text-white cursor-pointer hover:bg-red-600 transition-colors animate-pulse';
+                lastNumberEl.textContent = lastDrawn.toString();
+                lastNumberEl.title = 'Clique para remover este número';
+                lastNumberEl.style.backgroundColor = roundColor;
+                lastNumberEl.addEventListener('click', () => {
+                    const index = drawnPrizeNumbers.indexOf(lastDrawn);
+                    if (index > -1) {
+                        drawnPrizeNumbers.splice(index, 1);
+                        debouncedSave();
+                        showDrawnPrizesModal(); // Re-render the modal
                     }
-                    
-                    numberEl.addEventListener('click', () => {
-                        const index = drawnPrizeNumbers.indexOf(num);
-                        if (index > -1) {
-                            drawnPrizeNumbers.splice(index, 1);
-                            numberEl.remove();
-                            debouncedSave();
-                        }
+                });
+                lastDrawnEl.appendChild(lastNumberEl);
+                
+                // Display History
+                if(historyNumbers.length > 0) {
+                    historyNumbers.forEach(num => {
+                        const numberEl = document.createElement('div');
+                        numberEl.className = 'w-16 h-16 flex items-center justify-center text-2xl font-bold rounded-full bg-gray-700 text-white cursor-pointer hover:bg-red-600 transition-colors';
+                        numberEl.textContent = num.toString();
+                        numberEl.title = 'Clique para remover este número';
+                        numberEl.addEventListener('click', () => {
+                            const index = drawnPrizeNumbers.indexOf(num);
+                            if (index > -1) {
+                                drawnPrizeNumbers.splice(index, 1);
+                                numberEl.remove(); // Just remove the element, no need to re-render the whole modal
+                                debouncedSave();
+                            }
+                        });
+                        historyListEl.appendChild(numberEl);
                     });
-                    listEl.appendChild(numberEl);
-                 });
+                } else {
+                     historyListEl.innerHTML = `<p class="text-slate-400">Nenhum outro número no histórico.</p>`;
+                }
+
             } else {
-                listEl.innerHTML = `<p class="text-slate-400">Nenhum brinde sorteado ainda.</p>`;
+                lastDrawnEl.innerHTML = `<p class="text-slate-400">Nenhum brinde sorteado ainda.</p>`;
+                historyListEl.parentElement!.classList.add('hidden'); // Hide history section if no numbers
             }
 
             document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
