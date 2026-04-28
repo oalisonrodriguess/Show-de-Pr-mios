@@ -567,9 +567,9 @@ function updateAuctionBidDisplay(bid: number) {
             style: 'currency',
             currency: 'BRL',
         }).format(bid);
-        displayEl.classList.remove('animate-bid-update');
+        displayEl.classList.remove('animate-bid-flash');
         void displayEl.offsetWidth; 
-        displayEl.classList.add('animate-bid-update');
+        displayEl.classList.add('animate-bid-flash');
     }
 }
 
@@ -1635,12 +1635,14 @@ function showSettingsModal() {
     autocloseTimer.addEventListener('change', () => appStore.debouncedSave());
 
     const themeToggle = document.getElementById('theme-toggle') as HTMLInputElement;
-    themeToggle.checked = appConfig.isDarkMode !== false; // default true
-    themeToggle.addEventListener('change', (e) => {
-        appStore.state.appConfig.isDarkMode = (e.target as HTMLInputElement).checked;
-        applyTheme();
-        appStore.debouncedSave();
-    });
+    if (themeToggle) {
+        themeToggle.checked = appConfig.isDarkMode !== false; // default true
+        themeToggle.addEventListener('change', (e) => {
+            appStore.state.appConfig.isDarkMode = (e.target as HTMLInputElement).checked;
+            applyTheme();
+            appStore.debouncedSave();
+        });
+    }
 
     // --- Sponsors Tab ---
     populateSettingsSponsorsTab();
@@ -3358,8 +3360,9 @@ function applyDisplayZoom(scale: number) {
             displayContainer.innerHTML = '';
 
             const prizeDisplay = document.createElement('div');
-            prizeDisplay.className = 'font-black flex items-center justify-center w-64 h-64 sm:w-80 sm:h-80 rounded-full text-white shadow-xl shadow-inner';
-            prizeDisplay.style.fontSize = 'clamp(4rem, 15vw, 10rem)';
+            prizeDisplay.className = 'font-black flex items-center justify-center w-64 h-64 sm:w-80 sm:h-80 rounded-full text-white shadow-2xl';
+            prizeDisplay.style.fontSize = 'clamp(5rem, 15vw, 10rem)';
+            prizeDisplay.style.lineHeight = '1';
             const { activeGameNumber, gamesData } = appStore.state;
             prizeDisplay.style.backgroundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
 
@@ -4099,7 +4102,7 @@ function showRoundEditModal(gameNumber: string) {
             const fullScreenPrizeBtn = document.getElementById('fullscreen-prize-btn');
             if (fullScreenPrizeBtn) {
                 fullScreenPrizeBtn.addEventListener('click', () => {
-                    const section = document.getElementById('middle-row-section');
+                    const section = document.getElementById('draw-and-prize-section');
                     if (section) {
                         if (!document.fullscreenElement) {
                             section.requestFullscreen().catch(err => showAlert(`Erro: ${err.message}`));
@@ -4132,14 +4135,14 @@ function showRoundEditModal(gameNumber: string) {
                 const htmlElement = document.documentElement;
                 const isDark = htmlElement.classList.contains('dark');
                 
-                ['board-section', 'auction-section', 'middle-row-section'].forEach(id => {
+                ['board-section', 'auction-section', 'draw-and-prize-section'].forEach(id => {
                     const section = document.getElementById(id);
                     if (!section) return;
 
                     if (document.fullscreenElement === section) {
                         section.classList.remove('rounded-2xl', 'shadow-xl');
                         section.classList.add('overflow-y-auto');
-                        if (id === 'middle-row-section') {
+                        if (id === 'draw-and-prize-section') {
                              section.classList.add('p-4');
                         }
                         
@@ -4168,7 +4171,7 @@ function showRoundEditModal(gameNumber: string) {
                     } else if (!document.fullscreenElement) {
                         section.classList.add('rounded-2xl', 'shadow-xl');
                         section.classList.remove('overflow-y-auto');
-                        if (id === 'middle-row-section') {
+                        if (id === 'draw-and-prize-section') {
                              section.classList.remove('p-4');
                         }
                         if (id === 'board-section') {
