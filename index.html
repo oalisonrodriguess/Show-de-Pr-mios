@@ -6,6 +6,11 @@
     <title>Bingo Show</title>
     <!-- Carrega o Tailwind CSS para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
     <!-- Carrega a fonte Inter do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -314,6 +319,7 @@
         input[type="color"]::-webkit-color-swatch { border: 2px solid #9ca3af; border-radius: 50%; }
 
     </style>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-900 text-white">
     <meta name="description" content="An interactive bingo and prize show application designed for local, offline events. Manage rounds, draw numbers, track winners, and customize the game experience.">
@@ -339,14 +345,7 @@
             <!-- BARRA LATERAL ESQUERDA: VÍDEO, CONTROLES GERAIS E VENCEDORES -->
             <aside class="lg:col-span-1 bg-gray-800 rounded-2xl shadow-2xl p-6 flex flex-col">
                 
-                <!-- 1. COMO USAR? (TOPO ESQUERDO, AGORA PADRONIZADO) -->
-                <div class="bg-gray-800 p-0 rounded-xl mb-4 flex-shrink-0">
-                    <h3 class="text-base font-bold text-sky-400 mb-3 text-center" data-label-key="howToUseTitle">🎬 Como Usar?</h3>
-                    <!-- Campo de link escondido para salvar o valor no estado -->
-                    <input type="hidden" id="tutorial-link-input">
-                    
-                    <button id="show-tutorial-btn" disabled class="w-full bg-gray-500 text-white font-bold py-3 px-4 rounded-lg text-sm transition-all shadow-lg cursor-not-allowed" data-label-key="howToUseButton">Em Breve!</button>
-                </div>
+                
 
                 <!-- NOVO: Histórico de Versões -->
                 <button id="show-changelog-btn" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all mb-4 flex-shrink-0" data-label-key="versionHistoryButton">Histórico de Versões</button>
@@ -356,9 +355,11 @@
 
                 <!-- 2. BOTÕES DE CONTROLE GERAIS -->
                 <div class="flex flex-col gap-2 mb-4 flex-shrink-0">
-                    <button id="save-local-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="saveToFileButton">Salvar no Computador</button>
-                    <label for="load-local-input" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all text-center cursor-pointer" data-label-key="loadFromFileButton">Carregar do Computador</label>
-                    <input type="file" id="load-local-input" class="hidden" accept=".json,application/json">
+                    <button id="show-card-generator-btn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all">Gerar Cartelas</button>
+                    <button id="show-card-scanner-btn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all">Escanear Cartela</button>
+                    <button id="save-to-file-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="saveToFileButton">Salvar no Computador</button>
+                    <label id="load-from-file-btn" for="load-from-file-input" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all text-center cursor-pointer" data-label-key="loadFromFileButton">Carregar do Computador</label>
+                    <input type="file" id="load-from-file-input" class="hidden" accept=".json,application/json">
                     <div class="flex gap-2">
                         <button id="interval-btn" class="flex-grow bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg transition-all" data-label-key="intervalButton">Intervalo</button>
                         <button id="edit-menu-btn" title="Editar Cardápio" class="flex-shrink-0 bg-gray-600 hover:bg-gray-500 text-white font-bold p-2 rounded-lg text-sm shadow-lg transition-all">
@@ -392,8 +393,15 @@
             <!-- COLUNA CENTRAL: PAINEL, NÚMERO ANUNCIado E BRINDES -->
             <div class="lg:col-span-3 flex flex-col gap-6">
                 <!-- PAINEL DE NÚMEROS -->
-                <section class="p-4 bg-gray-800 rounded-2xl shadow-xl">
-                    <h2 class="text-xl font-bold mb-4 text-center text-slate-300" data-label-key="bingoBoardTitle">Painel de Números</h2>
+                <section id="board-section" class="p-4 bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4 relative">
+                        <h2 class="text-xl font-bold text-center text-slate-300 w-full" data-label-key="bingoBoardTitle">Painel de Números</h2>
+                        <button id="fullscreen-board-btn" class="absolute right-0 p-2 bg-gray-700 hover:bg-gray-600 rounded text-slate-300 transition-colors" title="Tela Cheia">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                             </svg>
+                        </button>
+                    </div>
                     
                     <!-- NOVO PAINEL DE RODADA ATIVA -->
                     <div id="active-round-panel" class="bg-gray-700 rounded-lg mb-4 p-6 text-center transition-all shadow-inner hidden cursor-pointer hover:bg-gray-600" title="Clique para editar prêmios e descrição">
@@ -422,6 +430,17 @@
                     <div id="bingo-board-wrapper" class="w-full mx-auto overflow-x-auto">
                         <!-- AQUI AS LETRAS B-I-N-G-O/A-J-U-D-E SERÃO RENDERIZADAS DINAMICAMENTE -->
                         <div id="bingo-board" class="grid grid-cols-10 gap-x-2 sm:gap-x-4 min-w-max"></div>
+                    <div id="fullscreen-controls" class="hidden flex-row gap-4 justify-between items-center mt-4 bg-gray-700 p-4 rounded-lg">
+                        <div class="flex-1">
+                            <label for="fs-board-zoom-slider" class="block text-xs font-bold text-slate-400 mb-1">Zoom do Painel (<span id="fs-board-zoom-value">100</span>%)</label>
+                            <input type="range" id="fs-board-zoom-slider" min="50" max="150" value="100" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="flex gap-2">
+                             <button id="fs-next-round-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg transition-transform transform hover:scale-105">Próxima Rodada</button>
+                             <button id="fs-auto-draw-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg transition-transform transform hover:scale-105" data-label-key="autoDrawButton">Sorteio Automático</button>
+                        </div>
+                    </div>
+
                     </div>
 
                     <div class="mt-4 grid grid-cols-3 gap-2">
@@ -431,7 +450,7 @@
                     </div>
                 </section>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
+                <div id="middle-row-section" class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
                     <!-- CONTROLES -->
                     <div id="controls-panel-left" class="lg:col-span-1 bg-gray-800 rounded-2xl p-4 w-full mx-auto flex flex-col">
                         <div id="clock" class="text-center text-2xl font-bold text-slate-300 mb-2"></div>
@@ -483,7 +502,14 @@
                     
                     <!-- SORTEIO DE BRINDES -->
                     <div id="prize-draw-section" class="lg:col-span-1 bg-gray-800 rounded-2xl p-4 w-full mx-auto flex flex-col">
-                        <h2 class="text-lg font-bold text-slate-300 mb-3 text-center" data-label-key="prizeDrawTitle">Sorteio de Brindes</h2>
+                        <div class="flex items-center justify-between mb-3 relative">
+         <h2 class="text-lg font-bold text-center text-slate-300 w-full" data-label-key="prizeDrawTitle">Sorteio de Brindes</h2>
+         <button id="fullscreen-prize-btn" class="absolute right-0 p-1 bg-gray-700 hover:bg-gray-600 rounded text-slate-300 transition-colors" title="Tela Cheia">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+             </svg>
+         </button>
+     </div>
                         <form id="prize-draw-form" class="flex flex-col gap-2 flex-grow">
                              <button type="button" id="check-drawn-prizes-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-lg mb-1" data-label-key="checkDrawnPrizesButton">Conferir Sorteados</button>
                             <div class="flex flex-col gap-1">
@@ -505,8 +531,15 @@
                     </div>
                 </div>
                  <!-- 2. LEILÃO (MOVIDO PARA O PAINEL CENTRAL) -->
-                <section class="bg-gray-800 p-6 rounded-2xl shadow-xl">
-                    <h2 class="text-2xl font-bold text-slate-300 mb-4 text-center" data-label-key="auctionTitle">Leilão</h2>
+                <section id="auction-section" class="bg-gray-800 p-6 rounded-2xl shadow-xl relative flex flex-col justify-center">
+                    <div class="flex items-center justify-between mb-4 relative">
+         <h2 class="text-2xl font-bold text-center text-slate-300 w-full" data-label-key="auctionTitle">Leilão</h2>
+         <button id="fullscreen-auction-btn" class="absolute right-0 p-2 bg-gray-700 hover:bg-gray-600 rounded text-slate-300 transition-colors" title="Tela Cheia">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+             </svg>
+         </button>
+     </div>
                     <form id="auction-form" class="space-y-3 max-w-lg mx-auto">
                         <input type="text" id="auction-item-name" placeholder="Nome do Item" class="w-full text-center text-base font-bold p-2 border-2 border-gray-600 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
                         <div class="relative text-center">
@@ -590,6 +623,8 @@
     <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
     <div id="round-edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
     <div id="next-round-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[60] hidden"></div>
+    <div id="card-generator-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
+    <div id="card-scanner-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden"></div>
 
     <!-- Rodapé para Impressão -->
     <div id="print-footer" class="hidden">
@@ -607,6 +642,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>

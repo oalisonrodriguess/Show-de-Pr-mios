@@ -1,39 +1,27 @@
 
+
         // FIX: Added declaration for the 'confetti' library function to resolve "Cannot find name 'confetti'" errors.
         declare var confetti: any;
-        
-        // --- Variáveis de Estado ---
-        let floatingNumberTimeout: ReturnType<typeof setTimeout> | null = null;
-        let currentVersion = "7.0"; // Foco 100% Local
-        
-        // Mapeamento de letras dinâmico
-        let DYNAMIC_LETTERS = ['B', 'I', 'N', 'G', 'O'];
-        let DYNAMIC_LETTERS_AJUDE = ['A', 'J', 'U', 'D', 'E'];
+import QRCode from 'qrcode';
+import jsQR from 'jsqr';
 
-        const BINGO_CONFIG: { [key: string]: { min: number; max: number } } = { B: { min: 1, max: 15 }, I: { min: 16, max: 30 }, N: { min: 31, max: 45 }, G: { min: 46, max: 60 }, O: { min: 61, max: 75 },
-                               A: { min: 1, max: 15 }, J: { min: 16, max: 30 }, U: { min: 31, max: 45 }, D: { min: 46, max: 60 }, E: { min: 61, max: 75 } };
-        const LETTERS = Object.keys(BINGO_CONFIG);
-        const roundColors = ['#16a34a', '#ca8a04', '#c2410c', '#0e7490', '#be185d', '#6d28d9', '#059669', '#b45309'];
-        
-        let gamesData: {[key: string]: any} = {}; 
-        let activeGameNumber: string | null = null;
-        let currentBingoType = ''; 
-        let gameCount = 6;
-        let menuItems = [ "Refrigerante - R$ 5,00", "Cerveja - R$ 7,00", "Água - R$ 3,00", "Espetinho - R$ 8,00", "Pastel - R$ 6,00", "Porção de Fritas - R$ 15,00" ];
-        let intervalContentInterval: any;
-        let intervalClockInterval: any;
-        let breakConfettiInterval: any;
-        let finalConfettiInterval: any;
-        let clockInterval: any;
-        const predefinedPrizes = [ { prize1: 'R$ 100,00', prize2: '', prize3: '' }, { prize1: 'R$ 100,00', prize2: 'R$ 200,00', prize3: '' }, { prize1: 'R$ 200,00', prize2: '', prize3: '' }, { prize1: 'R$ 100,00', prize2: 'R$ 300,00', prize3: '' }, { prize1: 'R$ 300,00', prize2: '', prize3: 'R$ 300,00' }, { prize1: 'R$ 200,00', prize2: 'R$ 2.000,00', prize3: '' } ];
-        let confettiAnimationId: number;
-        let spinTimeout: any;
-        let cycloneInterval: any;
-        let saveTimeout: any; // Debounce timer for saving state
-        let drawnPrizeNumbers: number[] = [];
-        let winnerDisplayTimeout: any; 
-        const winnerDisplayDuration = 5000;
-        let versionHistory = `**v7.0.0 (Atual)**
+
+        // --- Refactoring: Central Application Store ---
+        // All application state and data logic is encapsulated in this object.
+        // This separates data management from UI rendering and event handling, making the code more robust and maintainable.
+        const appStore = {
+            state: {
+                gamesData: {} as { [key: string]: any },
+                cardsData: {} as { [uuid: string]: { series: number, numbers: number[][] } },
+                activeGameNumber: null as string | null,
+                currentBingoType: '',
+                gameCount: 6,
+                menuItems: [
+                    "Refrigerante - R$ 5,00", "Cerveja - R$ 7,00", "Água - R$ 3,00", 
+                    "Espetinho - R$ 8,00", "Pastel - R$ 6,00", "Porção de Fritas - R$ 15,00"
+                ],
+                drawnPrizeNumbers: [] as number[],
+                versionHistory: `**v7.0.0 (Atual)**
 - **REMARCA E FOCO LOCAL:** O programa foi renomeado para "Bingo Show". Toda a funcionalidade online e de sincronização com a nuvem (Firebase) foi removida. O aplicativo agora opera em um modo 100% local, salvando todos os dados (incluindo imagens de patrocinadores) diretamente no navegador para máxima confiabilidade e simplicidade em eventos presenciais.
 - **NOVO LOGOTIPO:** O aplicativo agora apresenta um novo logotipo para refletir a marca "Bingo Show".
 - **PATROCINADOR GLOBAL:** Adicionada uma nova seção nas configurações para cadastrar um "Patrocinador Global". Uma única imagem e nome podem ser definidos para aparecer em todos os números que não possuam um patrocinador individual, garantindo que a tela de sorteio sempre exiba um apoio.
@@ -61,181 +49,398 @@
 - **GESTÃO DE RODADAS:** Adicionado um ícone de lixeira (🗑️) em cada rodada, permitindo sua exclusão mediante confirmação.
 - **CORES DINÂMICAS E CONSISTENTES:** O número sorteado no painel principal agora é pintado com a cor exata da rodada ativa. O cabeçalho do modal de "Brindes Sorteados" também adota a cor da rodada.
 - **FEEDBACK VISUAL APRIMORADO:** O botão da rodada ativa agora fica verde e exibe o texto "Jogando...", facilitando a identificação.
-- **CONTROLE DE MODAIS:** Adicionada uma nova seção nas configurações para desativar o fechamento automático dos modais de sorteio ou ajustar seu tempo de exibição (de 3 a 15 segundos).`;
+- **CONTROLE DE MODAIS:** Adicionada uma nova seção nas configurações para desativar o fechamento automático dos modais de sorteio ou ajustar seu tempo de exibição (de 3 a 15 segundos).`,
+                appConfig: {
+                    isDarkMode: true,
+                    pixKey: '1e8e4af0-4d23-440c-9f3d-b4e527f65911',
+                    paypalLink: 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW',
+                    tutorialVideoLink: 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ', 
+                    bingoTitle: 'BINGO',
+                    boardColor: 'default',
+                    boardScale: 90,
+                    displayScale: 100,
+                    verificationPanelZoom: 100,
+                    floatingNumberZoom: 100,
+                    sponsorDisplayZoom: 100,
+                    drawnTextColor: '#FFFFFF',
+                    drawnTextStrokeColor: '#000000',
+                    drawnTextStrokeWidth: 2,
+                    isEventClosed: false,
+                    customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4NCiAgPGRlZnM+DQogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJncmFkLWJnIiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiPg0KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE3MjU1NCIvPg0KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMWUzYThhIi8+DQogICAgPC9yYWRpYWxHcmFkaWVudD4NCiAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciPg0KICAgICAgPGZlRHJvcFNoYWRvdyBkeD0iMyIgZHk9IjUiIHN0ZERldmlhdGlvbj0iMyIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9IjAuNSIvPg0KICAgIDwvZmlsdGVyPg0KICA8L2RlZnM+DQogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSJ1cmwoI2dyYWQtYmcpIi8+DQogIDxnIGZpbHRlcj0idXJsKCNzaGFkb3cpIj4NCiAgICA8cGF0aCBkPSJNMTI4IDEyOCBMMzg0IDEyOCBMMzg0IDI1NiBMMjU2IDM4NCBMMTI4IDI1NiBaIiBmaWxsPSIjZmFjYzE1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMTUgMjU2IDI1NikiLz4NCiAgICA8cGF0aCBkPSJNMTQ4IDE0OCBMMzY0IDE0OCBMMzY0IDI1NiBMMjU2IDM2NCBMMTQ4IDI1NiBaIiBmaWxsPSIjZmVmMDhhIiB0cmFuc2Zvcm09InJvdGF0ZSgtMTUgMjU2IDI1NikiLz4NCiAgICA8dGV4dCB4PSI1MCUiIHk9IjQyJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUzYThhIiBsZXR0ZXItc3BhY2luZz0iLTUiPkJJTkdPPC90ZXh0Pg0KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNjUlIiBkb21pbmFudC1mYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlyeT0iJ0ludGVyJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI5MCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzE3MjU1NCIgbGV0dGVyLXNwYWNpbmc9IjgiPlNIT1c8L3RleHQ+DQogIDwvZz4NCiAgPGc+DQogICAgICA8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSIzMCIgZmlsbD0iIzM4YmRmOCIgb3BhY2l0eT0iMC44Ii8+DQogICAgICA8dGV4dCB4PSI5MCIgeT0iOTQiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMTcyNTU0Ij5CPC90ZXh0Pg0KICA8L2c+DQogIDxnPg0KICAgICAgPGNpcmNsZSBjeD0iNDIyIiBjeT0iNDIyIiByPSIzMCIgZmlsbD0iI2ZiYmYyNCIgb3BhY2l0eT0iMC44Ii8+DQogICAgICA8dGV4dCB4PSI0MjIiIHk9IjQyNiIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidJbnRlcicsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjgiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMxNzI1NTQiPjc1PC90ZXh0Pg0KICA8L2c+DQogICAgPGc+DQogICAgICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSIxNTAiIHI9IjIwIiBmaWxsPSIjYTNlNjM1IiBvcGFjaXR5PSIwLjgiLz4NCiAgPC9nPg0KICAgIDxnPg0KICAgICAgPGNpcmNsZSBjeD0iMTEwIiBjeT0iMzkwIiByPSIyNSIgZmlsbD0iI2Y0NzJiNiIgb3BhY2l0eT0iMC44Ii8+DQogIDwvZz4NCjwvc3ZnPg==',
+                    enableSponsorsByNumber: false,
+                    enableModalAutoclose: true,
+                    modalAutocloseSeconds: 5,
+                    sponsorsByNumber: {} as Record<number, {name: string, image: string}>,
+                    globalSponsor: { name: '', image: '' },
+                    shortcuts: {
+                        autoDraw: 'Control+Enter',
+                        verify: 'Control+Space',
+                        clearRound: 'Control+Delete',
+                        drawPrize: 'Control+B',
+                        registerPrize: 'Control+S',
+                        sellAuction: 'Control+L',
+                        showInterval: 'Control+I',
+                    }
+                },
+                appLabels: {
+                    howToUseTitle: "🎬 Como Usar?",
+                    howToUseButton: "Em Breve!",
+                    versionHistoryButton: "Histórico de Versões",
+                    customizeButton: "Personalizar",
+                    intervalButton: "Intervalo",
+                    generateProofButton: "Gerar Prova",
+                    endEventButton: "Encerrar Evento",
+                    resetEventButton: "Reiniciar Evento",
+                    saveToFileButton: "Salvar no Computador",
+                    loadFromFileButton: "Carregar do Computador",
+                    winnersTitle: "Vencedores",
+                    bingoBoardTitle: "Painel de Números",
+                    activeRoundIndicatorDefault: "Selecione uma Rodada",
+                    activeRoundIndicatorLabel: "Rodada Ativa:",
+                    controlsPanelTitle: "Controles",
+                    boardScaleLabel: "Escala Painel Números",
+                    displayScaleLabel: "Escala Número Anunciado",
+                    manualAnnounceButton: "Anunciar Manual",
+                    autoDrawButton: "Sorteio Automático",
+                    verifyButton: "Verificar",
+                    clearRoundButton: "Limpar Rodada Atual",
+                    announcedNumberLabel: "Número Anunciado",
+                    lastNumbersLabel: "Últimos 5 Números",
+                    prizeDrawTitle: "Sorteio de Brindes",
+                    checkDrawnPrizesButton: "Conferir Sorteados",
+                    prizeDrawFromLabel: "De:",
+                    prizeDrawToLabel: "Até:",
+                    noRepeatCheckboxLabel: "Não repetir sorteados",
+                    prizeDrawRandomButton: "Sortear",
+                    prizeDrawTicketNumberPlaceholder: "Nº Cartela",
+                    prizeDrawNamePlaceholder: "Nome (Opcional)",
+                    prizeDrawDescriptionPlaceholder: "Brinde (Opcional)",
+                    registerPrizeButton: "Registrar Brinde",
+                    supportTitle: "Apoie o Seminarista 🤝",
+                    supportButton: "Faça sua Doação",
+                    roundsAndPrizesTitle: "Rodadas e Prêmios",
+                    addExtraRoundButton: "Adicionar Rodada Extra",
+                    subscribeTitle: "Inscreva-se no Canal",
+                    subscribeButton: "Inscrever-se no Canal",
+                    prize1Label: "Quina",
+                    prize2Label: "Cartela Cheia",
+                    prize3Label: "Azarão",
+                    intervalModalTitle: "Intervalo",
+                    intervalModalSubtitle: "Voltamos em breve!",
+                    verificationModalTitle: "Verificando Números",
+                    verificationModalBackButton: "Voltar ao App",
+                    auctionTitle: "Leilão",
+                    sellItemButton: "Vender Item",
+                    clearRoundConfirmTitle: "Confirmar Limpeza",
+                    clearRoundConfirmMessage: "Tem certeza que deseja limpar todos os números sorteados da rodada atual?",
+                    clearRoundConfirmButton: "Limpar",
+                    clearRoundCancelButton: "Cancelar",
+                    modalBackButton: "Voltar ao App",
+                    announceButton: "Anunciar Número",
+                    winnerModalNamePlaceholder: "Nome do Ganhador",
+                    winnerModalRegisterButton: "Registrar Ganhador",
+                    alertModalTitle: "Atenção",
+                    alertModalOkButton: "OK",
+                    congratsModalTitle: "Parabéns!",
+                    congratsModalPrizeLabel: "Ganhou:",
+                    congratsModalMessage: "Parabéns e muita sorte!",
+                    congratsModalCloseButton: "Fechar",
+                    menuEditModalTitle: "Editar Cardápio",
+                    menuEditModalDescription: "Digite cada item em uma nova linha.",
+                    modalCancelButton: "Cancelar",
+                    modalSaveButton: "Salvar",
+                    winnerEditModalTitle: "Editar Vencedor",
+                    winnerEditModalNamePlaceholder: "Nome do Ganhador",
+                    winnerEditModalPrizePlaceholder: "Prêmio",
+                    winnerEditModalRemoveButton: "Remover",
+                    deleteConfirmModalTitle: "Confirmar Exclusão",
+                    deleteConfirmModalDeleteButton: "Excluir",
+                    proofOptionsModalTitle: "Gerar Prova",
+                    proofOptionsModalDescription: "Selecione quais rodadas e brindes incluir no documento.",
+                    proofOptionsModalGenerateButton: "Gerar Prova",
+                    spinningWheelSkipButton: "Pular Animação",
+                    resetConfirmModalTitle: "Atenção!",
+                    resetConfirmModalMessage: "Tem certeza que deseja reiniciar todo o evento? Todos os dados de rodadas, prêmios e vencedores serão perdidos permanentemente.",
+                    resetConfirmModalConfirmButton: "Sim, Reiniciar",
+                    drawnPrizesModalTitle: "Cartelas de Brinde Já Sorteadas",
+                    modalCloseButton: "Fechar",
+                    donationModalTitle: "Apoio ao Projeto Seminarista",
+                    donationModalDescription: "Sua doação ajuda a manter este projeto ativo. Agradecemos imensamente!",
+                    donationModalPaypalLabel: "Doação via PayPal",
+                    donationModalPixLabel: "PIX (Chave Aleatória)",
+                    donationModalCopyButton: "Copiar Chave PIX",
+                    finalWinnersModalTitle: "Vencedores do Evento",
+                    finalWinnersModalProofButton: "Gerar Prova Final",
+                    finalWinnersModalSupportButton: "Apoie o Seminarista (PIX/PayPal)",
+                    changelogModalTitle: "Histórico de Versões",
+                    changelogModalCurrentVersionLabel: "Versão Atual:",
+                    settingsModalTitle: "Configurações de Personalização",
+                    settingsTabAppearance: "Aparência",
+                    settingsTabLabels: "Textos e Rótulos",
+                    settingsTabShortcuts: "Atalhos",
+                    settingsTabSponsors: "Patrocinadores",
+                    quickShortcutsTitle: "Atalhos Rápidos",
+                    shortcutsEditTitle: "Personalizar Atalhos",
+                    shortcutsEditDescription: "Clique em um campo e pressione a nova combinação de teclas. As alterações são salvas automaticamente.",
+                    shortcutLabelAutoDraw: "Sorteio Automático",
+                    shortcutLabelVerify: "Verificar Números",
+                    shortcutLabelClearRound: "Limpar Rodada",
+                    shortcutLabelDrawPrize: "Sortear Brinde",
+                    shortcutLabelRegisterPrize: "Registrar Brinde",
+                    shortcutLabelSellAuction: "Vender Leilão",
+                    shortcutLabelShowInterval: "Abrir Intervalo",
+                    settingsLogoTitle: "Logo do Evento",
+                    settingsLogoDescription: "Selecione uma imagem (PNG, JPG) para ser o logotipo do seu evento. A imagem será redimensionada para se ajustar ao cabeçalho.",
+                    settingsLogoRemoveButton: "Remover Logo",
+                    settingsGlobalSponsorTitle: "Patrocinador Global",
+                    settingsGlobalSponsorDescription: "Defina um nome e imagem que aparecerão para qualquer número sorteado que não tenha um patrocinador específico.",
+                    removeGlobalSponsorButton: "Remover Patrocinador Global",
+                    settingsSponsorsByNumberTitle: "Patrocinadores por Número",
+                    settingsSponsorsByNumberEnable: "Habilitar exibição de patrocinador ao sortear número",
+                    settingsSponsorsByNumberDescription: "Cadastre um patrocinador para números específicos (de 1 a 75). O nome e a imagem aparecerão em destaque quando o número for sorteado.",
+                    settingsSponsorNumberLabel: "Nº",
+                    settingsSponsorNameLabel: "Nome do Patrocinador",
+                    settingsSponsorImageLabel: "Imagem do Patrocinador",
+                    settingsBingoTitleLabel: "Título do Grito de Vitória",
+                    settingsBingoTitleDescription: "Personalize o 'grito de vitória'. Mudar para 'AJUDE!' também altera as letras do painel (A-J-U-D-E), ideal para bingos beneficentes.",
+                    settingsBoardColorLabel: "Cor de Fundo da Cartela",
+                    settingsBoardColorDescription: "Escolha a cor de fundo para os números que ainda não foram sorteados no painel principal.",
+                    settingsBoardColorResetButton: "Limpar Cor",
+                    settingsDrawnNumberTitle: "Aparência do Número Sorteado",
+                    settingsDrawnTextColorLabel: "Cor do Texto (Letra e Número)",
+                    settingsDrawnStrokeColorLabel: "Cor da Borda (Contorno)",
+                    settingsDrawnStrokeWidthLabel: "Largura da Borda",
+                    settingsModalAutocloseTitle: "Fechamento Automático do Modal",
+                    settingsModalAutocloseEnable: "Fechar modais de sorteio automaticamente",
+                    settingsModalAutocloseTimeLabel: "Tempo de Exibição",
+                    settingsTestDataButton: "Gerar Vencedores de Teste",
+                    settingsCloseSaveButton: "Fechar e Salvar"
+                },
+            },
 
-        // --- Configurações Globais da Aplicação (Persistidas no LocalStorage) ---
-        let appConfig = {
-            // FIXOS
-            pixKey: '1e8e4af0-4d23-440c-9f3d-b4e527f65911',
-            paypalLink: 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW',
-            tutorialVideoLink: 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ', 
-            // CONFIGURÁVEIS
-            bingoTitle: 'BINGO',
-            boardColor: 'default',
-            boardScale: 90,
-            displayScale: 100,
-            verificationPanelZoom: 100,
-            floatingNumberZoom: 100,
-            sponsorDisplayZoom: 100,
-            drawnTextColor: '#FFFFFF',
-            drawnTextStrokeColor: '#000000',
-            drawnTextStrokeWidth: 2,
-            isEventClosed: false,
-            customLogoBase64: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4NCiAgICA8ZGVmcz4NCiAgICAgICAgPHJhZGlhbEdyYWRpZW50IGlkPSJiZ0dyYWRpZW50IiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiIGZ4PSI1MCUiIGZ5PSI1MCUiPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzRhMDBlMDsiLz4NCiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzhlMmRlMjsiLz4NCiAgICAgICAgPC9yYWRpYWxHcmFkaWVudD4NCiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0ZXh0R29sZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZGRDcwMDsiLz4NCiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZGQTUwMDsiLz4NCiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI1IiByZXN1bHQ9ImNvbG9yZWRCbHVyIi8+DQogICAgICAgICAgICA8ZmVNZXJnZT4NCiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49ImNvbG9yZWRCbHVyIi8+DQogICAgICAgICAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+DQogICAgICAgICAgICA8L2ZlTWVyZ2U+DQogICAgICAgIDwvZmlsdGVyPg0KICAgICAgICA8ZmlsdGVyIGlkPSJzaGFkb3ciPg0KICAgICAgICAgICAgPGZlRHJvcFNoYWRvdyBkeD0iMyIgZHk9IjMiIHN0ZERldmlhdGlvbj0iMyIgZmxvb2QtY29sb3I9IiMwMDAwMDAiIGZsb29kLW9wYWNpdHk9IjAuNSIvPg0KICAgICAgICA8L2ZpbHRlcj4NCiAgICA8L2RlZnM+DQogICAgDQogICAgPCEtLSBCYWNrZ3JvdW5kIC0tPg0KICAgIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSJ1cmwoI2JnR3JhZGllbnQpIi8+DQogICAgDQogICAgPCEtLSBJbm5lciBjb25jZW50cmljIGNpcmNsZXMgZm9yIGRlcHRoIC0tPg0KICAgIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjMwIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4yKSIgc3Ryb2tlLXdpZHRoPSI1Ii8+DQogICAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTUiIGZpbGw9InJnYmEoMCwwLDAsMC4yKSIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4NCg0KICAgIDwhLS0gQ2VudHJhbCBCaW5nbyBCYWxsIGVsZW1lbnQgLS0+DQogICAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxNTAiIGZpbGw9IiNmZmZmZmYiLz4NCiAgICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE0MCIgZmlsbD0iI2UwZTBlMCIvPg0KICAgIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTMwIiBzdHJva2U9IiNGRkQ3MDAiIHN0cm9rZS13aWR0aD0iOCIgZmlsbD0ibm9uZSIvPg0KICAgIA0KICAgIDwhLS0gR2xvc3N5IEhpZ2hsaWdodCBvbiBiYWxsIC0tPg0KICAgIDxwYXRoIGQ9Ik0gMTgwIDE2MCBBIDEyMCAxMjAgMCAwIDEgMzQwIDIwMCBBIDE1MCAxNTAgMCAwIDAgMTgwIDE2MCBaIiBmaWxsPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuNykiLz4NCg0KICAgIDwhLS0gVGV4dCAiU0hPVyIgLS0+DQogICAgPHRleHQgeD0iNTAlIiB5PSI1NSUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0MCIgZm9udC1zd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjdGV4dEdvbGQpIiBzdHJva2U9IiM2YTNlMDAiIHN0cm9rZS13aWR0aD0iNSIgbGV0dGVyLXNwYWNpbmc9IjgiIGZpbHRlcj0idXJsKCNzaGFkb3cpIj4NCiAgICAgICAgU0hPVw0KICAgIDwvdGV4dD4NCg0KICAgIDwhLS0gUGF0aCBmb3IgIkJJTkdPIiB0ZXh0IC0tPg0KICAgIDxwYXRoIGlkPSJjdXJ2ZSIgZD0iTSAxMDAsIDI1NiBBIDE1NiAxNTYgMCAwIDEgNDEyLCAyNTYiIGZpbGw9Im5vbmUiLz4NCiAgICANCiAgICA8IS0tIFRleHQgIkJJTkdPIiBvbiBhIGN1cnZlIC0tPg0KICAgIDx0ZXh0IHdpZHRoPSI1MTIiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmZmZmIiBsZXR0ZXItc3BhY2luZz0iMTUiIGZpbHRlcj0idXJsKCNnbG9wKSI+DQogICAgICAgIDx0ZXh0UGF0aCBocmVmPSIjY3VydmUiIHN0YXJ0T2Zmc2V0PSI1MCUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPg0KICAgICAgICAgICAgQklOR08NCiAgICAgICAgPC90ZXh0UGF0aD4NCiAgICA8L3RleHQ+DQogICAgDQogICAgPCEtLSBEZWNvcmF0aXZlIFN0YXJzIC0tPg0KICAgIDxnIGZpbGw9IiNGRkQ3MDAiIGZpbHRlcj0idXJsKCNnbG9wKSI+DQogICAgICAgIDxwYXRoIGQ9Ik0gODAgMTAwIEwgOTAgMTI1IEwgMTE1IDEyNSBMIDk1IDE0MCBMIDEwNSAxNjUgTCA4MCAxNTAgTCA1NSAxNjUgTCA2NSAxNDAgTCA0MCAxMjUgTCA2NSAxMjUgWiIvPg0KICAgICAgICA8cGF0aCBkPSJNIDQzMiAxMDAgTCA0MjIgMTI1IEwgMzk3IDEyNSBMIDQxNyAxNDAgTCA0MDcgMTY1IEwgNDMyIDE1MCBMIDQ1NyAxNjUgTCA0NDcgMTQwIEwgNDcyIDEyNSBMIDQ0NyAxMjUgWiIgdHJhbnNmb3JtPSJzY2FsZSgwLjgpIHRyYW5zbGF0ZSgxMDAsIDIwKSIvPg0KICAgIDwvZz4NCjwvc3ZnPg==',
-            enableSponsorsByNumber: false,
-            enableModalAutoclose: true,
-            modalAutocloseSeconds: 5,
-            sponsorsByNumber: {} as Record<number, {name: string, image: string}>,
-            globalSponsor: { name: '', image: '' },
-            shortcuts: {
-                autoDraw: 'Control+Enter',
-                verify: 'Control+Space',
-                clearRound: 'Control+Delete',
-                drawPrize: 'Control+B',
-                registerPrize: 'Control+S',
-                sellAuction: 'Control+L',
-                showInterval: 'Control+I',
+            saveTimeout: null as any,
+
+            // --- State Mutation Methods (Actions) ---
+            setActiveGame(gameNumber: string | null) {
+                this.state.activeGameNumber = gameNumber;
+                this.debouncedSave();
+            },
+
+            addExtraGame() {
+                this.state.gameCount++;
+                this.state.gamesData[this.state.gameCount] = {
+                    name: `Rodada ${this.state.gameCount}`,
+                    prizes: { prize1: '', prize2: '', prize3: '' },
+                    description: '',
+                    calledNumbers: [],
+                    winners: [],
+                    isComplete: false,
+                    color: roundColors[(this.state.gameCount - 1) % roundColors.length]
+                };
+                this.debouncedSave();
+                return this.state.gameCount;
+            },
+            
+            addCalledNumber(number: number) {
+                if (this.state.activeGameNumber) {
+                    const game = this.state.gamesData[this.state.activeGameNumber];
+                    if (game && !game.calledNumbers.includes(number)) {
+                        game.calledNumbers.push(number);
+                        this.debouncedSave();
+                    }
+                }
+            },
+            
+            removeCalledNumber(number: number) {
+                 if (this.state.activeGameNumber) {
+                    const game = this.state.gamesData[this.state.activeGameNumber];
+                    if (game) {
+                        const index = game.calledNumbers.indexOf(number);
+                        if (index > -1) {
+                            game.calledNumbers.splice(index, 1);
+                            this.debouncedSave();
+                        }
+                    }
+                }
+            },
+            
+            clearActiveRound() {
+                if (this.state.activeGameNumber) {
+                    const game = this.state.gamesData[this.state.activeGameNumber];
+                    if (game) {
+                        game.calledNumbers = [];
+                        this.debouncedSave();
+                    }
+                }
+            },
+
+            addWinner(prizeType: string, winnerName: string) {
+                if (this.state.activeGameNumber) {
+                    const game = this.state.gamesData[this.state.activeGameNumber];
+                    if (game) {
+                        const winnerData = {
+                            id: Date.now(),
+                            name: winnerName || "Ganhador Anônimo",
+                            prize: game.prizes[prizeType],
+                            gameNumber: this.state.activeGameNumber,
+                            bingoType: prizeType,
+                            numbers: [...game.calledNumbers].sort((a,b) => a-b)
+                        };
+                        game.winners.push(winnerData);
+                        this.debouncedSave();
+                        return winnerData;
+                    }
+                }
+                return null;
+            },
+
+            // --- Persistence Logic ---
+            getAppStateForSaving() {
+                const state = {
+                    gamesData: this.state.gamesData,
+                    cardsData: this.state.cardsData,
+                    gameCount: this.state.gameCount,
+                    activeGameNumber: this.state.activeGameNumber,
+                    menuItems: this.state.menuItems,
+                    drawnPrizeNumbers: this.state.drawnPrizeNumbers,
+                    versionText: currentVersion,
+                    versionHistory: this.state.versionHistory,
+                    appConfig: this.state.appConfig,
+                    appLabels: this.state.appLabels,
+                };
+                return state;
+            },
+
+            loadStateFromObject(state: any) {
+                this.state.gamesData = state.gamesData || {};
+                this.state.cardsData = state.cardsData || {};
+                this.state.gameCount = state.gameCount || 6;
+                this.state.activeGameNumber = state.activeGameNumber || null;
+                this.state.menuItems = state.menuItems || [ "Refrigerante - R$ 5,00", "Cerveja - R$ 7,00", "Água - R$ 3,00", "Espetinho - R$ 8,00", "Pastel - R$ 6,00", "Porção de Fritas - R$ 15,00" ];
+                this.state.drawnPrizeNumbers = state.drawnPrizeNumbers || [];
+                this.state.versionHistory = state.versionHistory || this.state.versionHistory;
+                const loadedConfig = state.appConfig || {};
+                this.state.appConfig = { ...this.state.appConfig, ...loadedConfig };
+                const loadedLabels = state.appLabels || {};
+                this.state.appLabels = { ...this.state.appLabels, ...loadedLabels };
+            },
+
+            debouncedSave() {
+                clearTimeout(this.saveTimeout);
+                this.saveTimeout = setTimeout(() => {
+                    this.saveStateToLocalStorage();
+                }, 1000);
+            },
+
+            async saveStateToLocalStorage() {
+                try {
+                    const appState = this.getAppStateForSaving();
+                    const stateToStore = JSON.parse(JSON.stringify(appState));
+                    const imageSavePromises: Promise<void>[] = [];
+                    if (stateToStore.appConfig && stateToStore.appConfig.sponsorsByNumber) {
+                        for (const num in stateToStore.appConfig.sponsorsByNumber) {
+                            const sponsor = stateToStore.appConfig.sponsorsByNumber[num];
+                            if (sponsor.image && sponsor.image.startsWith('data:image')) {
+                                imageSavePromises.push(saveSponsorImage(num, sponsor.image));
+                                delete sponsor.image;
+                            }
+                        }
+                    }
+                    if (stateToStore.appConfig && stateToStore.appConfig.globalSponsor) {
+                        const globalSponsor = stateToStore.appConfig.globalSponsor;
+                        if (globalSponsor.image && globalSponsor.image.startsWith('data:image')) {
+                             imageSavePromises.push(saveSponsorImage('global', globalSponsor.image));
+                             delete globalSponsor.image;
+                        }
+                    }
+                    await Promise.all(imageSavePromises);
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToStore));
+                    renderUpdateInfo();
+                } catch (error) {
+                    console.error("Falha ao salvar estado no localStorage:", error);
+                }
+            },
+
+            async loadStateFromLocalStorage(): Promise<boolean> {
+                try {
+                    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    if (savedState) {
+                        const appState = JSON.parse(savedState);
+                        this.loadStateFromObject(appState);
+                        await loadSponsorImages();
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error("Falha ao carregar estado do localStorage:", error);
+                    return false;
+                }
+            },
+            
+            async loadInitialState() {
+                let stateLoaded = false;
+                let forceSave = false;
+                
+                stateLoaded = await this.loadStateFromLocalStorage();
+                
+                if (!stateLoaded || Object.keys(this.state.gamesData).length === 0) {
+                    console.log("Nenhum estado salvo encontrado. Inicializando com dados padrão.");
+                    this.state.gameCount = 6;
+                    this.state.gamesData = {};
+                    for (let i = 1; i <= this.state.gameCount; i++) {
+                        this.state.gamesData[i] = {
+                            name: `Rodada ${i}`,
+                            prizes: {
+                                prize1: predefinedPrizes[i - 1]?.prize1 || '',
+                                prize2: predefinedPrizes[i - 1]?.prize2 || '',
+                                prize3: predefinedPrizes[i - 1]?.prize3 || ''
+                            },
+                            description: '',
+                            calledNumbers: [],
+                            winners: [],
+                            isComplete: false,
+                            color: roundColors[(i-1) % roundColors.length],
+                        };
+                    }
+                    forceSave = true;
+                }
+                
+                this.state.appConfig.tutorialVideoLink = 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ';
+                this.state.appConfig.paypalLink = 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW';
+                this.state.appConfig.pixKey = '1e8e4af0-4d23-440c-9f3d-b4e527f65911';
+                
+                applyLabels();
+                updateProgramTitle();
+                renderUIFromState();
+                
+                if (forceSave) {
+                    this.debouncedSave();
+                }
             }
         };
 
-        // Objeto para todos os textos customizáveis (i18n)
-        let appLabels = {
-            howToUseTitle: "🎬 Como Usar?",
-            howToUseButton: "Em Breve!",
-            versionHistoryButton: "Histórico de Versões",
-            customizeButton: "Personalizar",
-            intervalButton: "Intervalo",
-            generateProofButton: "Gerar Prova",
-            endEventButton: "Encerrar Evento",
-            resetEventButton: "Reiniciar Evento",
-            saveToFileButton: "Salvar no Computador",
-            loadFromFileButton: "Carregar do Computador",
-            winnersTitle: "Vencedores",
-            bingoBoardTitle: "Painel de Números",
-            activeRoundIndicatorDefault: "Selecione uma Rodada",
-            activeRoundIndicatorLabel: "Rodada Ativa:",
-            controlsPanelTitle: "Controles",
-            boardScaleLabel: "Escala Painel Números",
-            displayScaleLabel: "Escala Número Anunciado",
-            manualAnnounceButton: "Anunciar Manual",
-            autoDrawButton: "Sorteio Automático",
-            verifyButton: "Verificar",
-            clearRoundButton: "Limpar Rodada Atual",
-            announcedNumberLabel: "Número Anunciado",
-            lastNumbersLabel: "Últimos 5 Números",
-            prizeDrawTitle: "Sorteio de Brindes",
-            checkDrawnPrizesButton: "Conferir Sorteados",
-            prizeDrawFromLabel: "De:",
-            prizeDrawToLabel: "Até:",
-            noRepeatCheckboxLabel: "Não repetir sorteados",
-            prizeDrawRandomButton: "Sortear",
-            prizeDrawTicketNumberPlaceholder: "Nº Cartela",
-            prizeDrawNamePlaceholder: "Nome (Opcional)",
-            prizeDrawDescriptionPlaceholder: "Brinde (Opcional)",
-            registerPrizeButton: "Registrar Brinde",
-            supportTitle: "Apoie o Seminarista 🤝",
-            supportButton: "Faça sua Doação",
-            roundsAndPrizesTitle: "Rodadas e Prêmios",
-            addExtraRoundButton: "Adicionar Rodada Extra",
-            subscribeTitle: "Inscreva-se no Canal",
-            subscribeButton: "Inscrever-se no Canal",
-            prize1Label: "Quina",
-            prize2Label: "Cartela Cheia",
-            prize3Label: "Azarão",
-            intervalModalTitle: "Intervalo",
-            intervalModalSubtitle: "Voltamos em breve!",
-            verificationModalTitle: "Verificando Números",
-            verificationModalBackButton: "Voltar ao App",
-            auctionTitle: "Leilão",
-            sellItemButton: "Vender Item",
-            clearRoundConfirmTitle: "Confirmar Limpeza",
-            clearRoundConfirmMessage: "Tem certeza que deseja limpar todos os números sorteados da rodada atual?",
-            clearRoundConfirmButton: "Limpar",
-            clearRoundCancelButton: "Cancelar",
-            modalBackButton: "Voltar ao App",
-            announceButton: "Anunciar Número",
-            winnerModalNamePlaceholder: "Nome do Ganhador",
-            winnerModalRegisterButton: "Registrar Ganhador",
-            alertModalTitle: "Atenção",
-            alertModalOkButton: "OK",
-            congratsModalTitle: "Parabéns!",
-            congratsModalPrizeLabel: "Ganhou:",
-            congratsModalMessage: "Parabéns e muita sorte!",
-            congratsModalCloseButton: "Fechar",
-            menuEditModalTitle: "Editar Cardápio",
-            menuEditModalDescription: "Digite cada item em uma nova linha.",
-            modalCancelButton: "Cancelar",
-            modalSaveButton: "Salvar",
-            winnerEditModalTitle: "Editar Vencedor",
-            winnerEditModalNamePlaceholder: "Nome do Ganhador",
-            winnerEditModalPrizePlaceholder: "Prêmio",
-            winnerEditModalRemoveButton: "Remover",
-            deleteConfirmModalTitle: "Confirmar Exclusão",
-            deleteConfirmModalDeleteButton: "Excluir",
-            proofOptionsModalTitle: "Gerar Prova",
-            proofOptionsModalDescription: "Selecione quais rodadas e brindes incluir no documento.",
-            proofOptionsModalGenerateButton: "Gerar Prova",
-            spinningWheelSkipButton: "Pular Animação",
-            resetConfirmModalTitle: "Atenção!",
-            resetConfirmModalMessage: "Tem certeza que deseja reiniciar todo o evento? Todos os dados de rodadas, prêmios e vencedores serão perdidos permanentemente.",
-            resetConfirmModalConfirmButton: "Sim, Reiniciar",
-            drawnPrizesModalTitle: "Cartelas de Brinde Já Sorteadas",
-            modalCloseButton: "Fechar",
-            donationModalTitle: "Apoio ao Projeto Seminarista",
-            donationModalDescription: "Sua doação ajuda a manter este projeto ativo. Agradecemos imensamente!",
-            donationModalPaypalLabel: "Doação via PayPal",
-            donationModalPixLabel: "PIX (Chave Aleatória)",
-            donationModalCopyButton: "Copiar Chave PIX",
-            finalWinnersModalTitle: "Vencedores do Evento",
-            finalWinnersModalProofButton: "Gerar Prova Final",
-            finalWinnersModalSupportButton: "Apoie o Seminarista (PIX/PayPal)",
-            changelogModalTitle: "Histórico de Versões",
-            changelogModalCurrentVersionLabel: "Versão Atual:",
-            settingsModalTitle: "Configurações de Personalização",
-            settingsTabAppearance: "Aparência",
-            settingsTabLabels: "Textos e Rótulos",
-            settingsTabShortcuts: "Atalhos",
-            settingsTabSponsors: "Patrocinadores",
-            quickShortcutsTitle: "Atalhos Rápidos",
-            shortcutsEditTitle: "Personalizar Atalhos",
-            shortcutsEditDescription: "Clique em um campo e pressione a nova combinação de teclas. As alterações são salvas automaticamente.",
-            shortcutLabelAutoDraw: "Sorteio Automático",
-            shortcutLabelVerify: "Verificar Números",
-            shortcutLabelClearRound: "Limpar Rodada",
-            shortcutLabelDrawPrize: "Sortear Brinde",
-            shortcutLabelRegisterPrize: "Registrar Brinde",
-            shortcutLabelSellAuction: "Vender Leilão",
-            shortcutLabelShowInterval: "Abrir Intervalo",
-            settingsLogoTitle: "Logo do Evento",
-            settingsLogoDescription: "Selecione uma imagem (PNG, JPG) para ser o logotipo do seu evento. A imagem será redimensionada para se ajustar ao cabeçalho.",
-            settingsLogoRemoveButton: "Remover Logo",
-            settingsGlobalSponsorTitle: "Patrocinador Global",
-            settingsGlobalSponsorDescription: "Defina um nome e imagem que aparecerão para qualquer número sorteado que não tenha um patrocinador específico.",
-            removeGlobalSponsorButton: "Remover Patrocinador Global",
-            settingsSponsorsByNumberTitle: "Patrocinadores por Número",
-            settingsSponsorsByNumberEnable: "Habilitar exibição de patrocinador ao sortear número",
-            settingsSponsorsByNumberDescription: "Cadastre um patrocinador para números específicos (de 1 a 75). O nome e a imagem aparecerão em destaque quando o número for sorteado.",
-            settingsSponsorNumberLabel: "Nº",
-            settingsSponsorNameLabel: "Nome do Patrocinador",
-            settingsSponsorImageLabel: "Imagem do Patrocinador",
-            settingsBingoTitleLabel: "Título do Grito de Vitória",
-            settingsBingoTitleDescription: "Personalize o 'grito de vitória'. Mudar para 'AJUDE!' também altera as letras do painel (A-J-U-D-E), ideal para bingos beneficentes.",
-            settingsBoardColorLabel: "Cor de Fundo da Cartela",
-            settingsBoardColorDescription: "Escolha a cor de fundo para os números que ainda não foram sorteados no painel principal.",
-            settingsBoardColorResetButton: "Limpar Cor",
-            settingsDrawnNumberTitle: "Aparência do Número Sorteado",
-            settingsDrawnTextColorLabel: "Cor do Texto (Letra e Número)",
-            settingsDrawnStrokeColorLabel: "Cor da Borda (Contorno)",
-            settingsDrawnStrokeWidthLabel: "Largura da Borda",
-            settingsModalAutocloseTitle: "Fechamento Automático do Modal",
-            settingsModalAutocloseEnable: "Fechar modais de sorteio automaticamente",
-            settingsModalAutocloseTimeLabel: "Tempo de Exibição",
-            settingsTestDataButton: "Gerar Vencedores de Teste",
-            settingsCloseSaveButton: "Fechar e Salvar"
-        };
+        // --- Transient UI State (not persisted) ---
+        let floatingNumberTimeout: ReturnType<typeof setTimeout> | null = null;
+        let intervalContentInterval: any;
+        let intervalClockInterval: any;
+        let breakConfettiInterval: any;
+        let finalConfettiInterval: any;
+        let clockInterval: any;
+        let confettiAnimationId: number;
+        let spinTimeout: any;
+        let cycloneInterval: any;
+        let winnerDisplayTimeout: any; 
 
-
-        // --- Variáveis Locais ---
+        // --- Constants ---
+        const currentVersion = "7.1"; // Foco 100% Local
+        const DYNAMIC_LETTERS = ['B', 'I', 'N', 'G', 'O'];
+        const DYNAMIC_LETTERS_AJUDE = ['A', 'J', 'U', 'D', 'E'];
+        const BINGO_CONFIG: { [key: string]: { min: number; max: number } } = { B: { min: 1, max: 15 }, I: { min: 16, max: 30 }, N: { min: 31, max: 45 }, G: { min: 46, max: 60 }, O: { min: 61, max: 75 },
+                               A: { min: 1, max: 15 }, J: { min: 16, max: 30 }, U: { min: 31, max: 45 }, D: { min: 46, max: 60 }, E: { min: 61, max: 75 } };
+        const LETTERS = Object.keys(BINGO_CONFIG);
+        const roundColors = ['#16a34a', '#ca8a04', '#c2410c', '#0e7490', '#be185d', '#6d28d9', '#059669', '#b45309'];
+        const predefinedPrizes = [ { prize1: 'R$ 100,00', prize2: '', prize3: '' }, { prize1: 'R$ 100,00', prize2: 'R$ 200,00', prize3: '' }, { prize1: 'R$ 200,00', prize2: '', prize3: '' }, { prize1: 'R$ 100,00', prize2: 'R$ 300,00', prize3: '' }, { prize1: 'R$ 300,00', prize2: '', prize3: 'R$ 300,00' }, { prize1: 'R$ 200,00', prize2: 'R$ 2.000,00', prize3: '' } ];
+        const winnerDisplayDuration = 5000;
         const LOCAL_STORAGE_KEY = 'bingoShowState';
 
         // --- Seletores de Elementos ---
@@ -295,6 +500,9 @@
             auctionForm: document.getElementById('auction-form') as HTMLFormElement,
             roundEditModal: document.getElementById('round-edit-modal'),
             nextRoundModal: document.getElementById('next-round-modal'),
+            showCardGeneratorBtn: document.getElementById('show-card-generator-btn'),
+            cardGeneratorModal: document.getElementById('card-generator-modal'),
+            cardScannerModal: document.getElementById('card-scanner-modal'),
         };
         const confettiCtx = DOMElements.confettiCanvas.getContext('2d');
 
@@ -302,15 +510,15 @@ function renderCustomLogo() {
     const headerLogoContainer = document.getElementById('app-logo');
     if (!headerLogoContainer) return;
 
-    if (appConfig.customLogoBase64) {
-        headerLogoContainer.innerHTML = `<img id="header-logo" src="${appConfig.customLogoBase64}" alt="Logo do Evento" class="w-full h-full object-contain">`;
+    if (appStore.state.appConfig.customLogoBase64) {
+        headerLogoContainer.innerHTML = `<img id="header-logo" src="${appStore.state.appConfig.customLogoBase64}" alt="Logo do Evento" class="w-full h-full object-contain">`;
     } else {
         headerLogoContainer.innerHTML = ''; 
     }
     
     const settingsPreview = document.getElementById('custom-logo-preview') as HTMLImageElement;
     if (settingsPreview) {
-        settingsPreview.src = appConfig.customLogoBase64 || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        settingsPreview.src = appStore.state.appConfig.customLogoBase64 || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
 }
 
@@ -320,7 +528,7 @@ function renderShortcutsLegend() {
 
     container.innerHTML = ''; 
 
-    const shortcutMap: { [key in keyof typeof appConfig.shortcuts]: keyof typeof appLabels } = {
+    const shortcutMap: { [key in keyof typeof appStore.state.appConfig.shortcuts]: keyof typeof appStore.state.appLabels } = {
         autoDraw: 'shortcutLabelAutoDraw',
         verify: 'shortcutLabelVerify',
         clearRound: 'shortcutLabelClearRound',
@@ -330,19 +538,19 @@ function renderShortcutsLegend() {
         showInterval: 'shortcutLabelShowInterval',
     };
 
-    for (const key in appConfig.shortcuts) {
-        const shortcutKey = key as keyof typeof appConfig.shortcuts;
+    for (const key in appStore.state.appConfig.shortcuts) {
+        const shortcutKey = key as keyof typeof appStore.state.appConfig.shortcuts;
         const labelKey = shortcutMap[shortcutKey];
-        if (labelKey && appLabels[labelKey]) {
+        if (labelKey && appStore.state.appLabels[labelKey]) {
             const legendItem = document.createElement('li');
             legendItem.className = 'flex justify-between items-center';
             
             const labelSpan = document.createElement('span');
-            labelSpan.textContent = `${appLabels[labelKey]}:`;
+            labelSpan.textContent = `${appStore.state.appLabels[labelKey]}:`;
 
             const keySpan = document.createElement('span');
             keySpan.className = 'font-mono bg-gray-700 text-sky-300 rounded px-2 py-1';
-            keySpan.textContent = appConfig.shortcuts[shortcutKey];
+            keySpan.textContent = appStore.state.appConfig.shortcuts[shortcutKey];
 
             legendItem.appendChild(labelSpan);
             legendItem.appendChild(keySpan);
@@ -394,10 +602,10 @@ function populateSettingsLabelsTab() {
 
     const keysToExclude = ['prize1Label', 'prize2Label', 'prize3Label'];
 
-    Object.keys(appLabels).forEach(key => {
+    Object.keys(appStore.state.appLabels).forEach(key => {
         if (keysToExclude.includes(key)) return;
 
-        const labelKey = key as keyof typeof appLabels;
+        const labelKey = key as keyof typeof appStore.state.appLabels;
 
         const wrapper = document.createElement('div');
         wrapper.className = 'flex flex-col';
@@ -410,12 +618,12 @@ function populateSettingsLabelsTab() {
         const input = document.createElement('input');
         input.type = 'text';
         input.id = `label-input-${labelKey}`;
-        input.value = appLabels[labelKey];
+        input.value = appStore.state.appLabels[labelKey];
         input.className = 'bg-gray-900 text-white p-2 rounded-lg text-sm focus:ring-sky-500 focus:border-sky-500';
 
         input.addEventListener('change', (e) => {
-            appLabels[labelKey] = (e.target as HTMLInputElement).value;
-            debouncedSave();
+            appStore.state.appLabels[labelKey] = (e.target as HTMLInputElement).value;
+            appStore.debouncedSave();
         });
 
         wrapper.appendChild(label);
@@ -430,7 +638,7 @@ function populateSettingsShortcutsTab() {
 
     container.innerHTML = '';
 
-    const shortcutMap: { [key in keyof typeof appConfig.shortcuts]: keyof typeof appLabels } = {
+    const shortcutMap: { [key in keyof typeof appStore.state.appConfig.shortcuts]: keyof typeof appStore.state.appLabels } = {
         autoDraw: 'shortcutLabelAutoDraw',
         verify: 'shortcutLabelVerify',
         clearRound: 'shortcutLabelClearRound',
@@ -440,8 +648,8 @@ function populateSettingsShortcutsTab() {
         showInterval: 'shortcutLabelShowInterval',
     };
 
-    Object.keys(appConfig.shortcuts).forEach(key => {
-        const shortcutKey = key as keyof typeof appConfig.shortcuts;
+    Object.keys(appStore.state.appConfig.shortcuts).forEach(key => {
+        const shortcutKey = key as keyof typeof appStore.state.appConfig.shortcuts;
         const labelKey = shortcutMap[shortcutKey];
 
         const wrapper = document.createElement('div');
@@ -450,20 +658,20 @@ function populateSettingsShortcutsTab() {
         const label = document.createElement('label');
         label.htmlFor = `shortcut-input-${shortcutKey}`;
         label.className = 'text-base font-medium text-slate-300 mb-1 sm:mb-0';
-        label.textContent = appLabels[labelKey];
+        label.textContent = appStore.state.appLabels[labelKey];
 
         const input = document.createElement('input');
         input.type = 'text';
         input.readOnly = true;
         input.id = `shortcut-input-${shortcutKey}`;
-        input.value = appConfig.shortcuts[shortcutKey];
+        input.value = appStore.state.appConfig.shortcuts[shortcutKey];
         input.className = 'bg-gray-900 text-center text-sky-300 font-mono p-2 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer w-full sm:w-auto';
 
         input.addEventListener('focus', () => {
             input.value = 'Pressione a nova tecla...';
         });
         input.addEventListener('blur', () => {
-            input.value = appConfig.shortcuts[shortcutKey];
+            input.value = appStore.state.appConfig.shortcuts[shortcutKey];
         });
 
         input.addEventListener('keydown', (e) => {
@@ -490,9 +698,9 @@ function populateSettingsShortcutsTab() {
             shortcutString += key;
             
             input.value = shortcutString;
-            appConfig.shortcuts[shortcutKey] = shortcutString;
+            appStore.state.appConfig.shortcuts[shortcutKey] = shortcutString;
             renderShortcutsLegend();
-            debouncedSave();
+            appStore.debouncedSave();
             input.blur(); 
         });
 
@@ -504,6 +712,7 @@ function populateSettingsShortcutsTab() {
 }
         // --- Funções de Template HTML ---
         function getModalTemplates() {
+            const { appLabels } = appStore.state;
             return {
                 verification: `<div id="verification-modal-content" class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-7xl w-full text-center flex flex-col h-[90vh]">
                                    <div class="flex-shrink-0 flex justify-between items-center mb-2">
@@ -831,53 +1040,642 @@ function populateSettingsShortcutsTab() {
                     <div class="w-full bg-gray-700 rounded-full h-2.5 mt-6">
                       <div id="next-round-progress" class="bg-sky-500 h-2.5 rounded-full" style="width: 100%; transition: width 5s linear;"></div>
                     </div>
-                 </div>`
+                 </div>`,
+                cardGenerator: `<div class="modal-content bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-5xl w-full text-left flex flex-col h-[90vh]">
+                                   <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex-shrink-0">Gerador de Cartelas</h2>
+                                   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 flex-shrink-0">
+                                       <input type="text" id="card-batch-title" placeholder="Título (Ex: Bingo de Natal)" class="md:col-span-2 w-full text-base font-bold p-3 border-2 border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                       <input type="number" id="card-quantity" placeholder="Quantidade" value="100" class="w-full text-center text-base font-bold p-3 border-2 border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                       <select id="card-per-page" class="w-full text-base font-bold p-3 border-2 border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                          <option value="1">1 por Folha</option>
+                                          <option value="2">2 por Folha</option>
+                                          <option value="4">4 por Folha</option>
+                                          <option value="6" selected>6 por Folha</option>
+                                       </select>
+                                   </div>
+                                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 flex-shrink-0">
+                                       <textarea id="card-prizes-text" placeholder="Prêmios / Rodadas (Opcional, aparece à esquerda)" class="w-full text-sm p-3 border-2 border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg h-24 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+                                       <textarea id="card-menu-text" placeholder="Cardápio (Opcional, aparece à direita)" class="w-full text-sm p-3 border-2 border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg h-24 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+                                   </div>
+                                   <div class="flex items-center gap-2 mb-4 flex-shrink-0">
+                                       <input type="checkbox" id="card-use-logo" class="w-5 h-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                                       <label for="card-use-logo" class="text-sm font-bold text-gray-800 dark:text-slate-200">Usar logomarca no espaço central da cartela (em vez de ★)</label>
+                                   </div>
+                                   <div class="flex justify-end gap-4 mb-4 flex-shrink-0">
+                                        <button id="generate-cards-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-6 rounded-full">Gerar e Visualizar</button>
+                                        <button id="print-cards-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-full hidden">Imprimir Cartelas</button>
+                                   </div>
+                                   <div id="card-print-preview" class="flex-grow bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-y-auto flex items-center justify-center">
+                                        <p class="text-slate-400 text-center">Defina as opções, clique em "Gerar e Visualizar" para criar as cartelas.</p>
+                                   </div>
+                                   <button id="close-card-generator-btn" class="mt-4 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-full text-lg flex-shrink-0 self-center">${appLabels.modalCloseButton}</button>
+                               </div>`,
+                cardScanner: `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-2xl w-full text-center">
+                                <h2 class="text-3xl font-bold text-white mb-4">Verificar Cartela com Câmera</h2>
+                                <div id="scanner-container" class="relative w-full aspect-square bg-gray-900 rounded-lg overflow-hidden">
+                                    <video id="scanner-video" class="w-full h-full object-cover" playsinline></video>
+                                    <canvas id="scanner-canvas" class="hidden"></canvas>
+                                    <div class="absolute inset-0 border-8 border-red-500/50" style="clip-path: polygon(0% 0%, 0% 25%, 25% 25%, 25% 0%, 75% 0%, 75% 25%, 100% 25%, 100% 75%, 75% 75%, 75% 100%, 25% 100%, 25% 75%, 0% 75%);"></div>
+                                </div>
+                                <p id="scanner-message" class="text-slate-400 mt-4 h-6">Aponte o QR Code da cartela para a câmera.</p>
+                                <button id="close-card-scanner-btn" class="mt-4 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-full text-lg">${appLabels.modalCancelButton}</button>
+                            </div>`,
             };
         }
         
-        function getAppState() {
-            const state = {
-                gamesData,
-                gameCount,
-                activeGameNumber,
-                menuItems,
-                drawnPrizeNumbers,
-                versionText: currentVersion,
-                versionHistory,
-                appConfig,
-                appLabels,
-            };
-            return state;
-        }
+// FIX: Added definitions for missing UI functions to resolve multiple "Cannot find name" errors.
+function confirmClearRound() {
+    if (!appStore.state.activeGameNumber) {
+        showAlert("Nenhuma rodada ativa para limpar.");
+        return;
+    }
+    DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
+    DOMElements.clearRoundConfirmModal.classList.remove('hidden');
 
-        function loadAppState(state: any) {
-            gamesData = state.gamesData || {};
-            gameCount = state.gameCount || 6;
-            activeGameNumber = state.activeGameNumber || null;
-            menuItems = state.menuItems || [ "Refrigerante - R$ 5,00", "Cerveja - R$ 7,00", "Água - R$ 3,00", "Espetinho - R$ 8,00", "Pastel - R$ 6,00", "Porção de Fritas - R$ 15,00" ];
-            drawnPrizeNumbers = state.drawnPrizeNumbers || [];
-            versionHistory = state.versionHistory || versionHistory;
-            const loadedConfig = state.appConfig || {};
-            appConfig = { ...appConfig, ...loadedConfig };
-            const loadedLabels = state.appLabels || {};
-            appLabels = { ...appLabels, ...loadedLabels };
+    document.getElementById('confirm-clear-round-btn')!.onclick = () => {
+        startNewRound();
+        DOMElements.clearRoundConfirmModal.classList.add('hidden');
+    };
+    document.getElementById('cancel-clear-round-btn')!.onclick = () => {
+        DOMElements.clearRoundConfirmModal.classList.add('hidden');
+    };
+}
+
+function generateProof(selectedGameKeys: string[]) {
+    const { gamesData, appLabels, appConfig } = appStore.state;
+    let proofContent = `
+        <html>
+        <head>
+            <title>Prova do Sorteio - ${appConfig.bingoTitle}</title>
+            <style>
+                body { font-family: sans-serif; margin: 2rem; }
+                h1 { text-align: center; }
+                h2 { border-bottom: 2px solid #ccc; padding-bottom: 5px; margin-top: 2rem; }
+                table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .numbers { font-size: 0.8em; word-break: break-all; }
+            </style>
+        </head>
+        <body>
+            <h1>Prova do Sorteio - ${appConfig.bingoTitle}</h1>
+            <p style="text-align: center;">Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+    `;
+
+    selectedGameKeys.forEach(key => {
+        const game = gamesData[key];
+        if (game && game.winners && game.winners.length > 0) {
+            proofContent += `<h2>${game.name || `Rodada ${key}`}</h2>`;
+            proofContent += '<table><thead><tr><th>Ganhador</th><th>Prêmio</th>';
+            if (key !== 'Brindes' && key !== 'Leilão') {
+                proofContent += `<th>Números Sorteados (${game.calledNumbers.length})</th>`;
+            } else if (key === 'Brindes') {
+                proofContent += '<th>Nº da Cartela</th>';
+            } else if (key === 'Leilão') {
+                proofContent += '<th>Item</th><th>Lance</th>';
+            }
+            proofContent += '</tr></thead><tbody>';
+
+            game.winners.forEach((winner: any) => {
+                proofContent += '<tr>';
+                proofContent += `<td>${winner.name}</td>`;
+                if (key !== 'Leilão') {
+                    proofContent += `<td>${winner.prize}</td>`;
+                }
+
+                if (key !== 'Brindes' && key !== 'Leilão') {
+                    proofContent += `<td class="numbers">${winner.numbers.join(', ')}</td>`;
+                } else if (key === 'Brindes') {
+                     proofContent += `<td>${winner.cartela}</td>`;
+                } else if (key === 'Leilão') {
+                    proofContent += `<td>${winner.itemName}</td><td>R$ ${winner.bid},00</td>`;
+                }
+                proofContent += '</tr>';
+            });
+            proofContent += '</tbody></table>';
         }
+    });
+
+    proofContent += '</body></html>';
+    
+    const proofWindow = window.open('', '_blank');
+    if (proofWindow) {
+        proofWindow.document.write(proofContent);
+        proofWindow.document.close();
+        proofWindow.print();
+    } else {
+        showAlert("Não foi possível abrir a janela de impressão. Verifique se o seu navegador está bloqueando pop-ups.");
+    }
+}
+
+function showProofOptionsModal(isFinal = false) {
+    DOMElements.proofOptionsModal.innerHTML = getModalTemplates().proofOptions;
+    const optionsList = document.getElementById('proof-options-list')!;
+    optionsList.innerHTML = '';
+
+    const createCheckbox = (id: string, label: string, checked = true) => `
+        <div class="flex items-center">
+            <input id="proof-option-${id}" type="checkbox" ${checked ? 'checked' : ''} class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+            <label for="proof-option-${id}" class="ml-3 text-sm text-slate-200">${label}</label>
+        </div>
+    `;
+
+    Object.keys(appStore.state.gamesData).forEach(key => {
+        const game = appStore.state.gamesData[key];
+        if (game.winners && game.winners.length > 0) {
+            optionsList.innerHTML += createCheckbox(key, game.name || `Rodada ${key}`);
+        }
+    });
+
+    DOMElements.proofOptionsModal.classList.remove('hidden');
+
+    document.getElementById('cancel-proof-btn')!.onclick = () => DOMElements.proofOptionsModal.classList.add('hidden');
+    document.getElementById('generate-selected-proof-btn')!.onclick = () => {
+        const selectedGameKeys = Array.from(optionsList.querySelectorAll<HTMLInputElement>('input:checked')).map(input => input.id.replace('proof-option-', ''));
+        generateProof(selectedGameKeys);
+        DOMElements.proofOptionsModal.classList.add('hidden');
+        if(isFinal) DOMElements.finalWinnersModal.classList.add('hidden');
+    };
+}
+
+function showWinnerEditModal(winnerId: number) {
+    let winnerData: any = null;
+    let gameKey: string | null = null;
+
+    for (const key in appStore.state.gamesData) {
+        const game = appStore.state.gamesData[key];
+        if (game.winners) {
+            const foundWinner = game.winners.find((w: any) => w.id === winnerId);
+            if (foundWinner) {
+                winnerData = foundWinner;
+                gameKey = key;
+                break;
+            }
+        }
+    }
+
+    if (!winnerData || !gameKey) {
+        console.error(`Vencedor com ID ${winnerId} não encontrado.`);
+        return;
+    }
+
+    DOMElements.winnerEditModal.innerHTML = getModalTemplates().winnerEdit;
+    
+    const nameInput = document.getElementById('edit-winner-name') as HTMLInputElement;
+    const prizeInput = document.getElementById('edit-winner-prize') as HTMLInputElement;
+    
+    nameInput.value = winnerData.name;
+    prizeInput.value = winnerData.prize;
+
+    DOMElements.winnerEditModal.classList.remove('hidden');
+
+    document.getElementById('save-winner-changes-btn')!.onclick = () => {
+        winnerData.name = nameInput.value;
+        winnerData.prize = prizeInput.value;
+        renderAllWinners();
+        appStore.debouncedSave();
+        DOMElements.winnerEditModal.classList.add('hidden');
+    };
+
+    document.getElementById('cancel-winner-edit-btn')!.onclick = () => {
+        DOMElements.winnerEditModal.classList.add('hidden');
+    };
+    
+    document.getElementById('remove-winner-btn')!.onclick = () => {
+        DOMElements.deleteConfirmModal.innerHTML = getModalTemplates().deleteConfirm;
+        (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o vencedor "${winnerData.name}"?`;
         
-        const debouncedSave = () => {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                saveStateToLocalStorage();
-            }, 1000); 
+        DOMElements.deleteConfirmModal.classList.remove('hidden');
+
+        document.getElementById('confirm-delete-btn')!.onclick = () => {
+            if (gameKey) {
+                const game = appStore.state.gamesData[gameKey];
+                game.winners = game.winners.filter((w: any) => w.id !== winnerId);
+                renderAllWinners();
+                appStore.debouncedSave();
+            }
+            DOMElements.deleteConfirmModal.classList.add('hidden');
+            DOMElements.winnerEditModal.classList.add('hidden');
         };
-        
-        function generateTestData() {
-            gameCount = 6;
-            gamesData = {};
-            drawnPrizeNumbers = [12, 45, 101, 300]; 
-            activeGameNumber = '3';
 
-            for (let i = 1; i <= gameCount; i++) {
-                gamesData[i] = {
+        document.getElementById('cancel-delete-btn')!.onclick = () => {
+            DOMElements.deleteConfirmModal.classList.add('hidden');
+        };
+    };
+}
+
+function showDrawnPrizesModal() {
+    const { drawnPrizeNumbers, activeGameNumber, gamesData } = appStore.state;
+    DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
+    const historyList = document.getElementById('drawn-prizes-history-list')!;
+    const lastDrawnDisplay = document.getElementById('last-drawn-prize-display')!;
+    const subtitle = document.getElementById('drawn-prizes-subtitle')!;
+    historyList.innerHTML = '';
+    lastDrawnDisplay.innerHTML = '';
+
+    const activeRoundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
+
+    subtitle.textContent = `Total Sorteado: ${drawnPrizeNumbers.length}`;
+
+    const renderLastDrawn = () => {
+        lastDrawnDisplay.innerHTML = '';
+        if (drawnPrizeNumbers.length > 0) {
+            const lastNumber = drawnPrizeNumbers[drawnPrizeNumbers.length - 1];
+            lastDrawnDisplay.innerHTML = `
+                <div class="bg-amber-400 text-gray-900 font-black rounded-lg w-40 h-24 flex flex-col items-center justify-center text-5xl shadow-lg relative p-2 animate-bounce-in">
+                    <span class="text-sm absolute top-1">Cartela</span>
+                    <span class="text-4xl leading-none mt-2">${lastNumber}</span>
+                </div>
+            `;
+        } else {
+            lastDrawnDisplay.innerHTML = `<p class="text-slate-400">Nenhum brinde sorteado ainda.</p>`;
+        }
+    };
+
+    const renderHistory = () => {
+        historyList.innerHTML = '';
+        [...drawnPrizeNumbers].reverse().forEach(num => {
+            const prizeEl = document.createElement('div');
+            prizeEl.className = 'relative bg-gray-700 text-white font-bold rounded-lg w-20 h-14 flex items-center justify-center text-2xl shadow-md cursor-pointer group';
+            prizeEl.textContent = num.toString();
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full text-sm font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.title = `Excluir sorteio do número ${num}`;
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                const index = appStore.state.drawnPrizeNumbers.indexOf(num);
+                if (index > -1) {
+                    appStore.state.drawnPrizeNumbers.splice(index, 1);
+                    appStore.debouncedSave();
+                    // Re-render the modal content
+                    renderLastDrawn();
+                    renderHistory();
+                    subtitle.textContent = `Total Sorteado: ${appStore.state.drawnPrizeNumbers.length}`;
+                }
+            };
+
+            prizeEl.appendChild(deleteBtn);
+            historyList.appendChild(prizeEl);
+        });
+    };
+    
+    renderLastDrawn();
+    renderHistory();
+    
+    DOMElements.drawnPrizesModal.classList.remove('hidden');
+
+    document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
+        DOMElements.drawnPrizesModal.classList.add('hidden');
+    });
+}
+
+function showFinalWinnersModal() {
+    if (finalConfettiInterval) clearInterval(finalConfettiInterval);
+    DOMElements.finalWinnersModal.innerHTML = getModalTemplates().finalWinners;
+    DOMElements.finalWinnersModal.classList.remove('hidden');
+
+    const allWinners = Object.values(appStore.state.gamesData)
+        .flatMap(g => g.winners || [])
+        .filter(w => w && w.name); // Filter out any undefined/null winners
+
+    const winnerDisplay = document.getElementById('current-winner-card')!;
+    const sponsorsList = document.getElementById('final-sponsors-list')!;
+    
+    // Populate sponsors
+    const allSponsors = Object.values(appStore.state.appConfig.sponsorsByNumber)
+        .filter(s => s.image && s.name)
+        .concat(appStore.state.appConfig.globalSponsor.image ? [appStore.state.appConfig.globalSponsor] : []);
+    
+    const uniqueSponsors = Array.from(new Map(allSponsors.map(s => [s.name, s])).values());
+
+    if (uniqueSponsors.length > 0) {
+        sponsorsList.innerHTML = uniqueSponsors.map(s => `
+            <div class="flex flex-col items-center">
+                <img src="${s.image}" alt="${s.name}" class="w-20 h-20 object-contain rounded-md bg-white p-1">
+                <span class="text-xs text-slate-300 mt-1">${s.name}</span>
+            </div>
+        `).join('');
+    } else {
+        document.getElementById('final-sponsors-section')!.classList.add('hidden');
+    }
+
+
+    let winnerIndex = 0;
+    const displayNextWinner = () => {
+        if (allWinners.length === 0) {
+            winnerDisplay.innerHTML = `<h3 class="text-3xl font-bold text-white">Nenhum vencedor registrado.</h3>`;
+            winnerDisplay.classList.remove('scale-90', 'opacity-0');
+            winnerDisplay.classList.add('scale-100', 'opacity-100');
+            return;
+        }
+
+        winnerDisplay.classList.add('scale-90', 'opacity-0');
+        winnerDisplay.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            const winner = allWinners[winnerIndex];
+            const game = Object.values(appStore.state.gamesData).find(g => g.winners && g.winners.some((w:any) => w.id === winner.id));
+            
+            winnerDisplay.innerHTML = `
+                <p class="text-2xl font-bold text-sky-400 mb-2">${game ? game.name : 'Prêmio Especial'}</p>
+                <h3 class="text-5xl font-black text-amber-300">${winner.name}</h3>
+                <p class="text-3xl font-bold text-white mt-2">${winner.prize}</p>
+            `;
+            
+            winnerDisplay.classList.remove('scale-90', 'opacity-0');
+            winnerDisplay.classList.add('scale-100', 'opacity-100');
+
+            winnerIndex = (winnerIndex + 1) % allWinners.length;
+        }, 500);
+    };
+
+    if (winnerDisplayTimeout) clearInterval(winnerDisplayTimeout);
+    displayNextWinner();
+    winnerDisplayTimeout = setInterval(displayNextWinner, winnerDisplayDuration);
+
+    const startConfetti = () => {
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 2, angle: 270, spread: 55, origin: { x: Math.random(), y: 0 },
+                startVelocity: 15 + (Math.random() * 20), gravity: 0.7, ticks: 300, zIndex: 10000,
+            });
+        }
+    };
+    finalConfettiInterval = setInterval(startConfetti, 150);
+
+    document.getElementById('close-final-modal-btn')!.onclick = () => {
+        DOMElements.finalWinnersModal.classList.add('hidden');
+        if (winnerDisplayTimeout) clearInterval(winnerDisplayTimeout);
+        if (finalConfettiInterval) clearInterval(finalConfettiInterval);
+    };
+
+    document.getElementById('generate-proof-final-btn')!.onclick = () => showProofOptionsModal(true);
+    document.getElementById('donation-final-btn')!.onclick = () => (DOMElements.showDonationModalBtn as HTMLElement).click();
+}
+
+function populateSettingsSponsorsTab() {
+    const container = document.getElementById('sponsors-by-number-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+    
+    // Global Sponsor
+    const globalSponsorPreview = document.getElementById('global-sponsor-preview') as HTMLImageElement;
+    const globalSponsorNameInput = document.getElementById('global-sponsor-name') as HTMLInputElement;
+    const globalSponsorUpload = document.getElementById('global-sponsor-upload') as HTMLInputElement;
+    
+    if (appStore.state.appConfig.globalSponsor) {
+        if (appStore.state.appConfig.globalSponsor.image) globalSponsorPreview.src = appStore.state.appConfig.globalSponsor.image;
+        globalSponsorNameInput.value = appStore.state.appConfig.globalSponsor.name || '';
+    }
+    
+    globalSponsorNameInput.addEventListener('change', (e) => {
+        appStore.state.appConfig.globalSponsor.name = (e.target as HTMLInputElement).value;
+        appStore.debouncedSave();
+    });
+
+    globalSponsorUpload.addEventListener('change', async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+            const base64 = await fileToBase64(file);
+            appStore.state.appConfig.globalSponsor.image = base64;
+            globalSponsorPreview.src = base64;
+            appStore.debouncedSave();
+        }
+    });
+
+    document.getElementById('remove-global-sponsor-btn')!.addEventListener('click', () => {
+        appStore.state.appConfig.globalSponsor = { name: '', image: '' };
+        globalSponsorPreview.src = '';
+        globalSponsorNameInput.value = '';
+        deleteSponsorImage('global');
+        appStore.debouncedSave();
+    });
+
+    // Sponsors by Number
+    const enableCheckbox = document.getElementById('enable-sponsors-by-number-checkbox') as HTMLInputElement;
+    enableCheckbox.checked = appStore.state.appConfig.enableSponsorsByNumber;
+    enableCheckbox.addEventListener('change', (e) => {
+        appStore.state.appConfig.enableSponsorsByNumber = (e.target as HTMLInputElement).checked;
+        appStore.debouncedSave();
+        renderMasterBoard();
+    });
+
+    const header = `
+        <div class="grid grid-cols-[auto_1fr_1fr] gap-2 items-center text-sm font-bold text-slate-400 mb-2 px-2">
+            <span>${appStore.state.appLabels.settingsSponsorNumberLabel}</span>
+            <span>${appStore.state.appLabels.settingsSponsorNameLabel}</span>
+            <span>${appStore.state.appLabels.settingsSponsorImageLabel}</span>
+        </div>
+    `;
+    container.innerHTML = header;
+
+    for (let i = 1; i <= 75; i++) {
+        const sponsor = appStore.state.appConfig.sponsorsByNumber[i] || { name: '', image: '' };
+        
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-[auto_1fr_1fr_auto] gap-2 items-center p-2 rounded-lg hover:bg-gray-700/50';
+
+        const numberLabel = document.createElement('span');
+        numberLabel.className = 'font-bold text-lg text-slate-300';
+        numberLabel.textContent = i.toString();
+
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = sponsor.name;
+        nameInput.placeholder = 'Nome do patrocinador...';
+        nameInput.className = 'w-full bg-gray-900 text-white p-1 rounded-md text-sm';
+        nameInput.addEventListener('change', (e) => {
+            if (!appStore.state.appConfig.sponsorsByNumber[i]) appStore.state.appConfig.sponsorsByNumber[i] = { name: '', image: '' };
+            appStore.state.appConfig.sponsorsByNumber[i].name = (e.target as HTMLInputElement).value;
+            appStore.debouncedSave();
+        });
+
+        const imageInput = document.createElement('input');
+        imageInput.type = 'file';
+        imageInput.accept = 'image/*';
+        imageInput.className = 'text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 w-full';
+        imageInput.addEventListener('change', async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (file) {
+                const base64 = await fileToBase64(file);
+                if (!appStore.state.appConfig.sponsorsByNumber[i]) appStore.state.appConfig.sponsorsByNumber[i] = { name: '', image: '' };
+                appStore.state.appConfig.sponsorsByNumber[i].image = base64;
+                appStore.debouncedSave();
+                renderMasterBoard();
+            }
+        });
+
+        const removeImageBtn = document.createElement('button');
+        removeImageBtn.innerHTML = '🗑️';
+        removeImageBtn.title = 'Remover imagem do patrocinador';
+        removeImageBtn.className = 'text-slate-400 hover:text-red-500 rounded p-1 text-sm transition-colors';
+        removeImageBtn.addEventListener('click', () => {
+            if (appStore.state.appConfig.sponsorsByNumber[i]) {
+                appStore.state.appConfig.sponsorsByNumber[i].image = '';
+                deleteSponsorImage(i.toString());
+                imageInput.value = '';
+                appStore.debouncedSave();
+                renderMasterBoard();
+            }
+        });
+
+        row.appendChild(numberLabel);
+        row.appendChild(nameInput);
+        row.appendChild(imageInput);
+        row.appendChild(removeImageBtn);
+        container.appendChild(row);
+    }
+}
+
+function showSettingsModal() {
+    const { appConfig, appLabels } = appStore.state;
+    DOMElements.settingsModal.innerHTML = getModalTemplates().settings;
+    DOMElements.settingsModal.classList.remove('hidden');
+
+    const tabs = ['appearance', 'sponsors', 'labels', 'shortcuts'];
+    
+    const switchTab = (targetTabId: string) => {
+        tabs.forEach(tabId => {
+            document.getElementById(`tab-${tabId}`)!.classList.remove('border-sky-500', 'text-sky-400');
+            document.getElementById(`tab-${tabId}`)!.classList.add('border-transparent', 'text-gray-400', 'hover:text-gray-200', 'hover:border-gray-500');
+            document.getElementById(`tab-content-${tabId}`)!.classList.add('hidden');
+        });
+        document.getElementById(`tab-${targetTabId}`)!.classList.add('border-sky-500', 'text-sky-400');
+        document.getElementById(`tab-${targetTabId}`)!.classList.remove('border-transparent', 'text-gray-400', 'hover:text-gray-200', 'hover:border-gray-500');
+        document.getElementById(`tab-content-${targetTabId}`)!.classList.remove('hidden');
+    };
+
+    tabs.forEach(tabId => {
+        document.getElementById(`tab-${tabId}`)!.addEventListener('click', () => switchTab(tabId));
+    });
+
+    // --- Appearance Tab ---
+    const logoPreview = document.getElementById('custom-logo-preview') as HTMLImageElement;
+    if(appConfig.customLogoBase64) logoPreview.src = appConfig.customLogoBase64;
+    
+    (document.getElementById('custom-logo-upload') as HTMLInputElement).addEventListener('change', async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+            appStore.state.appConfig.customLogoBase64 = await fileToBase64(file);
+            logoPreview.src = appStore.state.appConfig.customLogoBase64;
+            renderCustomLogo();
+            appStore.debouncedSave();
+        }
+    });
+
+    document.getElementById('remove-custom-logo-btn')!.addEventListener('click', () => {
+        appStore.state.appConfig.customLogoBase64 = '';
+        logoPreview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        renderCustomLogo();
+        appStore.debouncedSave();
+    });
+    
+    const bingoTitleSelect = document.getElementById('bingo-title-select') as HTMLSelectElement;
+    bingoTitleSelect.value = appConfig.bingoTitle;
+    bingoTitleSelect.addEventListener('change', (e) => {
+        appStore.state.appConfig.bingoTitle = (e.target as HTMLSelectElement).value;
+        renderMasterBoard();
+        appStore.debouncedSave();
+    });
+
+    const boardColorPicker = document.getElementById('board-color-picker') as HTMLInputElement;
+    boardColorPicker.value = appConfig.boardColor === 'default' ? '#334155' : appConfig.boardColor;
+    boardColorPicker.addEventListener('input', (e) => {
+        appStore.state.appConfig.boardColor = (e.target as HTMLInputElement).value;
+        renderMasterBoard();
+    });
+    boardColorPicker.addEventListener('change', () => appStore.debouncedSave());
+    
+    document.getElementById('reset-board-color-btn')!.addEventListener('click', () => {
+        appStore.state.appConfig.boardColor = 'default';
+        boardColorPicker.value = '#334155';
+        renderMasterBoard();
+        appStore.debouncedSave();
+    });
+    
+    const drawnTextColorPicker = document.getElementById('drawn-text-color-picker') as HTMLInputElement;
+    drawnTextColorPicker.value = appConfig.drawnTextColor;
+    drawnTextColorPicker.addEventListener('input', (e) => appStore.state.appConfig.drawnTextColor = (e.target as HTMLInputElement).value);
+    drawnTextColorPicker.addEventListener('change', () => appStore.debouncedSave());
+
+    const drawnStrokeColorPicker = document.getElementById('drawn-stroke-color-picker') as HTMLInputElement;
+    drawnStrokeColorPicker.value = appConfig.drawnTextStrokeColor;
+    drawnStrokeColorPicker.addEventListener('input', (e) => appStore.state.appConfig.drawnTextStrokeColor = (e.target as HTMLInputElement).value);
+    drawnStrokeColorPicker.addEventListener('change', () => appStore.debouncedSave());
+    
+    const strokeWidthSlider = document.getElementById('drawn-stroke-width-slider') as HTMLInputElement;
+    const strokeWidthValue = document.getElementById('drawn-stroke-width-value') as HTMLElement;
+    strokeWidthSlider.value = appConfig.drawnTextStrokeWidth.toString();
+    strokeWidthValue.textContent = appConfig.drawnTextStrokeWidth.toString();
+    strokeWidthSlider.addEventListener('input', (e) => {
+        const width = parseInt((e.target as HTMLInputElement).value);
+        appStore.state.appConfig.drawnTextStrokeWidth = width;
+        strokeWidthValue.textContent = width.toString();
+    });
+    strokeWidthSlider.addEventListener('change', () => appStore.debouncedSave());
+
+    const autocloseCheckbox = document.getElementById('enable-modal-autoclose') as HTMLInputElement;
+    const autocloseTimer = document.getElementById('modal-autoclose-timer') as HTMLInputElement;
+    const autocloseValue = document.getElementById('modal-autoclose-value') as HTMLElement;
+    autocloseCheckbox.checked = appConfig.enableModalAutoclose;
+    autocloseTimer.value = appConfig.modalAutocloseSeconds.toString();
+    autocloseValue.textContent = appConfig.modalAutocloseSeconds.toString();
+    autocloseCheckbox.addEventListener('change', (e) => {
+        appStore.state.appConfig.enableModalAutoclose = (e.target as HTMLInputElement).checked;
+        appStore.debouncedSave();
+    });
+    autocloseTimer.addEventListener('input', (e) => {
+        const seconds = parseInt((e.target as HTMLInputElement).value);
+        appStore.state.appConfig.modalAutocloseSeconds = seconds;
+        autocloseValue.textContent = seconds.toString();
+    });
+    autocloseTimer.addEventListener('change', () => appStore.debouncedSave());
+
+    const themeToggle = document.getElementById('theme-toggle') as HTMLInputElement;
+    themeToggle.checked = appConfig.isDarkMode !== false; // default true
+    themeToggle.addEventListener('change', (e) => {
+        appStore.state.appConfig.isDarkMode = (e.target as HTMLInputElement).checked;
+        applyTheme();
+        appStore.debouncedSave();
+    });
+
+    // --- Sponsors Tab ---
+    populateSettingsSponsorsTab();
+
+    // --- Labels Tab ---
+    (document.getElementById('label-prize1Label') as HTMLInputElement).value = appLabels.prize1Label;
+    (document.getElementById('label-prize2Label') as HTMLInputElement).value = appLabels.prize2Label;
+    (document.getElementById('label-prize3Label') as HTMLInputElement).value = appLabels.prize3Label;
+    
+    (document.getElementById('label-prize1Label') as HTMLInputElement).addEventListener('change', e => { appLabels.prize1Label = (e.target as HTMLInputElement).value; appStore.debouncedSave(); });
+    (document.getElementById('label-prize2Label') as HTMLInputElement).addEventListener('change', e => { appLabels.prize2Label = (e.target as HTMLInputElement).value; appStore.debouncedSave(); });
+    (document.getElementById('label-prize3Label') as HTMLInputElement).addEventListener('change', e => { appLabels.prize3Label = (e.target as HTMLInputElement).value; appStore.debouncedSave(); });
+
+    populateSettingsLabelsTab();
+
+    // --- Shortcuts Tab ---
+    populateSettingsShortcutsTab();
+    
+    // --- Bottom Buttons ---
+    document.getElementById('generate-test-data-btn')!.addEventListener('click', generateTestData);
+    document.getElementById('close-settings-btn')!.addEventListener('click', () => {
+        DOMElements.settingsModal.classList.add('hidden');
+        applyLabels();
+        renderUIFromState(); // To update any visual changes
+    });
+}
+
+        function generateTestData() {
+            appStore.state.gameCount = 6;
+            appStore.state.gamesData = {};
+            appStore.state.drawnPrizeNumbers = [12, 45, 101, 300]; 
+            appStore.state.activeGameNumber = '3';
+
+            for (let i = 1; i <= appStore.state.gameCount; i++) {
+                appStore.state.gamesData[i] = {
                     name: `Rodada de Teste ${i}`,
                     prizes: {
                         prize1: predefinedPrizes[i - 1]?.prize1 || '',
@@ -892,28 +1690,28 @@ function populateSettingsShortcutsTab() {
                 };
             }
             
-            gamesData[1].winners.push({ id: 101, name: "Maria " + appLabels.prize1Label, prize: gamesData[1].prizes.prize1, gameNumber: '1', bingoType: 'prize1', numbers: gamesData[1].calledNumbers });
-            gamesData[2].winners.push({ id: 201, name: "João " + appLabels.prize2Label, prize: gamesData[2].prizes.prize2, gameNumber: '2', bingoType: 'prize2', numbers: gamesData[2].calledNumbers });
-            gamesData[2].isComplete = true;
-            gamesData[4].winners.push({ id: 401, name: "Pedro Teste", prize: gamesData[4].prizes.prize2, gameNumber: '4', bingoType: 'prize2', numbers: gamesData[4].calledNumbers });
-            gamesData[4].isComplete = true;
-            gamesData[5].winners.push({ id: 501, name: "Ana " + appLabels.prize3Label, prize: gamesData[5].prizes.prize3, gameNumber: '5', bingoType: 'prize3', numbers: gamesData[5].calledNumbers });
-            gamesData[5].isComplete = true;
-            gamesData[6].winners.push({ id: 601, name: "Final Evento", prize: gamesData[6].prizes.prize2, gameNumber: '6', bingoType: 'prize2', numbers: gamesData[6].calledNumbers });
-            gamesData[6].isComplete = true;
+            appStore.state.gamesData[1].winners.push({ id: 101, name: "Maria " + appStore.state.appLabels.prize1Label, prize: appStore.state.gamesData[1].prizes.prize1, gameNumber: '1', bingoType: 'prize1', numbers: appStore.state.gamesData[1].calledNumbers });
+            appStore.state.gamesData[2].winners.push({ id: 201, name: "João " + appStore.state.appLabels.prize2Label, prize: appStore.state.gamesData[2].prizes.prize2, gameNumber: '2', bingoType: 'prize2', numbers: appStore.state.gamesData[2].calledNumbers });
+            appStore.state.gamesData[2].isComplete = true;
+            appStore.state.gamesData[4].winners.push({ id: 401, name: "Pedro Teste", prize: appStore.state.gamesData[4].prizes.prize2, gameNumber: '4', bingoType: 'prize2', numbers: appStore.state.gamesData[4].calledNumbers });
+            appStore.state.gamesData[4].isComplete = true;
+            appStore.state.gamesData[5].winners.push({ id: 501, name: "Ana " + appStore.state.appLabels.prize3Label, prize: appStore.state.gamesData[5].prizes.prize3, gameNumber: '5', bingoType: 'prize3', numbers: appStore.state.gamesData[5].calledNumbers });
+            appStore.state.gamesData[5].isComplete = true;
+            appStore.state.gamesData[6].winners.push({ id: 601, name: "Final Evento", prize: appStore.state.gamesData[6].prizes.prize2, gameNumber: '6', bingoType: 'prize2', numbers: appStore.state.gamesData[6].calledNumbers });
+            appStore.state.gamesData[6].isComplete = true;
 
-            if (!gamesData['Brindes']) gamesData['Brindes'] = { winners: [] };
-            gamesData['Brindes'].winners.push({ id: 901, name: "Carla", prize: "Ventilador", gameNumber: 'Brinde', bingoType: 'Sorteio', cartela: '12' });
-            gamesData['Brindes'].winners.push({ id: 902, name: "Ronaldo", prize: "Rádio", gameNumber: 'Brinde', bingoType: 'Sorteio', cartela: '101' });
+            if (!appStore.state.gamesData['Brindes']) appStore.state.gamesData['Brindes'] = { winners: [] };
+            appStore.state.gamesData['Brindes'].winners.push({ id: 901, name: "Carla", prize: "Ventilador", gameNumber: 'Brinde', bingoType: 'Sorteio', cartela: '12' });
+            appStore.state.gamesData['Brindes'].winners.push({ id: 902, name: "Ronaldo", prize: "Rádio", gameNumber: 'Brinde', bingoType: 'Sorteio', cartela: '101' });
 
-            if (!gamesData['Leilão']) gamesData['Leilão'] = { winners: [] };
-            gamesData['Leilão'].winners.push({ id: 1001, name: "Marcos", prize: "Bolo (Leilão)", gameNumber: 'Leilão', bingoType: 'Leilão', itemName: "Bolo de Chocolate", bid: "150" });
+            if (!appStore.state.gamesData['Leilão']) appStore.state.gamesData['Leilão'] = { winners: [] };
+            appStore.state.gamesData['Leilão'].winners.push({ id: 1001, name: "Marcos", prize: "Bolo (Leilão)", gameNumber: 'Leilão', bingoType: 'Leilão', itemName: "Bolo de Chocolate", bid: "150" });
             
-            appConfig.isEventClosed = false;
-            activeGameNumber = '3';
-            gamesData[3].calledNumbers = gamesData[3].calledNumbers.slice(0, 10);
+            appStore.state.appConfig.isEventClosed = false;
+            appStore.state.activeGameNumber = '3';
+            appStore.state.gamesData[3].calledNumbers = appStore.state.gamesData[3].calledNumbers.slice(0, 10);
 
-            const savePromise = saveStateToLocalStorage();
+            const savePromise = appStore.saveStateToLocalStorage();
             savePromise.then(() => {
                 showAlert("Dados de teste gerados com sucesso! O aplicativo será recarregado com o novo histórico.");
                 DOMElements.settingsModal.classList.add('hidden');
@@ -963,7 +1761,8 @@ function applyBoardZoom(scale: number) {
     const wrapper = DOMElements.bingoBoardWrapper;
     const zoomValueEl = document.getElementById('board-zoom-value');
     if (wrapper) {
-        wrapper.style.transform = `scale(${scale / 100})`;
+        // Use CSS zoom (cleanest approach that updates layout properly in Chromium)
+        wrapper.style.zoom = `${scale}%`;
     }
     if (zoomValueEl) {
         zoomValueEl.textContent = `${scale}%`;
@@ -974,22 +1773,56 @@ function applyDisplayZoom(scale: number) {
     const wrapper = DOMElements.currentNumberWrapper;
     const zoomValueEl = document.getElementById('display-zoom-value');
     if (wrapper) {
-        wrapper.style.transform = `scale(${scale / 100})`;
+        wrapper.style.zoom = `${scale}%`;
     }
      if (zoomValueEl) {
         zoomValueEl.textContent = `${scale}%`;
     }
 }
 
-        const fileToBase64 = (file: File): Promise<string> =>
+        const fileToBase64 = (file: File, maxWidth = 800, maxHeight = 800, quality = 0.8): Promise<string> =>
             new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result as string);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target?.result as string;
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth || height > maxHeight) {
+                            const ratio = Math.min(maxWidth / width, maxHeight / height);
+                            width *= ratio;
+                            height *= ratio;
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) {
+                            resolve(reader.result as string); // fallback
+                            return;
+                        }
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Preserve transparency using WebP (or PNG for older browsers, though WebP is widely supported now)
+                        let format = 'image/webp';
+                        if (file.type === 'image/png') {
+                             // Use PNG for pristine logos if they specifically uploaded a PNG and size is small enough, but webp is safer for compression.
+                             // Actually, let's just use WebP for everything as it supports transparency and compression.
+                        }
+                        const dataUrl = canvas.toDataURL('image/webp', quality);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = (error) => reject(error);
+                };
                 reader.onerror = error => reject(error);
             });
             
         function applyLabels() {
+            const { appLabels } = appStore.state;
             for (const key in appLabels) {
                 const elements = document.querySelectorAll(`[data-label-key="${key}"]`);
                 elements.forEach(el => {
@@ -1032,19 +1865,28 @@ function applyDisplayZoom(scale: number) {
         }
 
         function findNextGameNumber() {
-            const sortedGameNumbers = Object.keys(gamesData).filter(key => !isNaN(parseInt(key))).map(Number).sort((a, b) => a - b);
-            for (const num of sortedGameNumbers) { if (!gamesData[num].isComplete) return num.toString(); }
+            const sortedGameNumbers = Object.keys(appStore.state.gamesData).filter(key => !isNaN(parseInt(key))).map(Number).sort((a, b) => a - b);
+            for (const num of sortedGameNumbers) { if (!appStore.state.gamesData[num].isComplete) return num.toString(); }
             return null;
         }
 
         function areAllGamesComplete() {
-            const gameKeys = Object.keys(gamesData).filter(key => !isNaN(parseInt(key)));
+            const gameKeys = Object.keys(appStore.state.gamesData).filter(key => !isNaN(parseInt(key)));
             if (gameKeys.length === 0) return false;
-            return gameKeys.every(key => gamesData[key].isComplete);
+            return gameKeys.every(key => appStore.state.gamesData[key].isComplete);
         }
 
         function updateProgramTitle() {
             document.title = "Bingo Show";
+        }
+
+        function applyTheme() {
+            const isDark = appStore.state.appConfig.isDarkMode !== false;
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         }
 
         function renderAppName() {
@@ -1104,6 +1946,21 @@ function applyDisplayZoom(scale: number) {
             });
         }
 
+        async function clearAllSponsorImages() {
+            try {
+                const db = await openDb();
+                return new Promise<void>((resolve, reject) => {
+                    const transaction = db.transaction(STORE_NAME, 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.clear();
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject("Failed to clear images from IndexedDB.");
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         async function loadSponsorImages() {
             try {
                 const db = await openDb();
@@ -1115,11 +1972,11 @@ function applyDisplayZoom(scale: number) {
                     request.onsuccess = () => {
                         const images = request.result;
                         images.forEach(item => {
-                            if (item.id === 'global' && appConfig.globalSponsor) {
-                                appConfig.globalSponsor.image = item.image;
+                            if (item.id === 'global' && appStore.state.appConfig.globalSponsor) {
+                                appStore.state.appConfig.globalSponsor.image = item.image;
                             }
-                            else if (appConfig.sponsorsByNumber[item.id]) {
-                                appConfig.sponsorsByNumber[item.id].image = item.image;
+                            else if (appStore.state.appConfig.sponsorsByNumber[item.id]) {
+                                appStore.state.appConfig.sponsorsByNumber[item.id].image = item.image;
                             }
                         });
                         resolve();
@@ -1133,10 +1990,9 @@ function applyDisplayZoom(scale: number) {
 
         async function saveStateToFile() {
             try {
-                // Garante que o estado mais recente seja salvo no navegador antes de exportar.
-                await saveStateToLocalStorage();
+                await appStore.saveStateToLocalStorage();
         
-                const appState = getAppState();
+                const appState = appStore.getAppStateForSaving();
                 const stateString = JSON.stringify(appState, null, 2); 
                 const blob = new Blob([stateString], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -1178,10 +2034,10 @@ function applyDisplayZoom(scale: number) {
                          throw new Error("O arquivo selecionado não parece ser um backup válido do Bingo Show.");
                     }
         
-                    loadAppState(loadedState);
+                    appStore.loadStateFromObject(loadedState);
                     renderUIFromState();
                     applyLabels();
-                    debouncedSave();
+                    appStore.debouncedSave();
                     showAlert("Backup carregado com sucesso! O evento foi restaurado.");
         
                 } catch (error: any) {
@@ -1200,97 +2056,9 @@ function applyDisplayZoom(scale: number) {
             reader.readAsText(file);
         }
 
-        async function saveStateToLocalStorage() {
-            try {
-                const appState = getAppState();
-                const stateToStore = JSON.parse(JSON.stringify(appState));
-        
-                // Lidar com imagens de patrocinadores individuais e global
-                const imageSavePromises: Promise<void>[] = [];
-                if (stateToStore.appConfig && stateToStore.appConfig.sponsorsByNumber) {
-                    for (const num in stateToStore.appConfig.sponsorsByNumber) {
-                        const sponsor = stateToStore.appConfig.sponsorsByNumber[num];
-                        if (sponsor.image && sponsor.image.startsWith('data:image')) {
-                            imageSavePromises.push(saveSponsorImage(num, sponsor.image));
-                            delete sponsor.image;
-                        }
-                    }
-                }
-                if (stateToStore.appConfig && stateToStore.appConfig.globalSponsor) {
-                    const globalSponsor = stateToStore.appConfig.globalSponsor;
-                    if (globalSponsor.image && globalSponsor.image.startsWith('data:image')) {
-                         imageSavePromises.push(saveSponsorImage('global', globalSponsor.image));
-                         delete globalSponsor.image;
-                    }
-                }
-                
-                await Promise.all(imageSavePromises);
-                
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToStore));
-                renderUpdateInfo();
-            } catch (error) {
-                console.error("Falha ao salvar estado no localStorage:", error);
-            }
-        }
-        
-        async function loadStateFromLocalStorage(): Promise<boolean> {
-            try {
-                const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
-                if (savedState) {
-                    const appState = JSON.parse(savedState);
-                    loadAppState(appState);
-                    await loadSponsorImages();
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.error("Falha ao carregar estado do localStorage:", error);
-                return false;
-            }
-        }
-        
-        async function loadInitialState() {
-            let stateLoaded = false;
-            let forceSave = false;
-        
-            stateLoaded = await loadStateFromLocalStorage();
-        
-            if (!stateLoaded || Object.keys(gamesData).length === 0) {
-                console.log("Nenhum estado salvo encontrado. Inicializando com dados padrão.");
-                gameCount = 6;
-                gamesData = {};
-                for (let i = 1; i <= gameCount; i++) {
-                    gamesData[i] = {
-                        name: `Rodada ${i}`,
-                        prizes: {
-                            prize1: predefinedPrizes[i - 1]?.prize1 || '',
-                            prize2: predefinedPrizes[i - 1]?.prize2 || '',
-                            prize3: predefinedPrizes[i - 1]?.prize3 || ''
-                        },
-                        description: '',
-                        calledNumbers: [],
-                        winners: [],
-                        isComplete: false,
-                        color: roundColors[(i-1) % roundColors.length],
-                    };
-                }
-                forceSave = true; 
-            }
-        
-            appConfig.tutorialVideoLink = 'https://youtu.be/8iOOW-CR-WQ?si=Jolrp2qR38xhY5EZ';
-            appConfig.paypalLink = 'https://www.paypal.com/donate/?hosted_button_id=WJBLF3LV3RZRW';
-            appConfig.pixKey = '1e8e4af0-4d23-440c-9f3d-b4e527f65911';
-        
-            applyLabels();
-            updateProgramTitle();
-            renderUIFromState();
-            
-            if (forceSave) {
-                debouncedSave();
-            }
-        }
-
         function renderUIFromState() {
+            const { gamesData, activeGameNumber, appConfig, appLabels } = appStore.state;
+            applyTheme();
             renderCustomLogo();
             renderMasterBoard();
             DOMElements.gamesListEl.innerHTML = '';
@@ -1343,6 +2111,7 @@ function applyDisplayZoom(scale: number) {
         // --- Funções do Jogo ---
 
         function announceNumber(number: number) {
+            const { activeGameNumber, gamesData, appLabels, appConfig } = appStore.state;
             if (!activeGameNumber) {
                 showAlert("Por favor, selecione uma rodada clicando em 'Jogar' para iniciar.");
                 return;
@@ -1389,10 +2158,11 @@ function applyDisplayZoom(scale: number) {
             
             DOMElements.numberInput.value = '';
             DOMElements.letterInput.value = '';
-            debouncedSave();
+            appStore.debouncedSave();
         }
 
         function showFloatingNumber(number: number) {
+            const { activeGameNumber, gamesData, appConfig } = appStore.state;
             if (!activeGameNumber) {
                 showAlert("Por favor, selecione uma rodada clicando em 'Jogar' para iniciar.");
                 return;
@@ -1422,6 +2192,7 @@ function applyDisplayZoom(scale: number) {
         }
 
         function showClassicFloatingNumberModal(number: number) {
+            const { activeGameNumber, gamesData, appConfig } = appStore.state;
             DOMElements.floatingNumberModal.innerHTML = getModalTemplates().floatingNumber;
             const game = gamesData[activeGameNumber!];
             if (!game) {
@@ -1452,16 +2223,16 @@ function applyDisplayZoom(scale: number) {
             const applyZoom = (scale: number) => {
                 displayWrapper.style.transform = `scale(${scale / 100})`;
                 if (zoomValue) zoomValue.textContent = `${scale}%`;
-                appConfig.floatingNumberZoom = scale;
+                appStore.state.appConfig.floatingNumberZoom = scale;
             };
 
             const adjustZoom = (amount: number) => {
-                 const newZoom = Math.max(50, Math.min(200, appConfig.floatingNumberZoom + amount));
+                 const newZoom = Math.max(50, Math.min(200, appStore.state.appConfig.floatingNumberZoom + amount));
                  applyZoom(newZoom);
-                 debouncedSave();
+                 appStore.debouncedSave();
             };
 
-            const initialZoom = appConfig.floatingNumberZoom || 100;
+            const initialZoom = appStore.state.appConfig.floatingNumberZoom || 100;
             applyZoom(initialZoom);
 
             zoomInBtn.addEventListener('click', () => adjustZoom(5));
@@ -1506,6 +2277,7 @@ function applyDisplayZoom(scale: number) {
         }
 
         function showSponsorDisplayModal(number: number, sponsor: any) {
+            const { activeGameNumber, gamesData, appConfig } = appStore.state;
             DOMElements.sponsorDisplayModal.innerHTML = getModalTemplates().sponsorDisplay;
             
             const game = gamesData[activeGameNumber!];
@@ -1543,16 +2315,16 @@ function applyDisplayZoom(scale: number) {
             const applyZoom = (scale: number) => {
                 displayWrapper.style.transform = `scale(${scale / 100})`;
                 if (zoomValue) zoomValue.textContent = `${scale}%`;
-                appConfig.sponsorDisplayZoom = scale;
+                appStore.state.appConfig.sponsorDisplayZoom = scale;
             };
 
             const adjustZoom = (amount: number) => {
-                 const newZoom = Math.max(50, Math.min(200, appConfig.sponsorDisplayZoom + amount));
+                 const newZoom = Math.max(50, Math.min(200, appStore.state.appConfig.sponsorDisplayZoom + amount));
                  applyZoom(newZoom);
-                 debouncedSave();
+                 appStore.debouncedSave();
             };
 
-            const initialZoom = appConfig.sponsorDisplayZoom || 100;
+            const initialZoom = appStore.state.appConfig.sponsorDisplayZoom || 100;
             applyZoom(initialZoom);
 
             zoomInBtn.addEventListener('click', () => adjustZoom(5));
@@ -1599,6 +2371,7 @@ function applyDisplayZoom(scale: number) {
         }
 
         function handleAutoDraw() {
+            const { activeGameNumber, gamesData } = appStore.state;
             if (!activeGameNumber) {
                 showAlert("Selecione uma rodada para o sorteio automático.");
                 return;
@@ -1640,6 +2413,7 @@ function applyDisplayZoom(scale: number) {
             }
 
             const finishAnimation = (drawnNumber: number) => {
+                const { appConfig } = appStore.state;
                 clearTimeout(spinTimeout);
                 if(cycloneInterval) clearInterval(cycloneInterval);
                 const letter = getLetterForNumber(drawnNumber);
@@ -1660,8 +2434,8 @@ function applyDisplayZoom(scale: number) {
                 let autoCloseTimeout: ReturnType<typeof setTimeout>;
 
                 const closeModalAction = () => {
-                    clearTimeout(autoCloseTimeout); // Evita que o timer dispare se o botão for clicado
-                    if (DOMElements.spinningWheelModal.classList.contains('hidden')) return; // Previne dupla execução
+                    clearTimeout(autoCloseTimeout);
+                    if (DOMElements.spinningWheelModal.classList.contains('hidden')) return;
 
                     DOMElements.spinningWheelModal.classList.add('hidden');
                     document.querySelectorAll('[data-label-key="autoDrawButton"]').forEach(btn => (btn as HTMLButtonElement).disabled = false);
@@ -1669,8 +2443,6 @@ function applyDisplayZoom(scale: number) {
                 };
 
                 closeBtn.onclick = closeModalAction;
-
-                // Adiciona o timer para fechamento automático após 3 segundos
                 autoCloseTimeout = setTimeout(closeModalAction, 3000);
             };
             
@@ -1682,12 +2454,13 @@ function applyDisplayZoom(scale: number) {
         }
         
         function cancelAnnouncedNumber(number: number) {
+            const { activeGameNumber, gamesData, appConfig } = appStore.state;
             if (!activeGameNumber) return;
             const game = gamesData[activeGameNumber];
             if (!game) return;
-            const numberIndex = game.calledNumbers.indexOf(number);
-            if (numberIndex === -1) return;
-            game.calledNumbers.splice(numberIndex, 1);
+            
+            appStore.removeCalledNumber(number);
+
             const cell = document.getElementById(`master-cell-${number}`) as HTMLElement;
             if (cell) {
                 cell.classList.remove('text-white', 'scale-125', 'text-gray-900');
@@ -1731,28 +2504,18 @@ function applyDisplayZoom(scale: number) {
                 (DOMElements.currentNumberEl as HTMLElement).style.visibility = 'hidden';
             }
             updateActiveRoundStats();
-            debouncedSave();
         }
 
         function startNewRound() {
-            if (!activeGameNumber) {
-                showAlert("Selecione uma rodada clicando em 'Jogar' primeiro.");
-                return;
-            }
-            const game = gamesData[activeGameNumber];
-            if (!game) {
-                console.error(`Erro: Rodada ativa ${activeGameNumber} não encontrada.`);
-                return;
-            }
-            game.calledNumbers = [];
-            loadRoundState(activeGameNumber);
-            debouncedSave();
+            appStore.clearActiveRound();
+            loadRoundState(appStore.state.activeGameNumber);
         }
 
         function loadRoundState(gameNumber: string | null) {
+            const { gamesData, appLabels } = appStore.state;
             clearInterval(clockInterval);
             if (gameNumber === null) {
-                activeGameNumber = null;
+                appStore.setActiveGame(null);
                 DOMElements.activeRoundPanel.classList.add('hidden');
                 DOMElements.noActiveRoundPanel.classList.remove('hidden');
                 (DOMElements.currentNumberEl as HTMLElement).style.visibility = 'hidden';
@@ -1762,7 +2525,7 @@ function applyDisplayZoom(scale: number) {
                 return;
             }
             
-            activeGameNumber = gameNumber;
+            appStore.setActiveGame(gameNumber);
             const game = gamesData[gameNumber];
 
             if (!game) {
@@ -1833,11 +2596,9 @@ function applyDisplayZoom(scale: number) {
             const lastNumber = game.calledNumbers[game.calledNumbers.length - 1];
             if (lastNumber) {
                 const letter = getLetterForNumber(lastNumber);
-                const mainColor = appConfig.drawnTextColor;
-                const strokeColor = appConfig.drawnTextStrokeColor;
-                const strokeWidth = appConfig.drawnTextStrokeWidth;
-                (DOMElements.currentNumberEl as HTMLElement).style.color = mainColor;
-                (DOMElements.currentNumberEl as HTMLElement).style.webkitTextStroke = `${strokeWidth}px ${strokeColor}`;
+                const { drawnTextColor, drawnTextStrokeColor, drawnTextStrokeWidth } = appStore.state.appConfig;
+                (DOMElements.currentNumberEl as HTMLElement).style.color = drawnTextColor;
+                (DOMElements.currentNumberEl as HTMLElement).style.webkitTextStroke = `${drawnTextStrokeWidth}px ${drawnTextStrokeColor}`;
 
                 DOMElements.currentNumberEl.innerHTML = `<span>${letter}</span><span>${lastNumber}</span>`;
                 (DOMElements.currentNumberEl as HTMLElement).style.visibility = 'visible';
@@ -1845,6 +2606,7 @@ function applyDisplayZoom(scale: number) {
         }
 
         function updateActiveRoundStats() {
+            const { activeGameNumber, gamesData } = appStore.state;
             if (!activeGameNumber) return;
             const game = gamesData[activeGameNumber];
             if (!game) return;
@@ -1853,11 +2615,10 @@ function applyDisplayZoom(scale: number) {
         }
 
         function renderMasterBoard() {
+            const { appConfig } = appStore.state;
             DOMElements.bingoBoardEl.innerHTML = '';
             const currentLetters = appConfig.bingoTitle === 'AJUDE' ? DYNAMIC_LETTERS_AJUDE : DYNAMIC_LETTERS;
             
-            // Otimização: Tamanhos fixos, o zoom é controlado pelo 'transform: scale' no wrapper.
-            // Isso previne o "double-scaling" e melhora a performance.
             const headerSizeClass = 'text-6xl'; 
             const cellSizeClass = 'w-20 h-20 text-5xl'; 
 
@@ -1895,11 +2656,11 @@ function applyDisplayZoom(scale: number) {
                     }
 
                     cell.addEventListener('click', () => {
-                        if (!activeGameNumber) {
+                        if (!appStore.state.activeGameNumber) {
                             showAlert("Por favor, selecione uma rodada clicando em 'Jogar' para iniciar.");
                             return;
                         }
-                        const game = gamesData[activeGameNumber];
+                        const game = appStore.state.gamesData[appStore.state.activeGameNumber];
                         if (!game) return;
                         if (game.calledNumbers.includes(i)) cancelAnnouncedNumber(i);
                         else showFloatingNumber(i);
@@ -1912,6 +2673,7 @@ function applyDisplayZoom(scale: number) {
         }
         
         function clearMasterBoard(applyCustomColor = false) {
+            const { activeGameNumber, gamesData, appConfig } = appStore.state;
             const activeRoundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : null;
             for (let i = 1; i <= 75; i++) {
                 const cell = document.getElementById(`master-cell-${i}`) as HTMLElement;
@@ -1938,6 +2700,7 @@ function applyDisplayZoom(scale: number) {
         }
 
         function updateMasterBoardCell(number: number) {
+            const { activeGameNumber, gamesData } = appStore.state;
             const cell = document.getElementById(`master-cell-${number}`) as HTMLElement;
             if (cell) {
                 cell.classList.remove('bg-gray-700', 'text-slate-300', 'text-gray-900', 'text-white', 'text-slate-200');
@@ -1949,11 +2712,11 @@ function applyDisplayZoom(scale: number) {
         }
         
         function updateLastNumbers(letter: string, number: number, shouldAddToState: boolean) {
-            if (shouldAddToState && activeGameNumber) {
-                const game = gamesData[activeGameNumber];
-                if (!game) return;
-                game.calledNumbers.push(number);
+            if (shouldAddToState) {
+                appStore.addCalledNumber(number);
             }
+
+            const { activeGameNumber, gamesData } = appStore.state;
             DOMElements.lastNumbersDisplay.innerHTML = '';
             if (!activeGameNumber || !gamesData[activeGameNumber]) return;
 
@@ -1979,6 +2742,7 @@ function applyDisplayZoom(scale: number) {
         // --- Funções da Interface (UI) ---
 
         function createGameElement(gameNumber: number, prizes: { prize1: string, prize2: string, prize3: string }) {
+            const { gamesData, appLabels } = appStore.state;
             const gameItem = document.createElement('div');
             gameItem.className = 'game-item bg-gray-700 p-4 rounded-xl shadow-lg transition-all duration-300 ease-in-out border border-transparent';
             gameItem.dataset.gameNumber = gameNumber.toString();
@@ -1992,6 +2756,15 @@ function applyDisplayZoom(scale: number) {
             const controlsWrapper = document.createElement('div');
             controlsWrapper.className = 'flex items-center gap-2';
 
+            const editBtn = document.createElement('button');
+            editBtn.innerHTML = '✏️';
+            editBtn.title = `Editar Rodada ${gameNumber}`;
+            editBtn.className = 'text-lg hover:text-sky-400 transition-colors';
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showRoundEditModal(gameNumber.toString());
+            });
+
             const colorPicker = document.createElement('input');
             colorPicker.type = 'color';
             colorPicker.className = 'w-8 h-8 p-0 border-2 border-gray-600 rounded-full cursor-pointer';
@@ -1999,10 +2772,10 @@ function applyDisplayZoom(scale: number) {
             colorPicker.addEventListener('input', (e) => {
                 const newColor = (e.target as HTMLInputElement).value;
                 gamesData[gameNumber].color = newColor;
-                if (activeGameNumber === gameNumber.toString()) {
-                    loadRoundState(activeGameNumber);
+                if (appStore.state.activeGameNumber === gameNumber.toString()) {
+                    loadRoundState(appStore.state.activeGameNumber);
                 }
-                debouncedSave();
+                appStore.debouncedSave();
             });
 
             const deleteBtn = document.createElement('button');
@@ -2013,7 +2786,8 @@ function applyDisplayZoom(scale: number) {
                 e.stopPropagation(); 
                 confirmDeleteRound(gameNumber.toString());
             });
-
+            
+            controlsWrapper.appendChild(editBtn);
             controlsWrapper.appendChild(colorPicker);
             controlsWrapper.appendChild(deleteBtn);
             header.appendChild(title);
@@ -2037,7 +2811,7 @@ function applyDisplayZoom(scale: number) {
                 input.dataset.prizeKey = prizeKey;
                 input.addEventListener('change', (e) => {
                     gamesData[gameNumber].prizes[prizeKey as keyof typeof prizes] = (e.target as HTMLInputElement).value;
-                    debouncedSave();
+                    appStore.debouncedSave();
                 });
                 prizeInputWrapper.appendChild(label);
                 prizeInputWrapper.appendChild(input);
@@ -2054,24 +2828,16 @@ function applyDisplayZoom(scale: number) {
         }
 
         function addExtraGame() {
-            gameCount++;
-            gamesData[gameCount] = {
-                name: `Rodada ${gameCount}`,
-                prizes: { prize1: '', prize2: '', prize3: '' },
-                description: '',
-                calledNumbers: [],
-                winners: [],
-                isComplete: false,
-                color: roundColors[(gameCount - 1) % roundColors.length]
-            };
-            const gameEl = createGameElement(gameCount, gamesData[gameCount].prizes);
+            const newGameNumber = appStore.addExtraGame();
+            const { gamesData } = appStore.state;
+            const gameEl = createGameElement(newGameNumber, gamesData[newGameNumber].prizes);
             gameEl.classList.add('animate-fade-in-down'); 
             DOMElements.gamesListEl.prepend(gameEl); 
             updateGameItemUI(gameEl, false);
-            debouncedSave();
         }
 
         function confirmDeleteRound(gameNumber: string) {
+            const { gamesData } = appStore.state;
             DOMElements.deleteConfirmModal.innerHTML = getModalTemplates().deleteConfirm;
             const roundName = gamesData[gameNumber]?.name || `Rodada ${gameNumber}`;
             (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja excluir a rodada "${roundName}"? Esta ação não pode ser desfeita.`;
@@ -2086,13 +2852,13 @@ function applyDisplayZoom(scale: number) {
                     gameEl.remove();
                 }
         
-                if (activeGameNumber === gameNumber) {
-                    activeGameNumber = null;
+                if (appStore.state.activeGameNumber === gameNumber) {
+                    appStore.setActiveGame(null);
                     loadRoundState(null); 
                 }
         
                 DOMElements.deleteConfirmModal.classList.add('hidden');
-                debouncedSave();
+                appStore.debouncedSave();
             });
             
             document.getElementById('cancel-delete-btn')!.addEventListener('click', () => {
@@ -2101,6 +2867,7 @@ function applyDisplayZoom(scale: number) {
         }
         
         function getLetterForNumber(number: number): string | null {
+            const { appConfig } = appStore.state;
             const lettersToCheck = appConfig.bingoTitle === 'AJUDE' ? DYNAMIC_LETTERS_AJUDE : DYNAMIC_LETTERS;
             const baseLetters = DYNAMIC_LETTERS; 
             
@@ -2116,6 +2883,7 @@ function applyDisplayZoom(scale: number) {
         }
 
         function showVerificationPanel() {
+            const { activeGameNumber, gamesData, appConfig } = appStore.state;
             if (!activeGameNumber) {
                 showAlert("Nenhuma rodada ativa para verificar.");
                 return;
@@ -2158,13 +2926,13 @@ function applyDisplayZoom(scale: number) {
                 });
                 
                 if (zoomValue) zoomValue.textContent = `${scale}%`;
-                appConfig.verificationPanelZoom = scale;
+                appStore.state.appConfig.verificationPanelZoom = scale;
             };
             
             const adjustZoom = (amount: number) => {
-                const newZoom = Math.max(50, Math.min(200, appConfig.verificationPanelZoom + amount));
+                const newZoom = Math.max(50, Math.min(200, appStore.state.appConfig.verificationPanelZoom + amount));
                 applyZoom(newZoom);
-                debouncedSave();
+                appStore.debouncedSave();
             };
         
             sortedNumbers.forEach((num: number) => {
@@ -2255,7 +3023,6 @@ function applyDisplayZoom(scale: number) {
         
             const progressBar = document.getElementById('next-round-progress') as HTMLElement;
             
-            // Forçar reflow para garantir que a transição funcione
             progressBar.style.transition = 'none';
             progressBar.style.width = '100%';
             
@@ -2270,10 +3037,11 @@ function applyDisplayZoom(scale: number) {
         }
 
         function handleBingoConfirmation(prizeType: string) {
+            const { activeGameNumber, gamesData, appConfig, appLabels } = appStore.state;
             if (!activeGameNumber) return;
             const game = gamesData[activeGameNumber];
             if (!game) return;
-            currentBingoType = prizeType;
+            appStore.state.currentBingoType = prizeType;
             DOMElements.verificationModal.classList.add('hidden');
             
             DOMElements.winnerModal.innerHTML = getModalTemplates().winner;
@@ -2292,35 +3060,31 @@ function applyDisplayZoom(scale: number) {
             const timerEl = document.getElementById('winner-countdown-timer')!;
             timerEl.textContent = countdown.toString();
             
+            const cleanupWinnerModal = () => {
+                clearInterval(countdownInterval);
+                if (confettiAnimationId) clearInterval(confettiAnimationId);
+                document.removeEventListener('keydown', handleKeydown);
+            };
+
             const countdownInterval = setInterval(() => {
                 countdown--;
                 timerEl.textContent = countdown.toString();
                 if (countdown <= 0) {
-                    clearInterval(countdownInterval);
+                    cleanupWinnerModal();
                     DOMElements.winnerModal.classList.add('hidden');
-                    if (confettiAnimationId) clearInterval(confettiAnimationId);
                 }
             }, 1000);
 
             const registerAndClose = () => {
-                clearInterval(countdownInterval);
+                cleanupWinnerModal();
                 const winnerName = winnerNameInput.value.trim();
-                const winnerId = Date.now();
+                const winnerData = appStore.addWinner(prizeType, winnerName);
                 
-                const winnerData = {
-                    id: winnerId,
-                    name: winnerName || "Ganhador Anônimo",
-                    prize: game.prizes[prizeType],
-                    gameNumber: activeGameNumber,
-                    bingoType: prizeType,
-                    numbers: [...game.calledNumbers].sort((a,b) => a-b)
-                };
-                
-                game.winners.push(winnerData);
-                renderWinner(winnerData);
+                if (winnerData) {
+                    renderWinner(winnerData);
+                }
                 
                 DOMElements.winnerModal.classList.add('hidden');
-                 if (confettiAnimationId) clearInterval(confettiAnimationId);
                 
                 const gameItem = DOMElements.gamesListEl.querySelector(`.game-item[data-game-number="${activeGameNumber}"]`);
                 if (gameItem && areAllPrizesWon(game)) {
@@ -2346,14 +3110,14 @@ function applyDisplayZoom(scale: number) {
                         }
                         loadRoundState(nextGameNumber.toString());
                     } else if (areAllGamesComplete()) {
-                        appConfig.isEventClosed = true;
+                        appStore.state.appConfig.isEventClosed = true;
                         showFinalWinnersModal();
                     }
                 }
                 
                 DOMElements.shareBtn.classList.remove('hidden');
                 DOMElements.endEventBtn.classList.remove('hidden');
-                debouncedSave();
+                appStore.debouncedSave();
             };
 
             registerWinnerBtn.addEventListener('click', registerAndClose);
@@ -2362,18 +3126,16 @@ function applyDisplayZoom(scale: number) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     registerAndClose();
-                    document.removeEventListener('keydown', handleKeydown);
                 } else if (e.key === 'Escape') {
+                    cleanupWinnerModal();
                     DOMElements.winnerModal.classList.add('hidden');
-                    if (confettiAnimationId) clearInterval(confettiAnimationId);
-                    clearInterval(countdownInterval);
-                    document.removeEventListener('keydown', handleKeydown);
                 }
             };
             document.addEventListener('keydown', handleKeydown);
         }
         
         function renderWinner(winnerData: any) {
+            const { gamesData, appLabels } = appStore.state;
             const winnerCard = document.createElement('div');
             winnerCard.className = 'winner-card bg-gray-700 p-4 rounded-xl shadow-lg transition-transform transform hover:scale-105';
             winnerCard.dataset.winnerId = winnerData.id.toString();
@@ -2391,7 +3153,7 @@ function applyDisplayZoom(scale: number) {
         function renderAllWinners() {
             DOMElements.winnersContainer.innerHTML = '';
             const allWinners: any[] = [];
-            Object.values(gamesData).forEach(game => {
+            Object.values(appStore.state.gamesData).forEach(game => {
                 if (game.winners && game.winners.length > 0) {
                     allWinners.push(...game.winners);
                 }
@@ -2414,14 +3176,18 @@ function applyDisplayZoom(scale: number) {
             (document.getElementById('congrats-winner-name') as HTMLElement).textContent = winnerName;
             (document.getElementById('congrats-prize-value') as HTMLElement).textContent = `Ganhou: ${prize}`;
             DOMElements.congratsModal.classList.remove('hidden');
-            document.getElementById('close-congrats-modal-btn')!.addEventListener('click', () => DOMElements.congratsModal.classList.add('hidden'));
+            document.getElementById('close-congrats-modal-btn')!.onclick = () => {
+                DOMElements.congratsModal.classList.add('hidden');
+                if (confettiAnimationId) clearInterval(confettiAnimationId);
+            };
             triggerConfetti();
         }
 
         function showIntervalModal() {
+            const { gamesData, appConfig, menuItems } = appStore.state;
             DOMElements.eventBreakModal.innerHTML = getModalTemplates().eventBreak;
             DOMElements.eventBreakModal.classList.remove('hidden');
-            DOMElements.confettiCanvas.style.zIndex = '51'; // Trazer para a frente do modal de intervalo
+            DOMElements.confettiCanvas.style.zIndex = '51'; 
             
             const leftContentEl = document.getElementById('break-left-content')!;
             const rightContentEl = document.getElementById('break-right-content')!;
@@ -2434,7 +3200,6 @@ function applyDisplayZoom(scale: number) {
                 allSponsors.push(appConfig.globalSponsor);
             }
             
-            // Prioriza exibir patrocinadores. Se não houver, exibe vencedores.
             const rightColumnContent = allSponsors.length > 0 ? allSponsors : allWinners;
             rightTitleEl.textContent = allSponsors.length > 0 ? "Apoio" : "Vencedores";
 
@@ -2442,7 +3207,6 @@ function applyDisplayZoom(scale: number) {
             let rightIndex = 0;
 
             const updateContent = () => {
-                // Coluna Esquerda: Cardápio
                 leftContentEl.classList.add('opacity-0');
                 setTimeout(() => {
                     leftContentEl.innerHTML = menuItems[leftIndex % menuItems.length];
@@ -2450,14 +3214,13 @@ function applyDisplayZoom(scale: number) {
                     leftIndex++;
                 }, 500);
 
-                // Coluna Direita: Patrocinadores ou Vencedores
                 if (rightColumnContent.length > 0) {
                     rightContentEl.classList.add('opacity-0');
                     setTimeout(() => {
                         const item = rightColumnContent[rightIndex % rightColumnContent.length];
-                        if (item.image) { // É um patrocinador
+                        if (item.image) { 
                             rightContentEl.innerHTML = `<img src="${item.image}" class="max-h-64 object-contain mb-4 rounded-lg shadow-lg"><p>${item.name}</p>`;
-                        } else { // É um vencedor
+                        } else { 
                             rightContentEl.innerHTML = `<p>${item.name}</p><p class="text-amber-400 text-5xl mt-2">${item.prize}</p>`;
                         }
                         rightContentEl.classList.remove('opacity-0');
@@ -2475,32 +3238,31 @@ function applyDisplayZoom(scale: number) {
             updateContent();
             updateClock();
             
+            if (intervalContentInterval) clearInterval(intervalContentInterval);
+            if (intervalClockInterval) clearInterval(intervalClockInterval);
+            if (breakConfettiInterval) clearInterval(breakConfettiInterval);
+            
             intervalContentInterval = setInterval(updateContent, 6000);
             intervalClockInterval = setInterval(updateClock, 1000);
             
             const startConfetti = () => {
-                // Efeito de chuva
-                const particleCount = 2;
-                confetti({
-                    particleCount,
-                    angle: 270,
-                    spread: 55,
-                    origin: { x: Math.random(), y: 0 },
-                    startVelocity: 15 + (Math.random() * 20),
-                    gravity: 0.7,
-                    ticks: 300,
-                    zIndex: 51, // Garante que esteja na frente
-                });
+                if (typeof confetti === 'function') {
+                    const particleCount = 2;
+                    confetti({
+                        particleCount, angle: 270, spread: 55, origin: { x: Math.random(), y: 0 },
+                        startVelocity: 15 + (Math.random() * 20), gravity: 0.7, ticks: 300, zIndex: 51,
+                    });
+                }
             };
             breakConfettiInterval = setInterval(startConfetti, 150);
 
-            document.getElementById('close-break-modal-btn')!.addEventListener('click', () => {
+            document.getElementById('close-break-modal-btn')!.onclick = () => {
                 DOMElements.eventBreakModal.classList.add('hidden');
                 clearInterval(intervalContentInterval);
                 clearInterval(intervalClockInterval);
                 clearInterval(breakConfettiInterval);
-                DOMElements.confettiCanvas.style.zIndex = '50'; // Reseta o zIndex
-            });
+                DOMElements.confettiCanvas.style.zIndex = '50';
+            };
         }
         
         function updateGameItemUI(gameItem: Element, isComplete: boolean) {
@@ -2521,7 +3283,7 @@ function applyDisplayZoom(scale: number) {
                 gameItem.classList.remove('game-completed-style');
                 gameItem.classList.add('cursor-pointer');
                 const gameNumber = gameItem.getAttribute('data-game-number');
-                const isActive = activeGameNumber === gameNumber;
+                const isActive = appStore.state.activeGameNumber === gameNumber;
                 
                 buttonContainer.innerHTML = `<button class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-lg play-btn">${isActive ? 'Jogando...' : 'Jogar'}</button>`;
                  if (isActive) {
@@ -2532,10 +3294,11 @@ function applyDisplayZoom(scale: number) {
         }
         
         function updateLastPrizesDisplay() {
-            DOMElements.lastNumbersDisplay.innerHTML = ''; // Limpa números anteriores (bingo ou brinde)
+            const { drawnPrizeNumbers, activeGameNumber, gamesData } = appStore.state;
+            DOMElements.lastNumbersDisplay.innerHTML = '';
             if (drawnPrizeNumbers.length === 0) return;
         
-            const activeRoundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7'; // Roxo como fallback
+            const activeRoundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
         
             const lastThree = drawnPrizeNumbers.slice(-3).reverse();
             lastThree.forEach((num: number) => {
@@ -2574,14 +3337,14 @@ function applyDisplayZoom(scale: number) {
             let finalNumber;
             if (noRepeatCheckbox.checked) {
                 const availableNumbers = Array.from({ length: max - min + 1 }, (_, i) => i + min)
-                    .filter(num => !drawnPrizeNumbers.includes(num));
+                    .filter(num => !appStore.state.drawnPrizeNumbers.includes(num));
 
                 if (availableNumbers.length === 0) {
                     showAlert("Todos os números neste intervalo já foram sorteados!");
                     return;
                 }
                 finalNumber = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
-                drawnPrizeNumbers.push(finalNumber);
+                appStore.state.drawnPrizeNumbers.push(finalNumber);
             } else {
                 finalNumber = Math.floor(Math.random() * (max - min + 1)) + min;
             }
@@ -2595,8 +3358,10 @@ function applyDisplayZoom(scale: number) {
             displayContainer.innerHTML = '';
 
             const prizeDisplay = document.createElement('div');
-            prizeDisplay.className = 'font-black flex items-center justify-center w-full h-full rounded-full text-white text-[10rem] sm:text-[15rem]';
-            prizeDisplay.style.backgroundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7'; // Cor da rodada ou roxo
+            prizeDisplay.className = 'font-black flex items-center justify-center w-64 h-64 sm:w-80 sm:h-80 rounded-full text-white shadow-xl shadow-inner';
+            prizeDisplay.style.fontSize = 'clamp(4rem, 15vw, 10rem)';
+            const { activeGameNumber, gamesData } = appStore.state;
+            prizeDisplay.style.backgroundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) ? gamesData[activeGameNumber].color : '#a855f7';
 
             displayContainer.appendChild(prizeDisplay);
             mainDisplayLabel.textContent = "SORTEANDO BRINDE...";
@@ -2623,26 +3388,19 @@ function applyDisplayZoom(scale: number) {
                 mainDisplayLabel.textContent = "CARTELA SORTEADA!";
                 updateLastPrizesDisplay();
                 
-                // Preenche automaticamente o número sorteado e foca no próximo campo
                 const numberInput = document.getElementById('prize-draw-number-manual') as HTMLInputElement;
                 const nameInput = document.getElementById('prize-draw-name') as HTMLInputElement;
-                if (numberInput) {
-                    numberInput.value = finalNumber.toString();
-                }
-                if (nameInput) {
-                    nameInput.focus();
-                }
+                if (numberInput) numberInput.value = finalNumber.toString();
+                if (nameInput) nameInput.focus();
 
-                setTimeout(() => {
-                     prizeDisplay.classList.remove('pulse-glow-animation');
-                }, 4000);
-
+                setTimeout(() => prizeDisplay.classList.remove('pulse-glow-animation'), 4000);
             }, 5000);
 
-            debouncedSave();
+            appStore.debouncedSave();
         }
-// FIX: Added the missing `showRoundEditModal` function definition.
+
 function showRoundEditModal(gameNumber: string) {
+    const { gamesData, appLabels } = appStore.state;
     const game = gamesData[gameNumber];
     if (!game) {
         console.error(`Attempted to edit non-existent round: ${gameNumber}`);
@@ -2692,7 +3450,7 @@ function showRoundEditModal(gameNumber: string) {
         renderUIFromState();
         
         DOMElements.roundEditModal.classList.add('hidden');
-        debouncedSave();
+        appStore.debouncedSave();
     };
 
     cancelBtn.onclick = () => {
@@ -2701,70 +3459,500 @@ function showRoundEditModal(gameNumber: string) {
 }
         
         function setupGlobalKeydownListener() {
-    // Attach listener to the window object for broader and more reliable event capturing.
-    window.addEventListener('keydown', (e) => {
-        const activeEl = document.activeElement as HTMLElement;
-        const isInputFocused = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable);
-        
-        // The winner modal has its own specific handler for Enter/Escape, so we block global shortcuts when it's open.
-        if (DOMElements.winnerModal && !DOMElements.winnerModal.classList.contains('hidden')) {
-            return;
+            window.addEventListener('keydown', (e) => {
+                const activeEl = document.activeElement as HTMLElement;
+                const isInputFocused = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable);
+                
+                if (DOMElements.winnerModal && !DOMElements.winnerModal.classList.contains('hidden')) {
+                    return;
+                }
+
+                const isOtherModalOpen = !!document.querySelector('.fixed.inset-0.z-50:not(.hidden):not(#verification-modal):not(#floating-number-modal):not(#sponsor-display-modal)');
+                if (isOtherModalOpen) {
+                    return;
+                }
+
+                if (isInputFocused) {
+                    return;
+                }
+
+                let shortcutString = '';
+                if (e.ctrlKey) shortcutString += 'Control+';
+                if (e.altKey) shortcutString += 'Alt+';
+                if (e.shiftKey) shortcutString += 'Shift+';
+                
+                let key = e.key;
+                if (key === ' ') {
+                    key = 'Space';
+                } else if (key.length === 1) {
+                    key = key.toUpperCase();
+                } else {
+                    key = key.charAt(0).toUpperCase() + key.slice(1);
+                }
+                
+                if (['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
+                    return;
+                }
+                shortcutString += key;
+
+                const action = Object.keys(appStore.state.appConfig.shortcuts).find(
+                    (k) => appStore.state.appConfig.shortcuts[k as keyof typeof appStore.state.appConfig.shortcuts] === shortcutString
+                );
+                
+                if (action) {
+                    e.preventDefault();
+                    
+                    switch (action) {
+                        case 'autoDraw': handleAutoDraw(); break;
+                        case 'verify': showVerificationPanel(); break;
+                        case 'clearRound': confirmClearRound(); break;
+                        case 'drawPrize': drawRandomPrize(); break;
+                        case 'registerPrize': (document.getElementById('prize-draw-form') as HTMLFormElement)?.requestSubmit(); break;
+                        case 'sellAuction': (DOMElements.auctionForm as HTMLFormElement)?.requestSubmit(); break;
+                        case 'showInterval': showIntervalModal(); break;
+                    }
+                }
+            });
         }
 
-        // If any other modal is open, we also block global shortcuts to prevent actions from firing "behind" the modal.
-        const isOtherModalOpen = !!document.querySelector('.fixed.inset-0.z-50:not(.hidden):not(#verification-modal):not(#floating-number-modal):not(#sponsor-display-modal)');
-        if (isOtherModalOpen) {
-            return;
-        }
-
-        // Block shortcuts when typing in any text field.
-        if (isInputFocused) {
-            return;
-        }
-
-        // Build the shortcut string representation from the key event.
-        let shortcutString = '';
-        if (e.ctrlKey) shortcutString += 'Control+';
-        if (e.altKey) shortcutString += 'Alt+';
-        if (e.shiftKey) shortcutString += 'Shift+';
-        
-        let key = e.key;
-        if (key === ' ') {
-            key = 'Space';
-        } else if (key.length === 1) {
-            key = key.toUpperCase();
-        } else {
-            // Capitalize keys like 'Enter', 'Delete', etc., to match the config.
-            key = key.charAt(0).toUpperCase() + key.slice(1);
+        // --- Gerador e Verificador de Cartelas ---
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
         }
         
-        // Avoid treating modifier keys themselves as part of the shortcut name.
-        if (['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
-            return; // Only a modifier key was pressed.
-        }
-        shortcutString += key;
-
-        // Find the action corresponding to the pressed shortcut.
-        const action = Object.keys(appConfig.shortcuts).find(
-            (k) => appConfig.shortcuts[k as keyof typeof appConfig.shortcuts] === shortcutString
-        );
+        function generateSingleBingoCardNumbers(): number[][] {
+            const card: number[][] = [];
+            const ranges = {
+                B: { min: 1, max: 15, count: 5 },
+                I: { min: 16, max: 30, count: 5 },
+                N: { min: 31, max: 45, count: 4 }, // Centro é livre
+                G: { min: 46, max: 60, count: 5 },
+                O: { min: 61, max: 75, count: 5 }
+            };
         
-        // If an action is found, prevent default browser behavior and execute the action.
-        if (action) {
-            e.preventDefault();
+            Object.values(ranges).forEach(config => {
+                const column: number[] = [];
+                const availableNumbers = Array.from({ length: config.max - config.min + 1 }, (_, i) => i + config.min);
+                for (let i = 0; i < config.count; i++) {
+                    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+                    column.push(availableNumbers.splice(randomIndex, 1)[0]);
+                }
+                card.push(column.sort((a, b) => a - b));
+            });
+        
+            card[2].splice(2, 0, 0); // Usando 0 para o espaço livre
+        
+            return card;
+        }
+
+        let pendingPrintCardQuantity = 0;
+        let pendingPrintCardTitle = "";
+        let pendingPrintCardPerPage = 6;
+        let pendingPrintPrizes = "";
+        let pendingPrintMenu = "";
+        let pendingPrintUseLogo = false;
+
+        async function renderCardsForPreview(title: string, quantity: number) {
+            pendingPrintCardQuantity = quantity;
+            pendingPrintCardTitle = title;
+            pendingPrintCardPerPage = parseInt((document.getElementById('card-per-page') as HTMLSelectElement).value) || 6;
+            pendingPrintPrizes = (document.getElementById('card-prizes-text') as HTMLTextAreaElement).value.trim();
+            pendingPrintMenu = (document.getElementById('card-menu-text') as HTMLTextAreaElement).value.trim();
+            pendingPrintUseLogo = (document.getElementById('card-use-logo') as HTMLInputElement).checked;
+
+            const previewContainer = document.getElementById('card-print-preview');
+            const printBtn = document.getElementById('print-cards-btn');
+            if (!previewContainer || !printBtn) return;
+
+            previewContainer.innerHTML = '<p class="text-slate-400 text-center w-full col-span-full">Renderizando visualização...</p>'; 
+            previewContainer.className = 'flex-grow bg-white rounded-lg p-4 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+
+            const newCardUUIDs = Object.keys(appStore.state.cardsData).slice(-quantity);
+            const previewUUIDs = newCardUUIDs.slice(0, 15);
+            let finalHTML = "";
+            const logoData = appStore.state.appConfig.customLogoBase64 || '';
+
+            for (const uuid of previewUUIDs) {
+                const cardData = appStore.state.cardsData[uuid];
+                if (!cardData) continue;
+                
+                let qrDataUrl = "";
+                try {
+                    qrDataUrl = await QRCode.toDataURL(uuid, { width: 80, margin: 1 });
+                } catch (err) {}
+
+                // In preview, we don't render the huge full layout, just a simplified card (but with bigger squares)
+                finalHTML += `
+                    <div class="bingo-card-print p-4 border border-gray-300 rounded-lg text-black bg-white flex flex-col items-center shadow-md pb-2" style="page-break-inside: avoid;">
+                        <h3 class="text-lg font-bold text-center leading-tight mb-1">${title}</h3>
+                        <p class="text-xs mb-2">Cartela N°: ${String(cardData.series).padStart(4, '0')}</p>
+                        <div class="grid grid-cols-5 gap-0.5 w-full my-1">
+                            ${['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => `
+                                <div class="text-center">
+                                    <div class="font-black text-xl text-red-600 mb-1">${letter}</div>
+                                    ${cardData.numbers[colIndex].map(num => {
+                                        if (num === 0) {
+                                            if (pendingPrintUseLogo && logoData) {
+                                                return `<div class="w-10 h-10 flex items-center justify-center border border-gray-400"><img src="${logoData}" class="max-w-full max-h-full object-contain p-0.5"></div>`;
+                                            }
+                                            return `<div class="w-10 h-10 flex items-center justify-center border border-gray-400 font-bold text-lg bg-gray-300">★</div>`;
+                                        }
+                                        return `<div class="w-10 h-10 flex items-center justify-center border border-gray-400 font-bold text-xl">${num}</div>`;
+                                    }).join('')}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <img src="${qrDataUrl}" alt="QR Code" class="mt-2 w-16 h-16">
+                    </div>
+                `;
+            }
+
+            if (quantity > 15) {
+                finalHTML += `<div class="p-4 border border-transparent flex items-center justify-center text-gray-500 font-bold col-span-full">... e mais ${quantity - 15} cartelas prontas para impressão.</div>`;
+            }
             
-            switch (action) {
-                case 'autoDraw': handleAutoDraw(); break;
-                case 'verify': showVerificationPanel(); break;
-                case 'clearRound': confirmClearRound(); break;
-                case 'drawPrize': drawRandomPrize(); break;
-                case 'registerPrize': (document.getElementById('prize-draw-form') as HTMLFormElement)?.requestSubmit(); break;
-                case 'sellAuction': (DOMElements.auctionForm as HTMLFormElement)?.requestSubmit(); break;
-                case 'showInterval': showIntervalModal(); break;
+            previewContainer.innerHTML = finalHTML;
+            printBtn.classList.remove('hidden');
+        }
+
+        function handleGenerateCards() {
+            const titleInput = document.getElementById('card-batch-title') as HTMLInputElement;
+            const quantityInput = document.getElementById('card-quantity') as HTMLInputElement;
+            const previewContainer = document.getElementById('card-print-preview');
+            
+            if (!titleInput || !quantityInput || !previewContainer) return;
+
+            const title = titleInput.value.trim() || "Bingo Show";
+            const quantity = parseInt(quantityInput.value, 10);
+
+            if (isNaN(quantity) || quantity <= 0 || quantity > 5000) {
+                showAlert("Por favor, insira uma quantidade válida entre 1 e 5000.");
+                return;
+            }
+
+            previewContainer.innerHTML = `<p class="text-slate-400 text-center">Gerando ${quantity} cartelas... Isso pode levar alguns segundos.</p>`;
+            
+            setTimeout(() => {
+                const startSeries = Object.keys(appStore.state.cardsData).length + 1;
+                for (let i = 0; i < quantity; i++) {
+                    const uuid = generateUUID();
+                    const numbers = generateSingleBingoCardNumbers();
+                    appStore.state.cardsData[uuid] = {
+                        series: startSeries + i,
+                        numbers: numbers
+                    };
+                }
+                
+                appStore.debouncedSave();
+                renderCardsForPreview(title, quantity);
+            }, 100);
+        }
+
+        async function handlePrintCards() {
+            const quantity = pendingPrintCardQuantity;
+            const title = pendingPrintCardTitle;
+            const perPage = pendingPrintCardPerPage;
+            const prizesText = pendingPrintPrizes;
+            const menuText = pendingPrintMenu;
+            const useLogo = pendingPrintUseLogo;
+            const logoData = appStore.state.appConfig.customLogoBase64 || '';
+
+            if (quantity === 0) return;
+
+            showAlert("Preparando PDF para " + quantity + " cartelas. Isso pode levar alguns segundos...");
+
+            const allNewUUIDs = Object.keys(appStore.state.cardsData).slice(-quantity);
+            let printHTML = "";
+
+            /* 
+               Grid logic:
+               Using Tailwind:
+               1 per page => grid-cols-1
+               2 per page => grid-cols-1 (stack vertically) or grid-cols-2
+               4 per page => grid-cols-2
+               6 per page => grid-cols-2
+            */
+            const colsClass = (perPage === 1 || perPage === 2) ? 'grid-cols-1' : 'grid-cols-2';
+            
+            // To ensure 6 per page works nicely on A4 portrait, we make the cards relatively small.
+            // If they have winged menus/prizes, it gets tighter.
+
+            for (let i = 0; i < allNewUUIDs.length; i += 50) {
+                const batch = allNewUUIDs.slice(i, i + 50);
+                const batchPromises = batch.map(async (uuid) => {
+                    const cardData = appStore.state.cardsData[uuid];
+                    if (!cardData) return "";
+                    let qrDataUrl = await QRCode.toDataURL(uuid, { width: 80, margin: 1 }).catch(()=>"");
+
+                    // Generate the wings
+                    const prizesHtml = prizesText ? `
+                    <div class="w-1/4 border-r border-black p-2 text-[10px] sm:text-xs text-center flex flex-col justify-center bg-gray-50 uppercase font-bold break-all">
+                        <div class="mb-2 text-sm text-sky-800">Prêmios/Rodadas</div>
+                        <pre class="whitespace-pre-wrap font-sans text-left leading-tight">${prizesText.replace(/</g,'&lt;')}</pre>
+                    </div>` : '';
+
+                    const menuHtml = menuText ? `
+                    <div class="w-1/4 border-l border-black p-2 text-[10px] sm:text-xs text-center flex flex-col justify-center bg-gray-50 uppercase font-bold break-all relative">
+                        <div class="mb-2 text-sm text-sky-800">Cardápio</div>
+                        <pre class="whitespace-pre-wrap font-sans text-left leading-tight">${menuText.replace(/</g,'&lt;')}</pre>
+                        <div class="absolute bottom-1 right-2 text-[8px] text-gray-500 font-normal">Identificação: ${String(cardData.series).padStart(4,'0')}</div>
+                    </div>` : '';
+
+                    const centerWidth = (prizesText && menuText) ? 'w-1/2' : (prizesText || menuText) ? 'w-3/4' : 'w-full';
+
+                    return `
+                        <div class="border-2 border-black flex flex-row items-stretch text-black bg-white shadow-sm break-inside-avoid print:break-inside-avoid" style="page-break-inside: avoid; margin-bottom: 2mm;">
+                            ${prizesHtml}
+
+                            <!-- CENTER: BINGO CARD -->
+                            <div class="${centerWidth} p-2 flex flex-col items-center justify-between">
+                                <div class="flex flex-col items-center mb-1">
+                                    <h3 class="text-base sm:text-xl font-bold text-center uppercase tracking-tight leading-none">${title}</h3>
+                                    <div class="text-[10px] sm:text-xs font-bold text-gray-600 mt-1">Cartela N° ${String(cardData.series).padStart(4, '0')}</div>
+                                </div>
+                                <div class="grid grid-cols-5 gap-0 w-full mb-1 border-2 border-black">
+                                    ${['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => `
+                                        <div class="text-center flex flex-col">
+                                            <div class="font-black text-lg sm:text-2xl text-white bg-black border-b border-r border-black">${letter}</div>
+                                            ${cardData.numbers[colIndex].map(num => {
+                                                const borderClass = colIndex === 4 ? 'border-b border-black' : 'border-b border-r border-black';
+                                                if (num === 0) {
+                                                    if (useLogo && logoData) {
+                                                        return `<div class="aspect-square flex items-center justify-center ${borderClass}"><img src="${logoData}" class="max-w-[80%] max-h-[80%] object-contain" /></div>`;
+                                                    }
+                                                    return `<div class="aspect-square flex items-center justify-center bg-gray-300 font-bold text-lg sm:text-xl ${borderClass}">★</div>`;
+                                                }
+                                                return `<div class="aspect-square flex items-center justify-center font-bold text-lg sm:text-2xl ${borderClass}">${num}</div>`;
+                                            }).join('')}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="flex flex-row justify-between w-full items-center px-2">
+                                    <div class="text-[8px] text-gray-500 uppercase tracking-widest">${uuid.split('-')[0]}</div>
+                                    <img src="${qrDataUrl}" alt="QR Code" class="w-12 h-12 object-contain">
+                                </div>
+                            </div>
+                            
+                            ${menuHtml}
+                        </div>
+                    `;
+                });
+
+                const resolvedBatchHTML = await Promise.all(batchPromises);
+                printHTML += resolvedBatchHTML.join("");
+                if (allNewUUIDs.length > 200) await new Promise(res => setTimeout(res, 5));
+            }
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showAlert('Não foi possível abrir a janela de impressão. Verifique se o seu navegador está bloqueando pop-ups.');
+                return;
+            }
+            
+            // To force page break natively, we inject perPage wrappers
+            let finalPagesHTML = '';
+            // Just use Tailwind's screen columns unless they specify a strict limit
+            // Actually CSS column grid takes care of standard splits
+            
+            let gridStyles = '';
+            if (perPage === 1) gridStyles = 'grid-cols-1 gap-8 max-w-2xl mx-auto';
+            if (perPage === 2) gridStyles = 'grid-cols-1 gap-4 max-w-2xl mx-auto my-4';
+            if (perPage === 4) gridStyles = 'grid-cols-2 gap-2 max-w-5xl mx-auto my-4';
+            if (perPage === 6) gridStyles = 'grid-cols-2 gap-x-2 gap-y-1 mx-auto my-1';
+
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>${title}</title>
+                        <script src="https://cdn.tailwindcss.com"></script>
+                        <style>
+                            /* Minimal margins for 6 per page */
+                            @media print {
+                                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; padding: 0; }
+                                @page { size: A4 portrait; margin: ${perPage === 6 ? '5mm' : '10mm'}; }
+                                .print\\:break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
+                            }
+                            body { font-family: 'Helvetica', 'Arial', sans-serif; background: white; margin: 0; padding: ${perPage===6?'5px':'20px'}; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="grid ${gridStyles}">
+                            ${printHTML}
+                        </div>
+                        <script>
+                            setTimeout(() => {
+                                window.print();
+                                window.close();
+                            }, 500);
+                        </script>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        function showCardGeneratorModal() {
+             DOMElements.cardGeneratorModal.innerHTML = getModalTemplates().cardGenerator;
+             DOMElements.cardGeneratorModal.classList.remove('hidden');
+             
+             // Populate prizes
+             let prizesLines = [];
+             const gameKeys = Object.keys(appStore.state.gamesData).filter(key => parseInt(key) > 0).sort((a,b) => parseInt(a) - parseInt(b));
+             for (const key of gameKeys) {
+                 const game = appStore.state.gamesData[key];
+                 const p1 = game.prizes.prize1;
+                 const p2 = game.prizes.prize2;
+                 const p3 = game.prizes.prize3;
+                 
+                 let prizesList = [];
+                 if (p1) prizesList.push(`${appStore.state.appLabels.prize1Label}: ${p1}`);
+                 if (p2) prizesList.push(`${appStore.state.appLabels.prize2Label}: ${p2}`);
+                 if (p3) prizesList.push(`${appStore.state.appLabels.prize3Label}: ${p3}`);
+                 
+                 if (prizesList.length > 0) {
+                     prizesLines.push(game.name || `RODADA ${key}`);
+                     prizesLines.push(prizesList.join("\n"));
+                     prizesLines.push("");
+                 }
+             }
+             const prizesTextEl = document.getElementById('card-prizes-text') as HTMLTextAreaElement;
+             if (prizesTextEl && prizesLines.length > 0) {
+                 prizesTextEl.value = prizesLines.join("\n").trim();
+             }
+
+             // Populate menu
+             const menuTextEl = document.getElementById('card-menu-text') as HTMLTextAreaElement;
+             if (menuTextEl && appStore.state.menuItems.length > 0) {
+                 menuTextEl.value = appStore.state.menuItems.join("\n");
+             }
+
+             document.getElementById('generate-cards-btn')!.addEventListener('click', handleGenerateCards);
+             document.getElementById('print-cards-btn')!.addEventListener('click', handlePrintCards);
+             document.getElementById('close-card-generator-btn')!.addEventListener('click', () => {
+                 DOMElements.cardGeneratorModal.classList.add('hidden');
+             });
+        }
+
+        let scannerStream: MediaStream | null = null;
+        let scannerAnimationId: number | null = null;
+
+        async function showCardScannerModal() {
+            DOMElements.cardScannerModal.innerHTML = getModalTemplates().cardScanner;
+            DOMElements.cardScannerModal.classList.remove('hidden');
+            
+            const video = document.getElementById('scanner-video') as HTMLVideoElement;
+            const canvas = document.getElementById('scanner-canvas') as HTMLCanvasElement;
+            const message = document.getElementById('scanner-message') as HTMLElement;
+            const closeBtn = document.getElementById('close-card-scanner-btn') as HTMLButtonElement;
+
+            const cleanupScanner = () => {
+                if (scannerAnimationId) cancelAnimationFrame(scannerAnimationId);
+                if (scannerStream) {
+                    scannerStream.getTracks().forEach(track => track.stop());
+                }
+                DOMElements.cardScannerModal.classList.add('hidden');
+            };
+
+            closeBtn.onclick = cleanupScanner;
+
+            try {
+                scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = scannerStream;
+                video.setAttribute("playsinline", "true");
+                await video.play();
+                
+                const tick = () => {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA && !DOMElements.cardScannerModal.classList.contains('hidden')) {
+                        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                        if (ctx) {
+                            canvas.height = video.videoHeight;
+                            canvas.width = video.videoWidth;
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                                inversionAttempts: "attemptBoth",
+                            });
+                            
+                            if (code) {
+                                message.textContent = "QR Code detectado!";
+                                message.classList.add("text-green-400");
+                                message.classList.remove("text-slate-400");
+                                cleanupScanner();
+                                verifyCardByQRCode(code.data);
+                                return;
+                            }
+                        }
+                    }
+                    if (!DOMElements.cardScannerModal.classList.contains('hidden')) {
+                        scannerAnimationId = requestAnimationFrame(tick);
+                    }
+                };
+                scannerAnimationId = requestAnimationFrame(tick);
+            } catch (error) {
+                console.error("Erro ao acessar a câmera:", error);
+                message.textContent = "Erro ao acessar a câmera. Verifique as permissões.";
+                message.classList.add("text-red-400");
             }
         }
-    });
-}
+
+        function verifyCardByQRCode(uuid: string) {
+            const cardData = appStore.state.cardsData[uuid];
+            
+            if (!cardData) {
+                showAlert(`Cartela não encontrada na base de dados (${uuid}).`);
+                return;
+            }
+            
+            const activeGame = appStore.state.activeGameNumber ? appStore.state.gamesData[appStore.state.activeGameNumber] : null;
+            if (!activeGame) {
+                showAlert("Nenhuma rodada ativa no momento para verificar a cartela.");
+                return;
+            }
+
+            const calledNumbers = activeGame.calledNumbers;
+            let hits = 0;
+            let totalNumbers = 24;
+            let isWinner = true;
+            let cardHTML = `<div class="grid grid-cols-5 gap-1 w-full my-4 bg-white p-2 rounded text-black max-w-sm mx-auto">`;
+            
+            for (let col = 0; col < 5; col++) {
+                cardHTML += `<div class="text-center"><div class="font-black text-xl text-red-600">${['B', 'I', 'N', 'G', 'O'][col]}</div>`;
+                for (let row = 0; row < 5; row++) {
+                    const num = cardData.numbers[col][row];
+                    if (num === 0) {
+                        cardHTML += `<div class="w-8 h-8 flex items-center justify-center border border-gray-400 bg-green-300 font-bold text-xs mx-auto mb-1">★</div>`;
+                    } else {
+                        const isHit = calledNumbers.includes(num);
+                        if (isHit) hits++;
+                        if (!isHit) isWinner = false;
+                        
+                        cardHTML += `<div class="w-8 h-8 flex items-center justify-center border border-gray-400 font-bold text-xs mx-auto mb-1 ${isHit ? 'bg-green-300' : 'bg-red-200'}">${num}</div>`;
+                    }
+                }
+                cardHTML += `</div>`;
+            }
+            cardHTML += `</div>`;
+            
+            const resultHtml = isWinner ? 
+                `<h3 class="text-2xl font-bold text-green-400 mb-2">BINGO VÁLIDO!</h3><p class="text-slate-200">Todos os números da cartela foram cantados!</p>` :
+                `<h3 class="text-2xl font-bold text-red-400 mb-2">BINGO INVÁLIDO</h3><p class="text-slate-200">Faltam ${(totalNumbers - hits)} número(s).</p>`;
+                
+            DOMElements.customAlertModal.innerHTML = `<div class="modal-content bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
+                <h2 class="text-3xl font-bold text-white mb-2">Resultado da Verificação</h2>
+                <h3 class="text-xl text-slate-300 mb-4">Cartela N° ${String(cardData.series).padStart(4, '0')}</h3>
+                ${resultHtml}
+                ${cardHTML}
+                <button id="close-card-result-btn" class="mt-6 bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-8 rounded-full text-lg">Fechar</button>
+            </div>`;
+            
+            DOMElements.customAlertModal.classList.remove('hidden');
+            document.getElementById('close-card-result-btn')!.onclick = () => {
+                DOMElements.customAlertModal.classList.add('hidden');
+            };
+        }
         
         // --- Handlers de Eventos ---
 
@@ -2797,7 +3985,7 @@ function showRoundEditModal(gameNumber: string) {
                     return;
                 }
                 
-                if (!gamesData['Brindes']) gamesData['Brindes'] = { winners: [] };
+                if (!appStore.state.gamesData['Brindes']) appStore.state.gamesData['Brindes'] = { winners: [] };
                 
                 const winnerData = {
                     id: Date.now(),
@@ -2807,7 +3995,7 @@ function showRoundEditModal(gameNumber: string) {
                     bingoType: 'Sorteio',
                     cartela: number
                 };
-                gamesData['Brindes'].winners.push(winnerData);
+                appStore.state.gamesData['Brindes'].winners.push(winnerData);
                 renderWinner(winnerData);
                 
                 numberInput.value = '';
@@ -2815,7 +4003,7 @@ function showRoundEditModal(gameNumber: string) {
                 descriptionInput.value = '';
                 
                 showCongratsModal(winnerData.name, winnerData.prize);
-                debouncedSave();
+                appStore.debouncedSave();
             });
 
             DOMElements.gamesListEl.addEventListener('click', (e) => {
@@ -2827,16 +4015,16 @@ function showRoundEditModal(gameNumber: string) {
                 if (!gameNumber) return;
 
                 if (target.classList.contains('reopen-btn')) {
-                    const game = gamesData[gameNumber];
+                    const game = appStore.state.gamesData[gameNumber];
                     if (game) {
                         game.isComplete = false;
                         updateGameItemUI(gameItem, false);
-                        debouncedSave();
+                        appStore.debouncedSave();
                     }
                     return;
                 }
                 
-                if (gamesData[gameNumber].isComplete) {
+                if (appStore.state.gamesData[gameNumber].isComplete) {
                      showAlert("Esta rodada já foi concluída. Você pode reabri-la se necessário.");
                      return;
                 }
@@ -2858,13 +4046,14 @@ function showRoundEditModal(gameNumber: string) {
             });
             
             document.getElementById('prize-draw-random-btn')!.addEventListener('click', drawRandomPrize);
-            DOMElements.shareBtn.addEventListener('click', showProofOptionsModal);
+            DOMElements.shareBtn.addEventListener('click', () => showProofOptionsModal());
             DOMElements.endEventBtn.addEventListener('click', showFinalWinnersModal);
             DOMElements.resetEventBtn.addEventListener('click', () => {
                 DOMElements.resetConfirmModal.innerHTML = getModalTemplates().resetConfirm;
                 DOMElements.resetConfirmModal.classList.remove('hidden');
-                document.getElementById('confirm-reset-btn')!.onclick = () => {
+                document.getElementById('confirm-reset-btn')!.onclick = async () => {
                     localStorage.removeItem(LOCAL_STORAGE_KEY);
+                    await clearAllSponsorImages();
                     window.location.reload();
                 };
                 document.getElementById('cancel-reset-btn')!.onclick = () => DOMElements.resetConfirmModal.classList.add('hidden');
@@ -2874,43 +4063,200 @@ function showRoundEditModal(gameNumber: string) {
                 DOMElements.menuEditModal.innerHTML = getModalTemplates().menuEdit;
                 DOMElements.menuEditModal.classList.remove('hidden');
                 const textarea = document.getElementById('menu-textarea') as HTMLTextAreaElement;
-                textarea.value = menuItems.join('\n');
+                textarea.value = appStore.state.menuItems.join('\n');
                 document.getElementById('save-menu-btn')!.onclick = () => {
-                    menuItems = textarea.value.split('\n').filter(item => item.trim() !== '');
+                    appStore.state.menuItems = textarea.value.split('\n').filter(item => item.trim() !== '');
                     DOMElements.menuEditModal.classList.add('hidden');
-                    debouncedSave();
+                    appStore.debouncedSave();
                 };
                 document.getElementById('cancel-menu-edit-btn')!.onclick = () => DOMElements.menuEditModal.classList.add('hidden');
             });
             DOMElements.checkDrawnPrizesBtn.addEventListener('click', showDrawnPrizesModal);
             
-            // Sliders de Zoom
             const boardZoomSlider = document.getElementById('board-zoom-slider') as HTMLInputElement;
             const displayZoomSlider = document.getElementById('display-zoom-slider') as HTMLInputElement;
             boardZoomSlider.addEventListener('input', (e) => {
                 const scale = parseInt((e.target as HTMLInputElement).value);
-                appConfig.boardScale = scale;
+                appStore.state.appConfig.boardScale = scale;
                 applyBoardZoom(scale);
             });
-            boardZoomSlider.addEventListener('change', debouncedSave);
+            boardZoomSlider.addEventListener('change', () => appStore.debouncedSave());
+            
+            const fullScreenAuctionBtn = document.getElementById('fullscreen-auction-btn');
+            if (fullScreenAuctionBtn) {
+                fullScreenAuctionBtn.addEventListener('click', () => {
+                    const section = document.getElementById('auction-section');
+                    if (section) {
+                        if (!document.fullscreenElement) {
+                            section.requestFullscreen().catch(err => showAlert(`Erro: ${err.message}`));
+                        } else {
+                            document.exitFullscreen();
+                        }
+                    }
+                });
+            }
+
+            const fullScreenPrizeBtn = document.getElementById('fullscreen-prize-btn');
+            if (fullScreenPrizeBtn) {
+                fullScreenPrizeBtn.addEventListener('click', () => {
+                    const section = document.getElementById('middle-row-section');
+                    if (section) {
+                        if (!document.fullscreenElement) {
+                            section.requestFullscreen().catch(err => showAlert(`Erro: ${err.message}`));
+                        } else {
+                            document.exitFullscreen();
+                        }
+                    }
+                });
+            }
+
+            const fullScreenBoardBtn = document.getElementById('fullscreen-board-btn');
+            if (fullScreenBoardBtn) {
+                fullScreenBoardBtn.addEventListener('click', () => {
+                    const section = document.getElementById('board-section');
+                    if (section) {
+                        if (!document.fullscreenElement) {
+                            section.requestFullscreen().catch(err => {
+                                showAlert(`Erro ao entrar em tela cheia: ${err.message}`);
+                            });
+                        } else {
+                            document.exitFullscreen();
+                        }
+                    }
+                });
+            }
+            
+            // Listen to fullscreen changes to style the section properly
+            document.addEventListener('fullscreenchange', () => {
+                const fsControls = document.getElementById('fullscreen-controls');
+                const htmlElement = document.documentElement;
+                const isDark = htmlElement.classList.contains('dark');
+                
+                ['board-section', 'auction-section', 'middle-row-section'].forEach(id => {
+                    const section = document.getElementById(id);
+                    if (!section) return;
+
+                    if (document.fullscreenElement === section) {
+                        section.classList.remove('rounded-2xl', 'shadow-xl');
+                        section.classList.add('overflow-y-auto');
+                        if (id === 'middle-row-section') {
+                             section.classList.add('p-4');
+                        }
+                        
+                        ['floating-number-modal', 'custom-alert-modal', 'congrats-modal', 'winner-modal', 'sponsor-display-modal', 'verification-modal', 'event-break-modal'].forEach(modalId => {
+                             const el = document.getElementById(modalId);
+                             if (el) section.appendChild(el);
+                        });
+
+                        if (id === 'board-section') {
+                            if (fsControls) fsControls.classList.remove('hidden');
+                            if (fsControls) fsControls.classList.add('flex');
+                            
+                            const fsZoomSlider = document.getElementById('fs-board-zoom-slider') as HTMLInputElement;
+                            if (fsZoomSlider) fsZoomSlider.value = appStore.state.appConfig.boardScale.toString();
+                            const fsZoomValue = document.getElementById('fs-board-zoom-value');
+                            if (fsZoomValue) fsZoomValue.textContent = appStore.state.appConfig.boardScale.toString();
+                        }
+
+                        if (isDark) {
+                             section.classList.add('bg-gray-800');
+                             section.classList.remove('bg-white');
+                        } else {
+                             section.classList.remove('bg-gray-800');
+                             section.classList.add('bg-white');
+                        }
+                    } else if (!document.fullscreenElement) {
+                        section.classList.add('rounded-2xl', 'shadow-xl');
+                        section.classList.remove('overflow-y-auto');
+                        if (id === 'middle-row-section') {
+                             section.classList.remove('p-4');
+                        }
+                        if (id === 'board-section') {
+                            if (fsControls) fsControls.classList.add('hidden');
+                            if (fsControls) fsControls.classList.remove('flex');
+                        }
+                        
+                        if (!document.fullscreenElement) {
+                            ['floating-number-modal', 'custom-alert-modal', 'congrats-modal', 'winner-modal', 'sponsor-display-modal', 'verification-modal', 'event-break-modal'].forEach(modalId => {
+                                const el = document.getElementById(modalId);
+                                if (el) document.body.appendChild(el);
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // FS controls events
+            const fsZoomSlider = document.getElementById('fs-board-zoom-slider');
+            if (fsZoomSlider) {
+                fsZoomSlider.addEventListener('input', (e) => {
+                    const scale = parseInt((e.target as HTMLInputElement).value);
+                    appStore.state.appConfig.boardScale = scale;
+                    applyBoardZoom(scale);
+                    const fsBoardZoomValue = document.getElementById('fs-board-zoom-value');
+                    if (fsBoardZoomValue) fsBoardZoomValue.textContent = `${scale}%`;
+                    const boardZoomSlider = document.getElementById('board-zoom-slider') as HTMLInputElement;
+                    if (boardZoomSlider) boardZoomSlider.value = scale.toString();
+                    const boardZoomValue = document.getElementById('board-zoom-value');
+                    if (boardZoomValue) boardZoomValue.textContent = `${scale}%`;
+                });
+                fsZoomSlider.addEventListener('change', () => appStore.debouncedSave());
+            }
+
+            const fsNextBtn = document.getElementById('fs-next-round-btn');
+            if (fsNextBtn) {
+                fsNextBtn.addEventListener('click', () => {
+                    // find next incomplete round
+                    const games = appStore.state.gamesData;
+                    const keys = Object.keys(games).filter(k => parseInt(k) > 0).sort((a,b)=>parseInt(a)-parseInt(b));
+                    let nextKey = null;
+                    let currentKeyIdx = appStore.state.activeGameNumber ? keys.indexOf(appStore.state.activeGameNumber) : -1;
+                    for (let i = currentKeyIdx + 1; i < keys.length; i++) {
+                        if (!games[keys[i]].isComplete) {
+                            nextKey = keys[i];
+                            break;
+                        }
+                    }
+                    if (!nextKey) {
+                        for (let i = 0; i <= currentKeyIdx; i++) {
+                            if (!games[keys[i]].isComplete) {
+                                nextKey = keys[i];
+                                break;
+                            }
+                        }
+                    }
+                    if (nextKey) {
+                        handleGameSelect(nextKey);
+                    } else {
+                        showAlert('Todas as rodadas foram concluídas!');
+                    }
+                });
+            }
+
+            const fsAutoDrawBtn = document.getElementById('fs-auto-draw-btn');
+            if (fsAutoDrawBtn) {
+                fsAutoDrawBtn.addEventListener('click', handleAutoDraw);
+            }
+
+
             
             displayZoomSlider.addEventListener('input', (e) => {
                 const scale = parseInt((e.target as HTMLInputElement).value);
-                appConfig.displayScale = scale;
+                appStore.state.appConfig.displayScale = scale;
                 applyDisplayZoom(scale);
             });
-             displayZoomSlider.addEventListener('change', debouncedSave);
+             displayZoomSlider.addEventListener('change', () => appStore.debouncedSave());
 
             DOMElements.clearRoundBtnTop.addEventListener('click', confirmClearRound);
             DOMElements.clearRoundBtnBottom.addEventListener('click', confirmClearRound);
 
             DOMElements.showDonationModalBtn.addEventListener('click', () => {
                 DOMElements.donationModal.innerHTML = getModalTemplates().donation;
-                (document.getElementById('pix-key-display') as HTMLElement).textContent = appConfig.pixKey;
+                (document.getElementById('pix-key-display') as HTMLElement).textContent = appStore.state.appConfig.pixKey;
                 document.getElementById('copy-pix-btn')!.addEventListener('click', () => {
-                    navigator.clipboard.writeText(appConfig.pixKey);
+                    navigator.clipboard.writeText(appStore.state.appConfig.pixKey);
                     (document.getElementById('copy-pix-btn') as HTMLElement).textContent = 'Copiado!';
-                    setTimeout(() => (document.getElementById('copy-pix-btn') as HTMLElement).textContent = appLabels.donationModalCopyButton, 2000);
+                    setTimeout(() => (document.getElementById('copy-pix-btn') as HTMLElement).textContent = appStore.state.appLabels.donationModalCopyButton, 2000);
                 });
                 document.getElementById('close-donation-btn')!.addEventListener('click', () => DOMElements.donationModal.classList.add('hidden'));
                 DOMElements.donationModal.classList.remove('hidden');
@@ -2919,12 +4265,11 @@ function showRoundEditModal(gameNumber: string) {
              DOMElements.showChangelogBtn.addEventListener('click', () => {
                 DOMElements.changelogModal.innerHTML = getModalTemplates().changelog;
                 const contentEl = document.getElementById('version-history-content')!;
-                // Basic Markdown to HTML conversion
-                const htmlContent = versionHistory
+                const htmlContent = appStore.state.versionHistory
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/- \*\*(.*?)\*\*:/g, '<h3 class="text-sky-400 font-bold mt-3 mb-1">$1</h3><p class="pl-4 border-l-2 border-gray-700">')
                     .replace(/\n- /g, '</p><p class="pl-4 border-l-2 border-gray-700">')
-                    .replace(/<p class="pl-4 border-l-2 border-gray-700">$/, ''); // Remove trailing empty p
+                    .replace(/<p class="pl-4 border-l-2 border-gray-700">$/, ''); 
 
                 contentEl.innerHTML = htmlContent;
                 document.getElementById('close-changelog-btn')!.addEventListener('click', () => DOMElements.changelogModal.classList.add('hidden'));
@@ -2960,7 +4305,7 @@ function showRoundEditModal(gameNumber: string) {
                     showAlert("Preencha todos os campos do leilão (item, arrematador e lance).");
                     return;
                 }
-                 if (!gamesData['Leilão']) gamesData['Leilão'] = { winners: [] };
+                 if (!appStore.state.gamesData['Leilão']) appStore.state.gamesData['Leilão'] = { winners: [] };
                 
                 const winnerData = {
                     id: Date.now(),
@@ -2971,770 +4316,46 @@ function showRoundEditModal(gameNumber: string) {
                     itemName: itemName,
                     bid: bid
                 };
-                gamesData['Leilão'].winners.push(winnerData);
+                appStore.state.gamesData['Leilão'].winners.push(winnerData);
                 renderWinner(winnerData);
                 
                 showCongratsModal(winnerName, `${itemName} por R$ ${bid},00`);
-
-                (DOMElements.auctionForm as HTMLFormElement).reset();
-                updateAuctionBidDisplay(0);
+                (document.getElementById('auction-item-name') as HTMLInputElement).value = '';
+                (document.getElementById('auction-winner-name') as HTMLInputElement).value = '';
                 (document.getElementById('auction-item-current-bid') as HTMLInputElement).value = '0';
-                
-                const gavel = document.getElementById('gavel-icon')!;
-                gavel.classList.remove('hidden', 'animate-gavel-strike');
-                void gavel.offsetWidth;
-                gavel.classList.add('animate-gavel-strike');
+                updateAuctionBidDisplay(0);
 
-                debouncedSave();
+                appStore.debouncedSave();
             });
+            
+            (document.getElementById('load-from-file-input') as HTMLInputElement).addEventListener('change', loadStateFromFile);
+            document.getElementById('save-to-file-btn')!.addEventListener('click', saveStateToFile);
+            document.getElementById('load-from-file-btn')!.addEventListener('click', () => (document.getElementById('load-from-file-input') as HTMLInputElement).click());
 
-             document.getElementById('save-local-btn')!.addEventListener('click', saveStateToFile);
-             document.getElementById('load-local-input')!.addEventListener('change', loadStateFromFile);
-
-             DOMElements.activeRoundPanel.addEventListener('click', () => {
-                if (activeGameNumber) {
-                    showRoundEditModal(activeGameNumber);
-                }
-            });
-        }
-        
-        function confirmClearRound() {
-            if (!activeGameNumber) {
-                showAlert("Nenhuma rodada ativa para limpar.");
-                return;
+            if (DOMElements.showCardGeneratorBtn) {
+                DOMElements.showCardGeneratorBtn.addEventListener('click', showCardGeneratorModal);
             }
-            DOMElements.clearRoundConfirmModal.innerHTML = getModalTemplates().clearRoundConfirm;
-            DOMElements.clearRoundConfirmModal.classList.remove('hidden');
-            document.getElementById('confirm-clear-round-btn')!.onclick = () => {
-                startNewRound();
-                DOMElements.clearRoundConfirmModal.classList.add('hidden');
-            };
-            document.getElementById('cancel-clear-round-btn')!.onclick = () => DOMElements.clearRoundConfirmModal.classList.add('hidden');
-        }
-
-        function showProofOptionsModal() {
-            DOMElements.proofOptionsModal.innerHTML = getModalTemplates().proofOptions;
-            const listContainer = document.getElementById('proof-options-list')!;
-            listContainer.innerHTML = ''; 
-
-            const createCheckbox = (id: string, label: string, checked = true) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'flex items-center gap-3 bg-gray-700 p-3 rounded-lg';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `proof-${id}`;
-                checkbox.dataset.id = id;
-                checkbox.checked = checked;
-                checkbox.className = 'h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500';
-                const labelEl = document.createElement('label');
-                labelEl.htmlFor = `proof-${id}`;
-                labelEl.textContent = label;
-                labelEl.className = "text-slate-200 font-medium";
-                wrapper.appendChild(checkbox);
-                wrapper.appendChild(labelEl);
-                return wrapper;
-            };
-
-            const sortedGameKeys = Object.keys(gamesData)
-                .filter(key => !isNaN(parseInt(key)) && gamesData[key].winners?.length > 0)
-                .sort((a, b) => parseInt(a) - parseInt(b));
-            
-            sortedGameKeys.forEach(key => {
-                listContainer.appendChild(createCheckbox(`game-${key}`, gamesData[key].name || `Rodada ${key}`));
-            });
-
-            if (gamesData['Brindes']?.winners?.length > 0) {
-                listContainer.appendChild(createCheckbox('brindes', 'Brindes Sorteados'));
+            if (document.getElementById('show-card-scanner-btn')) {
+                 document.getElementById('show-card-scanner-btn')!.addEventListener('click', showCardScannerModal);
             }
-            if (gamesData['Leilão']?.winners?.length > 0) {
-                listContainer.appendChild(createCheckbox('leilao', 'Itens do Leilão'));
-            }
-
-            DOMElements.proofOptionsModal.classList.remove('hidden');
-
-            document.getElementById('generate-selected-proof-btn')!.onclick = () => {
-                const selectedIds = Array.from(listContainer.querySelectorAll<HTMLInputElement>('input:checked')).map(cb => cb.dataset.id);
-                generateProof(selectedIds);
-                DOMElements.proofOptionsModal.classList.add('hidden');
-            };
-            document.getElementById('cancel-proof-btn')!.onclick = () => DOMElements.proofOptionsModal.classList.add('hidden');
-        }
-
-        function generateProof(selectedIds: (string | undefined)[]) {
-            const date = new Date().toLocaleString('pt-BR');
-            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://bingoshow.netlify.app`;
-            const logoSrc = appConfig.customLogoBase64;
-
-            const styles = `
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Slab:wght@700&display=swap');
-                    :root {
-                        --primary-color: #1e3a8a; /* Cor mais escura para impressão */
-                        --secondary-color: #333333;
-                        --text-color: #111111;
-                        --light-gray: #f0f0f0;
-                        --border-color: #cccccc;
-                    }
-                    body {
-                        font-family: 'Roboto', sans-serif;
-                        margin: 0;
-                        padding: 2cm;
-                        background-color: #ffffff;
-                        color: var(--text-color);
-                        line-height: 1.6;
-                        font-size: 11pt;
-                    }
-                    .report-container { max-width: 18cm; margin: auto; }
-                    .report-header { text-align: center; border-bottom: 2px solid var(--secondary-color); padding-bottom: 15px; margin-bottom: 25px; }
-                    .report-header h1 { margin: 0; font-size: 26pt; color: var(--primary-color); font-family: 'Roboto Slab', serif; }
-                    .report-header p { margin: 5px 0 0; font-size: 10pt; color: #555; }
-                    .print-button-container { text-align: center; margin-bottom: 20px; }
-                    .print-button { padding: 10px 20px; font-size: 12pt; cursor: pointer; background-color: var(--primary-color); color: white; border: none; border-radius: 5px; transition: background-color 0.2s; }
-                    .print-button:hover { background-color: #1c3276; }
-                    .section { margin-bottom: 30px; page-break-inside: avoid; }
-                    .section h2 { font-size: 18pt; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; font-family: 'Roboto Slab', serif; }
-                    .winner-block { margin-bottom: 20px; padding-left: 15px; border-left: 3px solid var(--light-gray); }
-                    .winner-block p { margin: 4px 0; }
-                    .winner-block strong { color: var(--secondary-color); font-weight: 700; }
-                    .numbers-list-container h3 { font-size: 12pt; margin-top: 15px; margin-bottom: 10px; font-style: italic; font-weight: normal; color: #444; }
-                    .numbers-list {
-                        font-family: 'Courier New', Courier, monospace;
-                        font-size: 10pt;
-                        column-count: 6;
-                        column-gap: 20px;
-                        background-color: var(--light-gray);
-                        border: 1px solid var(--border-color);
-                        padding: 15px;
-                        border-radius: 5px;
-                    }
-                    .numbers-list span { display: inline-block; width: 2.5em; text-align: right; }
-                    .report-footer {
-                        text-align: center;
-                        margin-top: 40px;
-                        padding-top: 20px;
-                        border-top: 2px solid var(--secondary-color);
-                        page-break-before: auto;
-                    }
-                    .footer-content {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        gap: 20px;
-                    }
-                    .footer-logo img {
-                        max-height: 60px;
-                        object-fit: contain;
-                    }
-                    .footer-info {
-                        font-size: 9pt;
-                        color: #555;
-                    }
-                    .footer-info p {
-                        margin: 0;
-                    }
-                    .footer-qr {
-                        text-align: center;
-                    }
-                    .footer-qr img {
-                        width: 80px;
-                        height: 80px;
-                        display: block;
-                        margin: 0 auto 5px;
-                    }
-                    .footer-qr p {
-                        font-size: 8pt;
-                        color: #555;
-                        margin: 0;
-                    }
-                    @media print {
-                        body { padding: 0; }
-                        .print-button-container { display: none; }
-                        @page { margin: 2cm; }
-                    }
-                </style>
-            `;
-        
-            let bodyContent = `<div class="report-container">`;
-            bodyContent += `<header class="report-header"><h1>Comprovante do Evento Bingo Show</h1><p>Relatório gerado em: ${date}</p></header>`;
-            bodyContent += `<div class="print-button-container"><button class="print-button" onclick="window.print()">🖨️ Imprimir Relatório</button></div>`;
-
-            selectedIds.forEach(id => {
-                if (!id) return;
-        
-                if (id.startsWith('game-')) {
-                    const gameNumber = id.replace('game-', '');
-                    const game = gamesData[gameNumber];
-                    if (game && game.winners.length > 0) {
-                        bodyContent += `<section class="section"><h2>${game.name || `Rodada ${gameNumber}`}</h2>`;
-                        game.winners.forEach((winner: any) => {
-                            bodyContent += `<div class="winner-block">
-                                              <p><strong>Ganhador:</strong> ${winner.name}</p>
-                                              <p><strong>Prêmio:</strong> ${winner.prize}</p>
-                                          </div>`;
-                            if (winner.numbers && winner.numbers.length > 0) {
-                                bodyContent += `<div class="numbers-list-container">
-                                                    <h3>Números Sorteados na Rodada (${winner.numbers.length}):</h3>
-                                                    <div class="numbers-list">${winner.numbers.map((n: number) => `<span>${n}</span>`).join('')}</div>
-                                                </div>`;
-                            }
-                        });
-                        bodyContent += `</section>`;
-                    }
-                } else if (id === 'brindes' && gamesData['Brindes']?.winners.length > 0) {
-                    bodyContent += `<section class="section"><h2>Brindes Sorteados</h2>`;
-                    gamesData['Brindes'].winners.forEach((winner: any) => {
-                        bodyContent += `<div class="winner-block">
-                                          <p><strong>Ganhador:</strong> ${winner.name}</p>
-                                          <p><strong>Prêmio:</strong> ${winner.prize}</p>
-                                          <p><strong>Nº da Cartela:</strong> ${winner.cartela}</p>
-                                      </div>`;
-                    });
-                    bodyContent += `</section>`;
-                } else if (id === 'leilao' && gamesData['Leilão']?.winners.length > 0) {
-                    bodyContent += `<section class="section"><h2>Leilão</h2>`;
-                    gamesData['Leilão'].winners.forEach((winner: any) => {
-                        bodyContent += `<div class="winner-block">
-                                          <p><strong>Arrematador:</strong> ${winner.name}</p>
-                                          <p><strong>Item:</strong> ${winner.itemName}</p>
-                                          <p><strong>Lance:</strong> R$ ${winner.bid},00</p>
-                                      </div>`;
-                    });
-                    bodyContent += `</section>`;
-                }
-            });
-        
-            bodyContent += `
-                <footer class="report-footer">
-                    <div class="footer-content">
-                        <div class="footer-logo">
-                            <img src="${logoSrc}" alt="Logo do Programa">
-                        </div>
-                        <div class="footer-info">
-                            <p><strong>Bingo Show</strong></p>
-                            <p>Versão ${currentVersion}</p>
-                            <p>bingoshow.netlify.app</p>
-                        </div>
-                        <div class="footer-qr">
-                            <img src="${qrCodeUrl}" alt="QR Code para o App">
-                            <p>Acesse o App</p>
-                        </div>
-                    </div>
-                </footer>
-            `;
-            bodyContent += `</div>`;
-        
-            const fullHtml = `
-                <!DOCTYPE html>
-                <html lang="pt-BR">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Comprovante do Bingo - ${date}</title>
-                    ${styles}
-                </head>
-                <body>
-                    ${bodyContent}
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                        }
-                    </script>
-                </body>
-                </html>
-            `;
-        
-            const blob = new Blob([fullHtml], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const proofWindow = window.open(url, '_blank');
-            if (!proofWindow) {
-                showAlert("O bloqueador de pop-ups impediu a abertura do comprovante. Por favor, habilite pop-ups para este site.");
-            }
-        }
-
-        function showFinalWinnersModal() {
-            appConfig.isEventClosed = true;
-            debouncedSave();
-
-            DOMElements.finalWinnersModal.innerHTML = getModalTemplates().finalWinners;
-            DOMElements.finalWinnersModal.classList.remove('hidden');
-            
-            const winnerDisplay = document.getElementById('current-winner-card')!;
-            const allWinners = Object.values(gamesData).flatMap(g => g.winners || []).sort((a,b) => a.id - b.id);
-            let winnerIndex = 0;
-
-            const updateWinnerDisplay = () => {
-                if (allWinners.length === 0) {
-                    winnerDisplay.innerHTML = `<h3 class="text-3xl font-bold text-white">Nenhum vencedor registrado.</h3>`;
-                    winnerDisplay.classList.add('opacity-100', 'scale-100');
-                    return;
-                }
-                const winner = allWinners[winnerIndex];
-                const game = gamesData[winner.gameNumber];
-                const prizeType = winner.bingoType === 'Sorteio' ? winner.prize : `${appLabels[winner.bingoType + 'Label' as keyof typeof appLabels]} (${winner.prize})`;
-                
-                winnerDisplay.classList.remove('opacity-100', 'scale-100');
-                winnerDisplay.classList.add('opacity-0', 'scale-90');
-
-                setTimeout(() => {
-                    winnerDisplay.innerHTML = `<p class="text-xl font-bold text-sky-400 mb-2">${game?.name || winner.gameNumber}</p>
-                                           <h3 class="text-5xl font-black text-white">${winner.name}</h3>
-                                           <p class="text-3xl font-bold text-amber-300 mt-2">${prizeType}</p>`;
-                    winnerDisplay.classList.remove('opacity-0', 'scale-90');
-                    winnerDisplay.classList.add('opacity-100', 'scale-100');
-                    winnerIndex = (winnerIndex + 1) % allWinners.length;
-                }, 500);
-            };
-
-            updateWinnerDisplay();
-            winnerDisplayTimeout = setInterval(updateWinnerDisplay, winnerDisplayDuration);
-            
-            // Lógica para exibir patrocinadores no final
-            const sponsorsListEl = document.getElementById('final-sponsors-list')!;
-            const sponsorMap = new Map<string, {name: string, image?: string}>();
-            // Adiciona patrocinadores individuais, garantindo unicidade pelo nome
-            Object.values(appConfig.sponsorsByNumber)
-                .filter(s => s && s.name)
-                .forEach(s => {
-                    if (!sponsorMap.has(s.name)) {
-                        sponsorMap.set(s.name, {name: s.name, image: s.image });
-                    }
-                });
-
-            // Adiciona o patrocinador global se ele tiver nome e não estiver já na lista
-            if (appConfig.globalSponsor && appConfig.globalSponsor.name && !sponsorMap.has(appConfig.globalSponsor.name)) {
-                sponsorMap.set(appConfig.globalSponsor.name, appConfig.globalSponsor);
-            }
-
-            const allSponsors = Array.from(sponsorMap.values());
-
-            if(allSponsors.length > 0) {
-                sponsorsListEl.innerHTML = ''; // Limpa o container
-                allSponsors.forEach(sponsor => {
-                    const sponsorEl = document.createElement('div');
-                    sponsorEl.className = 'flex flex-col items-center justify-center p-2 bg-gray-700 rounded-lg w-28 text-center';
-                    let imageHtml = '';
-                    if (sponsor.image) {
-                        imageHtml = `<img src="${sponsor.image}" alt="${sponsor.name}" class="h-16 object-contain rounded mb-1">`;
-                    }
-                    sponsorEl.innerHTML = `${imageHtml}<p class="text-xs mt-1 text-slate-300 w-full truncate" title="${sponsor.name}">${sponsor.name}</p>`;
-                    sponsorsListEl.appendChild(sponsorEl);
-                });
-            } else {
-                sponsorsListEl.innerHTML = `<p class="text-slate-400">Nenhum patrocinador cadastrado.</p>`;
-            }
-
-            document.getElementById('generate-proof-final-btn')!.addEventListener('click', () => {
-                 const allIds = Object.keys(gamesData).map(key => isNaN(parseInt(key)) ? key.toLowerCase() : `game-${key}`);
-                 generateProof(allIds);
-            });
-            document.getElementById('donation-final-btn')!.addEventListener('click', () => {
-                 DOMElements.showDonationModalBtn.click();
-            });
-            document.getElementById('close-final-modal-btn')!.addEventListener('click', () => {
-                 DOMElements.finalWinnersModal.classList.add('hidden');
-                 clearInterval(winnerDisplayTimeout);
-                 if (finalConfettiInterval) clearInterval(finalConfettiInterval);
-            });
-            
-             const startFinalConfetti = () => {
-                if (typeof confetti !== 'function') return;
-                const count = 200;
-                const defaults = { origin: { y: 0.7 }, zIndex: 1000 };
-                function fire(particleRatio: number, opts: any) {
-                    confetti({
-                        ...defaults,
-                        ...opts,
-                        particleCount: Math.floor(count * particleRatio)
-                    });
-                }
-                fire(0.25, { spread: 26, startVelocity: 55 });
-                fire(0.2, { spread: 60 });
-                fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-                fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-                fire(0.1, { spread: 120, startVelocity: 45 });
-            };
-            startFinalConfetti();
-            finalConfettiInterval = setInterval(startFinalConfetti, 3000);
-        }
-
-        function showWinnerEditModal(winnerId: number) {
-            let gameKey: string | null = null;
-            let winnerIndex = -1;
-
-            for (const key in gamesData) {
-                const index = gamesData[key].winners.findIndex((w: any) => w.id === winnerId);
-                if (index !== -1) {
-                    gameKey = key;
-                    winnerIndex = index;
-                    break;
-                }
-            }
-
-            if (!gameKey) return;
-            const winner = gamesData[gameKey].winners[winnerIndex];
-
-            DOMElements.winnerEditModal.innerHTML = getModalTemplates().winnerEdit;
-            const nameInput = document.getElementById('edit-winner-name') as HTMLInputElement;
-            const prizeInput = document.getElementById('edit-winner-prize') as HTMLInputElement;
-            nameInput.value = winner.name;
-            prizeInput.value = winner.prize;
-            
-            DOMElements.winnerEditModal.classList.remove('hidden');
-
-            document.getElementById('save-winner-changes-btn')!.onclick = () => {
-                gamesData[gameKey].winners[winnerIndex].name = nameInput.value;
-                gamesData[gameKey].winners[winnerIndex].prize = prizeInput.value;
-                renderAllWinners();
-                DOMElements.winnerEditModal.classList.add('hidden');
-                debouncedSave();
-            };
-            
-             document.getElementById('remove-winner-btn')!.onclick = () => {
-                DOMElements.deleteConfirmModal.innerHTML = getModalTemplates().deleteConfirm;
-                (document.getElementById('delete-confirm-message') as HTMLElement).textContent = `Tem certeza que deseja remover o vencedor "${winner.name}"?`;
-                (document.getElementById('confirm-delete-btn') as HTMLElement).textContent = "Remover Vencedor";
-                DOMElements.deleteConfirmModal.classList.remove('hidden');
-
-                document.getElementById('confirm-delete-btn')!.onclick = () => {
-                    gamesData[gameKey].winners.splice(winnerIndex, 1);
-                    renderAllWinners();
-                    DOMElements.deleteConfirmModal.classList.add('hidden');
-                    DOMElements.winnerEditModal.classList.add('hidden');
-                    debouncedSave();
-                };
-                 document.getElementById('cancel-delete-btn')!.onclick = () => DOMElements.deleteConfirmModal.classList.add('hidden');
-            };
-
-            document.getElementById('cancel-winner-edit-btn')!.onclick = () => DOMElements.winnerEditModal.classList.add('hidden');
-        }
-
-        function showDrawnPrizesModal() {
-            DOMElements.drawnPrizesModal.innerHTML = getModalTemplates().drawnPrizes;
-            const lastDrawnEl = document.getElementById('last-drawn-prize-display')!;
-            const historyListEl = document.getElementById('drawn-prizes-history-list')!;
-            const titleEl = document.getElementById('drawn-prizes-title')!;
-            const subtitleEl = document.getElementById('drawn-prizes-subtitle')!;
-            
-            lastDrawnEl.innerHTML = '';
-            historyListEl.innerHTML = '';
-            
-            const roundColor = (activeGameNumber && gamesData[activeGameNumber]?.color) || '#a855f7';
-            titleEl.style.color = roundColor;
-            subtitleEl.textContent = `Rodada Ativa: ${activeGameNumber ? (gamesData[activeGameNumber].name || `Rodada ${activeGameNumber}`) : 'Nenhuma'}`;
-
-            if (drawnPrizeNumbers.length > 0) {
-                const lastDrawn = drawnPrizeNumbers[drawnPrizeNumbers.length - 1];
-                const historyNumbers = drawnPrizeNumbers.slice(0, -1).sort((a, b) => a - b);
-
-                // Display Last Drawn Number
-                const lastNumberEl = document.createElement('div');
-                lastNumberEl.className = 'w-24 h-24 flex items-center justify-center text-5xl font-bold rounded-full text-white cursor-pointer hover:bg-red-600 transition-colors animate-pulse';
-                lastNumberEl.textContent = lastDrawn.toString();
-                lastNumberEl.title = 'Clique para remover este número';
-                lastNumberEl.style.backgroundColor = roundColor;
-                lastNumberEl.addEventListener('click', () => {
-                    const index = drawnPrizeNumbers.indexOf(lastDrawn);
-                    if (index > -1) {
-                        drawnPrizeNumbers.splice(index, 1);
-                        debouncedSave();
-                        showDrawnPrizesModal(); // Re-render the modal
-                    }
-                });
-                lastDrawnEl.appendChild(lastNumberEl);
-                
-                // Display History
-                if(historyNumbers.length > 0) {
-                    historyNumbers.forEach(num => {
-                        const numberEl = document.createElement('div');
-                        numberEl.className = 'w-16 h-16 flex items-center justify-center text-2xl font-bold rounded-full bg-gray-700 text-white cursor-pointer hover:bg-red-600 transition-colors';
-                        numberEl.textContent = num.toString();
-                        numberEl.title = 'Clique para remover este número';
-                        numberEl.addEventListener('click', () => {
-                            const index = drawnPrizeNumbers.indexOf(num);
-                            if (index > -1) {
-                                drawnPrizeNumbers.splice(index, 1);
-                                numberEl.remove(); // Just remove the element, no need to re-render the whole modal
-                                debouncedSave();
-                            }
-                        });
-                        historyListEl.appendChild(numberEl);
-                    });
-                } else {
-                     historyListEl.innerHTML = `<p class="text-slate-400">Nenhum outro número no histórico.</p>`;
-                }
-
-            } else {
-                lastDrawnEl.innerHTML = `<p class="text-slate-400">Nenhum brinde sorteado ainda.</p>`;
-                historyListEl.parentElement!.classList.add('hidden'); // Hide history section if no numbers
-            }
-
-            document.getElementById('close-drawn-prizes-btn')!.addEventListener('click', () => {
-                DOMElements.drawnPrizesModal.classList.add('hidden');
-            });
-            DOMElements.drawnPrizesModal.classList.remove('hidden');
-        }
-
-        function showSettingsModal() {
-            DOMElements.settingsModal.innerHTML = getModalTemplates().settings;
-            DOMElements.settingsModal.classList.remove('hidden');
-            
-            // Lógica dos Tabs
-            const tabs = ['appearance', 'sponsors', 'labels', 'shortcuts'];
-            tabs.forEach(tabId => {
-                document.getElementById(`tab-${tabId}`)!.addEventListener('click', () => {
-                    tabs.forEach(id => {
-                        document.getElementById(`tab-content-${id}`)!.classList.add('hidden');
-                        const tabBtn = document.getElementById(`tab-${id}`)!;
-                        tabBtn.classList.remove('border-sky-500', 'text-sky-400');
-                        tabBtn.classList.add('border-transparent', 'text-gray-400');
-                    });
-                    document.getElementById(`tab-content-${tabId}`)!.classList.remove('hidden');
-                    const activeTabBtn = document.getElementById(`tab-${tabId}`)!;
-                    activeTabBtn.classList.add('border-sky-500', 'text-sky-400');
-                    activeTabBtn.classList.remove('border-transparent', 'text-gray-400');
-                });
-            });
-
-            // Tab Aparência
-            const logoUpload = document.getElementById('custom-logo-upload') as HTMLInputElement;
-            const logoPreview = document.getElementById('custom-logo-preview') as HTMLImageElement;
-            const removeLogoBtn = document.getElementById('remove-custom-logo-btn')!;
-            logoPreview.src = appConfig.customLogoBase64 || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-
-            logoUpload.addEventListener('change', async (e) => {
-                const file = (e.target as HTMLInputElement).files?.[0];
-                if (file) {
-                    const base64 = await fileToBase64(file);
-                    appConfig.customLogoBase64 = base64;
-                    logoPreview.src = base64;
-                    renderCustomLogo();
-                }
-            });
-            removeLogoBtn.addEventListener('click', () => {
-                appConfig.customLogoBase64 = '';
-                logoPreview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                renderCustomLogo();
-            });
-
-            const bingoTitleSelect = document.getElementById('bingo-title-select') as HTMLSelectElement;
-            bingoTitleSelect.value = appConfig.bingoTitle;
-            bingoTitleSelect.addEventListener('change', (e) => {
-                const newValue = (e.target as HTMLSelectElement).value;
-                appConfig.bingoTitle = newValue;
-                const newLetters = newValue === 'AJUDE' ? DYNAMIC_LETTERS_AJUDE : DYNAMIC_LETTERS;
-                DYNAMIC_LETTERS.forEach((l, i) => BINGO_CONFIG[l] = BINGO_CONFIG[newLetters[i]]);
-                renderMasterBoard();
-                loadRoundState(activeGameNumber); 
-            });
-
-            const boardColorPicker = document.getElementById('board-color-picker') as HTMLInputElement;
-            boardColorPicker.value = appConfig.boardColor === 'default' ? '#374151' : appConfig.boardColor;
-            boardColorPicker.addEventListener('input', (e) => {
-                appConfig.boardColor = (e.target as HTMLInputElement).value;
-                renderMasterBoard();
-                loadRoundState(activeGameNumber);
-            });
-            document.getElementById('reset-board-color-btn')!.addEventListener('click', () => {
-                appConfig.boardColor = 'default';
-                boardColorPicker.value = '#374151';
-                renderMasterBoard();
-                loadRoundState(activeGameNumber);
-            });
-
-             const textColorPicker = document.getElementById('drawn-text-color-picker') as HTMLInputElement;
-            const strokeColorPicker = document.getElementById('drawn-stroke-color-picker') as HTMLInputElement;
-            const strokeWidthSlider = document.getElementById('drawn-stroke-width-slider') as HTMLInputElement;
-            const strokeWidthValue = document.getElementById('drawn-stroke-width-value') as HTMLElement;
-
-            textColorPicker.value = appConfig.drawnTextColor;
-            strokeColorPicker.value = appConfig.drawnTextStrokeColor;
-            strokeWidthSlider.value = appConfig.drawnTextStrokeWidth.toString();
-            strokeWidthValue.textContent = appConfig.drawnTextStrokeWidth.toString();
-
-            textColorPicker.addEventListener('input', (e) => { appConfig.drawnTextColor = (e.target as HTMLInputElement).value; announceNumber(1); });
-            strokeColorPicker.addEventListener('input', (e) => { appConfig.drawnTextStrokeColor = (e.target as HTMLInputElement).value; announceNumber(1); });
-            strokeWidthSlider.addEventListener('input', (e) => {
-                const width = parseInt((e.target as HTMLInputElement).value);
-                appConfig.drawnTextStrokeWidth = width;
-                strokeWidthValue.textContent = width.toString();
-                announceNumber(1);
-            });
-            if(activeGameNumber) cancelAnnouncedNumber(1);
-            else if(gamesData['1']) gamesData['1'].calledNumbers = [];
-
-
-             const modalAutocloseCheckbox = document.getElementById('enable-modal-autoclose') as HTMLInputElement;
-            const modalAutocloseTimer = document.getElementById('modal-autoclose-timer') as HTMLInputElement;
-            const modalAutocloseValue = document.getElementById('modal-autoclose-value') as HTMLElement;
-
-            modalAutocloseCheckbox.checked = appConfig.enableModalAutoclose;
-            modalAutocloseTimer.value = appConfig.modalAutocloseSeconds.toString();
-            modalAutocloseValue.textContent = appConfig.modalAutocloseSeconds.toString();
-
-            modalAutocloseCheckbox.addEventListener('change', (e) => {
-                appConfig.enableModalAutoclose = (e.target as HTMLInputElement).checked;
-            });
-            modalAutocloseTimer.addEventListener('input', (e) => {
-                const seconds = parseInt((e.target as HTMLInputElement).value);
-                appConfig.modalAutocloseSeconds = seconds;
-                modalAutocloseValue.textContent = seconds.toString();
-            });
-
-            // Tab Patrocinadores
-            const enableSponsorsCheckbox = document.getElementById('enable-sponsors-by-number-checkbox') as HTMLInputElement;
-            enableSponsorsCheckbox.checked = appConfig.enableSponsorsByNumber;
-            enableSponsorsCheckbox.addEventListener('change', (e) => {
-                appConfig.enableSponsorsByNumber = (e.target as HTMLInputElement).checked;
-                renderMasterBoard();
-                loadRoundState(activeGameNumber);
-            });
-            
-            const globalSponsorNameInput = document.getElementById('global-sponsor-name') as HTMLInputElement;
-            const globalSponsorUpload = document.getElementById('global-sponsor-upload') as HTMLInputElement;
-            const globalSponsorPreview = document.getElementById('global-sponsor-preview') as HTMLImageElement;
-            const removeGlobalSponsorBtn = document.getElementById('remove-global-sponsor-btn') as HTMLButtonElement;
-
-            if (appConfig.globalSponsor) {
-                globalSponsorNameInput.value = appConfig.globalSponsor.name || '';
-                globalSponsorPreview.src = appConfig.globalSponsor.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-            }
-
-            globalSponsorNameInput.addEventListener('change', (e) => {
-                appConfig.globalSponsor.name = (e.target as HTMLInputElement).value;
-            });
-
-            globalSponsorUpload.addEventListener('change', async (e) => {
-                const file = (e.target as HTMLInputElement).files?.[0];
-                if (file) {
-                    const base64 = await fileToBase64(file);
-                    appConfig.globalSponsor.image = base64;
-                    globalSponsorPreview.src = base64;
-                }
-            });
-
-            removeGlobalSponsorBtn.addEventListener('click', () => {
-                appConfig.globalSponsor = { name: '', image: '' };
-                globalSponsorNameInput.value = '';
-                globalSponsorPreview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                globalSponsorUpload.value = '';
-                deleteSponsorImage('global');
-            });
-            
-            const sponsorsContainer = document.getElementById('sponsors-by-number-container')!;
-            sponsorsContainer.innerHTML = ''; 
-            for (let i = 1; i <= 75; i++) {
-                const currentNumber = i; // FIX: Capture the loop variable `i` to prevent closure issues.
-                const sponsor = appConfig.sponsorsByNumber[currentNumber];
-                const wrapper = document.createElement('div');
-                wrapper.className = 'grid grid-cols-12 gap-2 items-center text-sm';
-                
-                const numberLabel = document.createElement('label');
-                numberLabel.className = 'col-span-1 font-bold text-slate-300';
-                numberLabel.textContent = `${currentNumber}:`;
-                
-                const nameInput = document.createElement('input');
-                nameInput.type = 'text';
-                nameInput.placeholder = 'Nome do Patrocinador';
-                nameInput.className = 'col-span-5 bg-gray-900 text-white p-2 rounded-lg';
-                nameInput.value = sponsor?.name || '';
-                nameInput.addEventListener('change', (e) => {
-                    if (!appConfig.sponsorsByNumber[currentNumber]) appConfig.sponsorsByNumber[currentNumber] = { name: '', image: '' };
-                    appConfig.sponsorsByNumber[currentNumber].name = (e.target as HTMLInputElement).value;
-                });
-
-                const imageUpload = document.createElement('input');
-                imageUpload.type = 'file';
-                imageUpload.accept = 'image/*';
-                imageUpload.className = 'col-span-5 text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100';
-                imageUpload.addEventListener('change', async (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) {
-                        const base64 = await fileToBase64(file);
-                        if (!appConfig.sponsorsByNumber[currentNumber]) {
-                            appConfig.sponsorsByNumber[currentNumber] = { name: '', image: '' };
-                        }
-                        appConfig.sponsorsByNumber[currentNumber].image = base64;
-                        await saveSponsorImage(currentNumber.toString(), base64); // FIX: Persist the image to IndexedDB
-                        renderMasterBoard();
-                        loadRoundState(activeGameNumber);
-                    }
-                });
-
-                const removeBtn = document.createElement('button');
-                removeBtn.innerHTML = '🗑️';
-                removeBtn.title = `Remover patrocinador do número ${currentNumber}`;
-                removeBtn.className = 'col-span-1 text-lg hover:text-red-500 transition-colors flex items-center justify-center';
-                removeBtn.addEventListener('click', () => {
-                    if (appConfig.sponsorsByNumber[currentNumber]) {
-                        delete appConfig.sponsorsByNumber[currentNumber];
-                        nameInput.value = '';
-                        imageUpload.value = '';
-                        deleteSponsorImage(currentNumber.toString());
-                        renderMasterBoard();
-                        loadRoundState(activeGameNumber);
-                    }
-                });
-                
-                wrapper.appendChild(numberLabel);
-                wrapper.appendChild(nameInput);
-                wrapper.appendChild(imageUpload);
-                wrapper.appendChild(removeBtn);
-                
-                sponsorsContainer.appendChild(wrapper);
-            }
-
-            // Tab Rótulos
-            populateSettingsLabelsTab();
-            ['prize1Label', 'prize2Label', 'prize3Label'].forEach(key => {
-                const input = document.getElementById(`label-${key}`) as HTMLInputElement;
-                if (input) {
-                    input.value = appLabels[key as keyof typeof appLabels];
-                    input.addEventListener('change', e => {
-                        appLabels[key as keyof typeof appLabels] = (e.target as HTMLInputElement).value;
-                        renderUIFromState();
-                        applyLabels();
-                        debouncedSave();
-                    });
-                }
-            });
-
-            // Tab Atalhos
-            populateSettingsShortcutsTab();
-
-            // Botões de Ação do Modal
-            document.getElementById('generate-test-data-btn')!.addEventListener('click', generateTestData);
-            document.getElementById('close-settings-btn')!.addEventListener('click', () => {
-                DOMElements.settingsModal.classList.add('hidden');
-                debouncedSave(); 
-            });
         }
 
         // --- Inicialização ---
+        document.addEventListener('DOMContentLoaded', () => {
+            appStore.loadInitialState().then(() => {
+                console.log("Estado inicial carregado.");
+                setupEventListeners();
+                setupGlobalKeydownListener();
+            });
+        });
 
-        /**
-         * Configura ouvintes de eventos para a funcionalidade de impressão.
-         * Atualiza dinamicamente as informações do rodapé de impressão antes de imprimir.
-         */
-        function setupPrintListeners() {
-            window.addEventListener('beforeprint', () => {
-                const printVersionEl = document.getElementById('print-version');
-                const printDateTimeEl = document.getElementById('print-datetime');
-        
-                if (printVersionEl) {
-                    printVersionEl.textContent = currentVersion;
-                }
-                if (printDateTimeEl) {
-                    printDateTimeEl.textContent = new Date().toLocaleString('pt-BR');
-                }
+        // --- Service Worker ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
             });
         }
-
-        /**
-         * Ponto de entrada principal do aplicativo.
-         * Garante que o DOM esteja totalmente carregado antes de inicializar o estado e os eventos.
-         */
-        document.addEventListener('DOMContentLoaded', () => {
-            loadInitialState();
-            setupEventListeners();
-            setupGlobalKeydownListener();
-            setupPrintListeners();
-        });

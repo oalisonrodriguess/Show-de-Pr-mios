@@ -1,5 +1,8 @@
 {
   "name": "Bingo Show",
   "description": "An interactive bingo and prize show application designed for local, offline events. Manage rounds, draw numbers, track winners, and customize the game experience.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
 }
